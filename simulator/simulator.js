@@ -5,7 +5,7 @@
 // The app (app.html) runs in an iframe of exactly the device's landscape CSS viewport; only a CSS transform on the
 // whole device scales it visually, so the app's innerWidth / innerHeight and media queries never see the window size.
 // One iframe for the whole session: switching devices resizes it and keeps the app state.
-import { DEVICES, deviceById } from "./devices.js?v=d13d2bae4b12";
+import { DEVICES, deviceById } from "./devices.js?v=ae10f1e9ab31";
 
 const $ = (id) => document.getElementById(id);
 const els = {
@@ -14,6 +14,13 @@ const els = {
   zoomButtons: [...document.querySelectorAll("[data-zoom]")],
 };
 const STAGE_PAD = 32;
+// Old links to the app itself (…/#/catalog, …/#/product/<id>) land here since the root became the simulator:
+// keep that route and open it inside the device once one is chosen.
+let appHash = location.hash.startsWith("#/") ? location.hash : "";
+if (appHash) history.replaceState(null, "", location.pathname + location.search);
+// Build id on the picker: shows at a glance whether the page is the latest deploy or a cached copy.
+const build = document.querySelector('meta[name="app-build"]')?.content;
+if (build) document.getElementById("buildId").textContent = `Сборка ${build}`;
 let current = null;
 let zoom = "fit";
 
@@ -61,7 +68,7 @@ function applyDevice(d) {
   els.meta.textContent = `${d.model} · ${d.width} × ${d.height} CSS px, горизонтально`;
   els.select.value = d.id;
   document.title = `${d.name} — витрина THE CULTT`;
-  if (first) els.app.src = `./app.html${location.search}`; // ?idle=… is passed through for testing
+  if (first) { els.app.src = `./app.html${location.search}${appHash}`; appHash = ""; } // ?idle=… is passed through for testing
   layout();
 }
 
@@ -83,6 +90,11 @@ function layout() {
 
 // ---------- Routing ----------
 function route() {
+  if (location.hash.startsWith("#/")) { // app route pasted while the simulator is open
+    appHash = location.hash;
+    history.replaceState(null, "", location.pathname + location.search + (current ? `#${current.id}` : ""));
+    if (current && els.app.contentWindow) { els.app.contentWindow.location.hash = appHash; appHash = ""; }
+  }
   const [id, z] = location.hash.slice(1).split("/");
   const d = deviceById(id);
   document.body.dataset.view = d ? "device" : "picker";

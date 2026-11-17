@@ -6,12 +6,12 @@
 //     после закрытия главное фото остается на том снимке, который смотрели;
 //   • справа неподвижная колонка: бренд + модель, тип, цена, «Примерить», короткий список характеристик.
 // Выбор на примерку — общий selection (тот же, что у каталога, панели и шторки); своего состояния нет.
-import PhotoSwipe from "../vendor/photoswipe/photoswipe.esm.min.js?v=d13d2bae4b12";
-import { createButton } from "../design-system/components/button/button.js?v=d13d2bae4b12";
-import { createTextAction } from "../design-system/components/text-action/text-action.js?v=d13d2bae4b12";
-import { createGalleryPager } from "../design-system/components/gallery-pager/gallery-pager.js?v=d13d2bae4b12";
-import { createIcon, iconMarkup } from "../design-system/icons/icon.js?v=d13d2bae4b12";
-import { money } from "./filters.js?v=d13d2bae4b12";
+import PhotoSwipe from "../vendor/photoswipe/photoswipe.esm.min.js?v=ae10f1e9ab31";
+import { createButton } from "../design-system/components/button/button.js?v=ae10f1e9ab31";
+import { createTextAction } from "../design-system/components/text-action/text-action.js?v=ae10f1e9ab31";
+import { createGalleryPager } from "../design-system/components/gallery-pager/gallery-pager.js?v=ae10f1e9ab31";
+import { createIcon, iconMarkup } from "../design-system/icons/icon.js?v=ae10f1e9ab31";
+import { money } from "./filters.js?v=ae10f1e9ab31";
 
 const h = (tag, className, ...children) => {
   const n = document.createElement(tag);

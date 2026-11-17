@@ -33,6 +33,7 @@ body.sim {
 .sim-picker__lead { margin: var(--spacing-standard-text-group) 0 0; color: var(--color-grey-7); }
 .sim-picker__list { display: flex; flex-wrap: wrap; justify-content: center; align-items: flex-end; gap: var(--spacing-spacious-group); margin-top: var(--space-48); }
 .sim-picker__direct { margin-top: var(--space-48); color: var(--color-grey-7); }
+.sim-picker__build { margin: var(--spacing-compact-inline) 0 0; color: var(--color-grey-6); font-variant-numeric: tabular-nums; }
 
 .sim-card {
   --corner-radius: 16px;

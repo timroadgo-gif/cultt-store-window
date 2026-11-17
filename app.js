@@ -3,16 +3,16 @@
 // page; the fitting tray and the fitting sheet are shared by both. "#/fitting-request" = placeholder for the step after
 // «Заказать на примерку».
 // Visitor state (catalog search / filters / sort, fitting selection) lives in memory only and is cleared when the idle timer returns the kiosk to the welcome screen.
-import { createButton } from "./design-system/components/button/button.js?v=d13d2bae4b12";
-import { idleTimeoutMs } from "./config.js?v=d13d2bae4b12";
-import { createIdleTimer } from "./idle.js?v=d13d2bae4b12";
-import { mountShowcase } from "./showcase.js?v=d13d2bae4b12";
-import { SHOWCASE_COLUMNS } from "./products.js?v=d13d2bae4b12";
-import { CATALOG_PRODUCTS } from "./catalog/products.js?v=d13d2bae4b12";
-import { createSelection } from "./catalog/selection.js?v=d13d2bae4b12";
-import { mountCatalog } from "./catalog/catalog-screen.js?v=d13d2bae4b12";
-import { mountFitting } from "./catalog/fitting-screen.js?v=d13d2bae4b12";
-import { mountProduct } from "./catalog/product-screen.js?v=d13d2bae4b12";
+import { createButton } from "./design-system/components/button/button.js?v=ae10f1e9ab31";
+import { idleTimeoutMs } from "./config.js?v=ae10f1e9ab31";
+import { createIdleTimer } from "./idle.js?v=ae10f1e9ab31";
+import { mountShowcase } from "./showcase.js?v=ae10f1e9ab31";
+import { SHOWCASE_COLUMNS } from "./products.js?v=ae10f1e9ab31";
+import { CATALOG_PRODUCTS } from "./catalog/products.js?v=ae10f1e9ab31";
+import { createSelection } from "./catalog/selection.js?v=ae10f1e9ab31";
+import { mountCatalog } from "./catalog/catalog-screen.js?v=ae10f1e9ab31";
+import { mountFitting } from "./catalog/fitting-screen.js?v=ae10f1e9ab31";
+import { mountProduct } from "./catalog/product-screen.js?v=ae10f1e9ab31";
 
 const ROUTES = { welcome: "#/", catalog: "#/catalog", fitting: "#/fitting-request", product: "#/product/" };
 const $ = (sel) => document.querySelector(sel);
@@ -38,14 +38,15 @@ function openProduct(id) {
 }
 const fitting = mountFitting($("#fittingScreen"), { byId, selection, onBack: () => go("catalog") });
 
-$("#welcomeCta").append(createButton({
+const welcomeCta = createButton({
   label: "Выбрать лоты",
   variant: "primary",
-  width: "fill",
   iconPosition: "trailing",
   icon: "arrow-right",
   onClick: () => go("catalog"),
-}));
+});
+welcomeCta.dataset.corner = "circular"; // true capsule ends (corner rule exception for fully round elements)
+$("#welcomeCta").append(welcomeCta);
 
 const idle = createIdleTimer({ timeoutMs: idleTimeoutMs(), onIdle: () => returnToWelcome() });
 

@@ -1,15 +1,15 @@
 // Каталог витрины (iPad, landscape): шапка (логотип, поиск, фильтры), категории + сортировка, активные фильтры и
 // число лотов, сетка карточек с выбором на примерку, панель примерки. Состояние каталога — в памяти, сбрасывается
 // reset() (по бездействию). Выбор на примерку живёт в selection и не сбрасывается при поиске / фильтрах / сортировке.
-import { createButton } from "../design-system/components/button/button.js?v=d13d2bae4b12";
-import { createTextAction } from "../design-system/components/text-action/text-action.js?v=d13d2bae4b12";
-import { createIcon } from "../design-system/icons/icon.js?v=d13d2bae4b12";
+import { createButton } from "../design-system/components/button/button.js?v=ae10f1e9ab31";
+import { createTextAction } from "../design-system/components/text-action/text-action.js?v=ae10f1e9ab31";
+import { createIcon } from "../design-system/icons/icon.js?v=ae10f1e9ab31";
 import {
   CATEGORIES, SORT_OPTIONS, applyCatalog, activeFilterChips, clearFilters, createCatalogState, lotsWord, money,
-} from "./filters.js?v=d13d2bae4b12";
-import { openFilterSheet } from "./filter-sheet.js?v=d13d2bae4b12";
-import { createFittingPanel } from "./fitting-panel.js?v=d13d2bae4b12";
-import { createFittingSheet } from "./fitting-sheet.js?v=d13d2bae4b12";
+} from "./filters.js?v=ae10f1e9ab31";
+import { openFilterSheet } from "./filter-sheet.js?v=ae10f1e9ab31";
+import { createFittingPanel } from "./fitting-panel.js?v=ae10f1e9ab31";
+import { createFittingSheet } from "./fitting-sheet.js?v=ae10f1e9ab31";
 
 const h = (tag, className, ...children) => {
   const n = document.createElement(tag);

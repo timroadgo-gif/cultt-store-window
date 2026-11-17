@@ -3,15 +3,16 @@
    sizes or card radius. They are app-level values of this prototype, built from UI Kit primitives where possible,
    and are proposals pending design approval (not part of tokens.json). */
 :root {
-  --kiosk-text-hero-size: clamp(56px, 7.6vh, 76px);
-  --kiosk-text-hero-line-height: 1.04;
-  --kiosk-text-lead-size: 22px;
-  --kiosk-text-lead-line-height: 30px;
-  --kiosk-text-step-size: 18px;
+  --kiosk-text-hero-size: clamp(52px, 7.4vh, 76px);
+  --kiosk-text-hero-line-height: 1.06;
+  --kiosk-text-lead-size: 20px;
+  --kiosk-text-lead-line-height: 28px;
+  --kiosk-text-step-size: 17px;
   --kiosk-text-step-line-height: 24px;
-  --kiosk-step-marker: 40px;
-  --kiosk-card-radius: 12px;
-  --kiosk-cta-width: 320px;
+  --kiosk-card-radius: 8px;
+  --kiosk-cta-height: 64px;       /* pill CTA (task requirement; UI Kit Button has only the 50 px size) */
+  --kiosk-cta-pad: var(--spacing-spacious-group);
+  --kiosk-caption-line: 18px;     /* showcase caption: fixed line so a card is a whole number of pixels */
   --kiosk-panel-pad: var(--spacing-spacious-group);
   --kiosk-intro-pad-inline: var(--spacing-spacious-hero);
   --kiosk-intro-pad-block: var(--spacing-spacious-section);
@@ -56,7 +57,7 @@ body { position: fixed; inset: 0; } /* no rubber-band scroll in iPad Safari / Ho
   -webkit-mask: url("assets/logo.svg") center / contain no-repeat;
   mask: url("assets/logo.svg") center / contain no-repeat;
 }
-.brand__tagline { color: var(--color-grey-7); }
+.welcome__brand { color: var(--color-green-7); } /* brand green, as in the catalog and the product page */
 .brand--compact .brand__logo { width: 123px; }
 
 /* ---------- Welcome: two panels ---------- */
@@ -94,19 +95,19 @@ body { position: fixed; inset: 0; } /* no rubber-band scroll in iPad Safari / Ho
 .welcome__title {
   margin: 0;
   font-family: var(--font-family-sans);
-  font-weight: var(--font-weight-regular);
+  font-weight: var(--font-weight-light);
   font-size: var(--kiosk-text-hero-size);
   line-height: var(--kiosk-text-hero-line-height);
   letter-spacing: var(--font-tracking-tight);
   color: var(--color-ink);
-  text-wrap: balance;
 }
+.welcome__line { display: block; white-space: nowrap; } /* «Более 7 000 лотов» / «доступны к примерке» */
 
 .welcome__lead {
   margin: 0;
   max-width: 30ch;
   font-family: var(--font-family-sans);
-  font-weight: var(--font-weight-regular);
+  font-weight: var(--font-weight-light);
   font-size: var(--kiosk-text-lead-size);
   line-height: var(--kiosk-text-lead-line-height);
   color: var(--color-grey-7);
@@ -117,14 +118,18 @@ body { position: fixed; inset: 0; } /* no rubber-band scroll in iPad Safari / Ho
   list-style: none;
   margin: 0;
   padding: 0;
+  max-width: 420px;
   display: flex;
   flex-direction: column;
-  gap: var(--spacing-standard-control);
+  box-shadow: inset 0 1px 0 var(--kiosk-hairline);
 }
 .steps__item {
-  display: flex;
-  align-items: center;
-  gap: var(--spacing-standard-block);
+  display: grid;
+  grid-template-columns: 40px minmax(0, 1fr);
+  align-items: baseline;
+  gap: var(--spacing-standard-control);
+  padding: var(--spacing-standard-control) 0;
+  box-shadow: inset 0 -1px 0 var(--kiosk-hairline);
   font-family: var(--font-family-sans);
   font-weight: var(--font-weight-regular);
   font-size: var(--kiosk-text-step-size);
@@ -132,20 +137,24 @@ body { position: fixed; inset: 0; } /* no rubber-band scroll in iPad Safari / Ho
   color: var(--color-ink);
 }
 .steps__num {
-  --corner-radius: calc(var(--kiosk-step-marker) / 2);
-  flex: none;
-  display: grid;
-  place-items: center;
-  width: var(--kiosk-step-marker);
-  height: var(--kiosk-step-marker);
-  border: 1px solid var(--color-grey-6);
-  color: var(--color-grey-7);
-  font-size: var(--text-body-size);
-  line-height: 1;
+  font-size: var(--text-body-s-size);
+  line-height: var(--kiosk-text-step-line-height);
+  font-weight: var(--font-weight-medium);
+  letter-spacing: var(--font-tracking-open);
+  color: var(--color-green-7);
   font-variant-numeric: tabular-nums;
 }
 
-.welcome__cta { flex: none; width: var(--kiosk-cta-width); max-width: 100%; }
+.welcome__cta { flex: none; }
+/* Pill CTA: the UI Kit primary Button (brand green, Manrope 500) with a taller, fully rounded geometry. */
+.welcome__cta .ds-button {
+  --_height: var(--kiosk-cta-height);
+  --_pad: var(--kiosk-cta-pad);
+  --_fs: var(--text-heading-s-size);
+  --_lh: var(--text-heading-s-line-height);
+  --corner-radius: calc(var(--kiosk-cta-height) / 2);
+  min-width: 264px;
+}
 
 /* ---------- Showcase ---------- */
 .showcase {
@@ -179,33 +188,32 @@ body { position: fixed; inset: 0; } /* no rubber-band scroll in iPad Safari / Ho
   to { transform: translate3d(0, 0, 0); }
 }
 
+/* Card = 3:4 photo + one-line caption on the green. Height is set in whole pixels by showcase.js. */
 .showcase-card {
-  --corner-radius: var(--kiosk-card-radius);
   position: relative;
   flex: none;
-  margin: 0 0 var(--spacing-standard-control); /* trailing gap per card: one sequence = exactly half the track */
-  height: var(--showcase-card-height, auto);
-  aspect-ratio: 1; /* fallback until showcase.js sets the whole-pixel height */
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-compact-inline);
+  margin: 0 0 var(--spacing-standard-block); /* trailing gap per card: one sequence = exactly half the track */
+}
+.showcase-card__media {
+  --corner-radius: var(--kiosk-card-radius);
+  height: var(--showcase-photo-height, auto);
+  aspect-ratio: 3 / 4; /* fallback until showcase.js sets the whole-pixel height */
   overflow: hidden;
   background: var(--kiosk-card-bg);
 }
-.showcase-card__image {
-  display: block;
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  object-position: 50% 92%;
-  pointer-events: none;
-}
+.showcase-card__image { display: block; width: 100%; height: 100%; object-fit: cover; pointer-events: none; }
 .showcase-card__label {
-  --corner-radius: var(--button-size-large-radius);
-  position: absolute;
-  left: var(--spacing-standard-text-group);
-  bottom: var(--spacing-standard-text-group);
-  max-width: calc(100% - 2 * var(--spacing-standard-text-group));
-  padding: var(--spacing-compact-stack) var(--spacing-compact-inline);
-  background: var(--color-white);
-  color: var(--color-ink);
+  margin: 0;
+  height: var(--kiosk-caption-line);
+  font-family: var(--font-family-sans);
+  font-weight: var(--font-weight-light);
+  font-size: var(--text-body-s-size);
+  line-height: var(--kiosk-caption-line);
+  letter-spacing: var(--font-tracking-open);
+  color: color-mix(in srgb, var(--color-white) 78%, transparent);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;

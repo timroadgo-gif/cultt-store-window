@@ -17,43 +17,43 @@
     <link rel="icon" type="image/png" sizes="32x32" href="./icons/favicon-32.png" />
     <link rel="preload" href="./design-system/fonts/manrope-cyrillic-wght-normal.woff2" as="font" type="font/woff2" crossorigin />
     <link rel="preload" href="./design-system/fonts/manrope-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin />
-    <link rel="stylesheet" href="./design-system/fonts/fonts.css?v=d13d2bae4b12" />
-    <link rel="stylesheet" href="./design-system/tokens/tokens.css?v=d13d2bae4b12" />
-    <link rel="stylesheet" href="./design-system/css/corners.css?v=d13d2bae4b12" />
-    <link rel="stylesheet" href="./design-system/css/typography.css?v=d13d2bae4b12" />
-    <link rel="stylesheet" href="./design-system/icons/icon.css?v=d13d2bae4b12" />
-    <link rel="stylesheet" href="./design-system/css/backdrop.css?v=d13d2bae4b12" />
-    <link rel="stylesheet" href="./design-system/components/button/button.css?v=d13d2bae4b12" />
-    <link rel="stylesheet" href="./design-system/components/field/field.css?v=d13d2bae4b12" />
-    <link rel="stylesheet" href="./design-system/components/checkbox/checkbox.css?v=d13d2bae4b12" />
-    <link rel="stylesheet" href="./design-system/components/text-action/text-action.css?v=d13d2bae4b12" />
-    <link rel="stylesheet" href="./design-system/components/gallery-pager/gallery-pager.css?v=d13d2bae4b12" />
-    <link rel="stylesheet" href="./vendor/photoswipe/photoswipe.css?v=d13d2bae4b12" />
-    <link rel="stylesheet" href="./styles.css?v=d13d2bae4b12" />
-    <link rel="stylesheet" href="./catalog/catalog.css?v=d13d2bae4b12" />
-    <link rel="stylesheet" href="./catalog/product.css?v=d13d2bae4b12" />
-    <meta name="build" content="d13d2bae4b12" />
-  <meta name="app-build" content="d13d2bae4b12" />
+    <link rel="stylesheet" href="./design-system/fonts/fonts.css?v=ae10f1e9ab31" />
+    <link rel="stylesheet" href="./design-system/tokens/tokens.css?v=ae10f1e9ab31" />
+    <link rel="stylesheet" href="./design-system/css/corners.css?v=ae10f1e9ab31" />
+    <link rel="stylesheet" href="./design-system/css/typography.css?v=ae10f1e9ab31" />
+    <link rel="stylesheet" href="./design-system/icons/icon.css?v=ae10f1e9ab31" />
+    <link rel="stylesheet" href="./design-system/css/backdrop.css?v=ae10f1e9ab31" />
+    <link rel="stylesheet" href="./design-system/components/button/button.css?v=ae10f1e9ab31" />
+    <link rel="stylesheet" href="./design-system/components/field/field.css?v=ae10f1e9ab31" />
+    <link rel="stylesheet" href="./design-system/components/checkbox/checkbox.css?v=ae10f1e9ab31" />
+    <link rel="stylesheet" href="./design-system/components/text-action/text-action.css?v=ae10f1e9ab31" />
+    <link rel="stylesheet" href="./design-system/components/gallery-pager/gallery-pager.css?v=ae10f1e9ab31" />
+    <link rel="stylesheet" href="./vendor/photoswipe/photoswipe.css?v=ae10f1e9ab31" />
+    <link rel="stylesheet" href="./styles.css?v=ae10f1e9ab31" />
+    <link rel="stylesheet" href="./catalog/catalog.css?v=ae10f1e9ab31" />
+    <link rel="stylesheet" href="./catalog/product.css?v=ae10f1e9ab31" />
+    <meta name="build" content="ae10f1e9ab31" />
+  <meta name="app-build" content="ae10f1e9ab31" />
   <script>(()=>{const m=document.querySelector('meta[name="app-build"]');if(!m||!window.fetch)return;const cur=m.content;const url=new URL('version.json',document.baseURI);const check=()=>fetch(url+'?t='+Date.now(),{cache:'no-store'}).then(r=>r.ok?r.json():null).then(v=>{if(!v||!v.build||v.build===cur)return;const k='app-build-reload:'+v.build;try{if(sessionStorage.getItem(k))return;sessionStorage.setItem(k,'1')}catch(e){}const u=new URL(location.href);u.searchParams.set('v',v.build);location.replace(u.href)}).catch(()=>{});check();document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible')check()});addEventListener('pageshow',e=>{if(e.persisted)check()})})();</script>
   </head>
   <body>
     <!-- Welcome / attract screen. It is also the idle state the kiosk returns to. -->
     <main class="welcome" data-screen-id="welcome" aria-labelledby="welcomeTitle">
       <section class="welcome__intro">
-        <div class="brand" role="img" aria-label="THE CULTT, ресейл-платформа">
+        <div class="brand welcome__brand" role="img" aria-label="THE CULTT">
           <span class="brand__logo" aria-hidden="true"></span>
-          <span class="brand__tagline ds-text-overline" aria-hidden="true">Ресейл-платформа</span>
         </div>
 
         <div class="welcome__content">
           <div class="welcome__text">
-            <h1 class="welcome__title" id="welcomeTitle">Более 7&nbsp;000 лотов доступны к&nbsp;примерке</h1>
+            <h1 class="welcome__title" id="welcomeTitle"><span class="welcome__line">Более 7&nbsp;000 лотов</span> <span class="welcome__line">доступны к&nbsp;примерке</span></h1>
             <p class="welcome__lead">Выберите свои — принесем со&nbsp;склада за&nbsp;несколько минут</p>
           </div>
-          <ol class="steps">
-            <li class="steps__item"><span class="steps__num ds-corner" data-corner="circular">1</span><span>Выберите лоты</span></li>
-            <li class="steps__item"><span class="steps__num ds-corner" data-corner="circular">2</span><span>Нажмите «Заказать на&nbsp;примерку»</span></li>
-            <li class="steps__item"><span class="steps__num ds-corner" data-corner="circular">3</span><span>Назовите номер консультанту</span></li>
+          <!-- Editorial steps: small green numerals, hairline rules, no markers or boxes. -->
+          <ol class="steps" aria-label="Как заказать примерку">
+            <li class="steps__item"><span class="steps__num" aria-hidden="true">01</span><span class="steps__text">Выберите лоты</span></li>
+            <li class="steps__item"><span class="steps__num" aria-hidden="true">02</span><span class="steps__text">Нажмите «Заказать на&nbsp;примерку»</span></li>
+            <li class="steps__item"><span class="steps__num" aria-hidden="true">03</span><span class="steps__text">Назовите номер консультанту</span></li>
           </ol>
         </div>
 
@@ -73,6 +73,6 @@
     <!-- Placeholder for the step after «Заказать на примерку» (catalog/fitting-screen.js). -->
     <main class="kf" id="fittingScreen" data-screen-id="fitting" aria-labelledby="fittingTitle" hidden></main>
 
-    <script type="module" src="./app.js?v=d13d2bae4b12"></script>
+    <script type="module" src="./app.js?v=ae10f1e9ab31"></script>
   </body>
 </html>

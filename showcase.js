@@ -3,11 +3,13 @@
 // by exactly one sequence (translateY 0 → -50 %, or the reverse), so the last frame equals the first.
 // Every card carries its own trailing gap (margin-bottom), so one sequence is exactly half the track.
 // Duration = sequence height / speed, so both columns move at the same constant px/s at any screen size.
-import { SHOWCASE_SPEED_PX_S } from "./config.js?v=d13d2bae4b12";
+import { SHOWCASE_SPEED_PX_S } from "./config.js?v=ae10f1e9ab31";
 
 const card = ({ name, image }) => {
   const el = document.createElement("figure");
-  el.className = "showcase-card ds-corner";
+  el.className = "showcase-card";
+  const media = document.createElement("div");
+  media.className = "showcase-card__media ds-corner";
   const img = document.createElement("img");
   img.className = "showcase-card__image";
   img.src = image;
@@ -15,9 +17,10 @@ const card = ({ name, image }) => {
   img.decoding = "async";
   img.draggable = false;
   const label = document.createElement("figcaption");
-  label.className = "showcase-card__label ds-corner ds-text-body-s";
+  label.className = "showcase-card__label";
   label.textContent = name;
-  el.append(img, label);
+  media.append(img);
+  el.append(media, label);
   return el;
 };
 
@@ -38,9 +41,9 @@ export function mountShowcase(root, columns) {
   const layout = () => {
     for (const { col, track, items } of tracks) {
       track.replaceChildren();
-      // Whole-pixel card height (square, = column width): one sequence is then an integer distance, so the
-      // wrap from -50 % back to 0 lands on the same pixel grid and shows no sub-pixel shift.
-      track.style.setProperty("--showcase-card-height", `${Math.round(col.clientWidth)}px`);
+      // Whole-pixel 3:4 photo height (caption line and gaps are whole pixels too): one sequence is then an integer
+      // distance, so the wrap from -50 % back to 0 lands on the same pixel grid and shows no sub-pixel shift.
+      track.style.setProperty("--showcase-photo-height", `${Math.round((col.clientWidth * 4) / 3)}px`);
       const seq = () => items.map(card);
       track.append(...seq());
       const seqHeight = track.scrollHeight;

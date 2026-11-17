@@ -3,16 +3,16 @@
 // page; the fitting tray and the fitting sheet are shared by both. "#/fitting-request" = placeholder for the step after
 // «Заказать на примерку».
 // Visitor state (catalog search / filters / sort, fitting selection) lives in memory only and is cleared when the idle timer returns the kiosk to the welcome screen.
-import { createButton } from "./design-system/components/button/button.js?v=99a3a2d742ee";
-import { idleTimeoutMs } from "./config.js?v=99a3a2d742ee";
-import { createIdleTimer } from "./idle.js?v=99a3a2d742ee";
-import { mountShowcase } from "./showcase.js?v=99a3a2d742ee";
-import { SHOWCASE_COLUMNS } from "./products.js?v=99a3a2d742ee";
-import { CATALOG_PRODUCTS } from "./catalog/products.js?v=99a3a2d742ee";
-import { createSelection } from "./catalog/selection.js?v=99a3a2d742ee";
-import { mountCatalog } from "./catalog/catalog-screen.js?v=99a3a2d742ee";
-import { mountFitting } from "./catalog/fitting-screen.js?v=99a3a2d742ee";
-import { mountProduct } from "./catalog/product-screen.js?v=99a3a2d742ee";
+import { createButton } from "./design-system/components/button/button.js?v=c296ea813e20";
+import { idleTimeoutMs } from "./config.js?v=c296ea813e20";
+import { createIdleTimer } from "./idle.js?v=c296ea813e20";
+import { mountShowcase } from "./showcase.js?v=c296ea813e20";
+import { SHOWCASE_COLUMNS } from "./products.js?v=c296ea813e20";
+import { CATALOG_PRODUCTS } from "./catalog/products.js?v=c296ea813e20";
+import { createSelection } from "./catalog/selection.js?v=c296ea813e20";
+import { mountCatalog } from "./catalog/catalog-screen.js?v=c296ea813e20";
+import { mountFitting } from "./catalog/fitting-screen.js?v=c296ea813e20";
+import { mountProduct } from "./catalog/product-screen.js?v=c296ea813e20";
 
 const ROUTES = { welcome: "#/", catalog: "#/catalog", fitting: "#/fitting-request", product: "#/product/" };
 const $ = (sel) => document.querySelector(sel);

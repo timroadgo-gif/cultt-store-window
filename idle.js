@@ -4,7 +4,8 @@
 //   idle.start();   // arm (also resets on any pointer / touch / key / wheel activity)
 //   idle.stop();    // disarm, listeners stay
 //   idle.dispose(); // disarm and remove every listener
-const ACTIVITY_EVENTS = ["pointerdown", "pointermove", "keydown", "wheel", "touchstart"];
+// "input" covers the iPad on-screen keyboard; "scroll" (captured from any scroller) covers momentum scrolling.
+const ACTIVITY_EVENTS = ["pointerdown", "pointermove", "keydown", "input", "wheel", "touchstart", "scroll"];
 
 export function createIdleTimer({ timeoutMs, onIdle, target = document } = {}) {
   if (!(timeoutMs > 0)) throw new Error("createIdleTimer: timeoutMs must be > 0");

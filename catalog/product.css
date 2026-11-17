@@ -1,0 +1,204 @@
+/* Product page (iPad landscape): thumbnails rail · main 3:4 photo (full available height) · fixed info column.
+   The bottom band is always reserved for the shared fitting tray, so adding the first lot never shifts the layout.
+   Kiosk-only values below (pending design approval); everything else comes from UI Kit tokens. */
+:root {
+  --kp-pad: var(--kc-pad);
+  --kp-thumb-w: 72px;
+  --kp-gap: var(--spacing-standard-control);
+  --kp-col-gap: var(--spacing-spacious-section);
+  --kp-info-max: 440px;
+  --kp-title-size: 32px;
+  --kp-title-line: 40px;
+  --kp-price-size: 24px;
+  --kp-price-line: 32px;
+  --kp-cta-max: 400px;
+  --kp-tray-reserve: calc(var(--kc-panel-height) + var(--kc-panel-bottom) + var(--spacing-standard-block) + var(--safe-bottom));
+}
+
+.kp {
+  position: relative;
+  isolation: isolate;
+  display: flex;
+  flex-direction: column;
+  height: 100dvh;
+  min-height: 100%;
+  overflow: hidden;
+  background: var(--kiosk-surface);
+}
+.kp.is-entering .kp-body { animation: kp-in 260ms var(--kc-ease); }
+@keyframes kp-in { from { opacity: 0; } to { opacity: 1; } }
+
+/* ---------- Header ---------- */
+.kp-bar {
+  flex: none;
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  padding: calc(var(--spacing-standard-block) + var(--safe-top)) calc(var(--kp-pad) + var(--safe-right)) var(--spacing-standard-block) calc(var(--kp-pad) + var(--safe-left));
+}
+.kp-bar__start { justify-self: start; }
+.kp-logo { color: var(--color-green-7); }
+
+/* ---------- Body ---------- */
+.kp-body {
+  flex: 1 1 auto;
+  min-height: 0;
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: var(--kp-col-gap);
+  padding: 0 calc(var(--kp-pad) + var(--safe-right)) var(--kp-tray-reserve) calc(var(--kp-pad) + var(--safe-left));
+}
+
+/* ---------- Gallery ---------- */
+.kp-gallery { height: 100%; min-height: 0; display: flex; gap: var(--kp-gap); }
+.kp-thumbs {
+  flex: none;
+  width: var(--kp-thumb-w);
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-compact-inline);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-width: none;
+  padding: 2px; /* room for the active outline */
+  margin: -2px;
+}
+.kp-thumbs::-webkit-scrollbar { display: none; }
+.kp-thumb {
+  --corner-radius: var(--kc-product-radius);
+  flex: none;
+  width: 100%;
+  aspect-ratio: 3 / 4;
+  padding: 0;
+  border: 0;
+  overflow: hidden;
+  background: var(--color-grey-1);
+  cursor: pointer;
+  opacity: .72;
+  transition: opacity 160ms var(--kc-ease), box-shadow 160ms var(--kc-ease);
+  -webkit-tap-highlight-color: transparent;
+}
+.kp-thumb img { display: block; width: 100%; height: 100%; object-fit: cover; pointer-events: none; }
+.kp-thumb[aria-selected="true"] { opacity: 1; box-shadow: 0 0 0 1px var(--color-ink); }
+.kp-thumb:focus-visible { outline: 2px solid var(--color-ink); outline-offset: 2px; }
+
+.kp-main {
+  --corner-radius: var(--kc-product-radius);
+  position: relative;
+  height: 100%;
+  aspect-ratio: 3 / 4; /* the photos are 3:4: the frame never crops or stretches them */
+  overflow: hidden;
+  background: var(--color-grey-1);
+}
+.kp-track {
+  display: flex;
+  width: 100%;
+  height: 100%;
+  overflow-x: auto;
+  overflow-y: hidden;
+  scroll-snap-type: x mandatory;
+  overscroll-behavior-x: contain; /* a swipe at the last photo never turns into browser back navigation */
+  scrollbar-width: none;
+  touch-action: pan-x;
+}
+.kp-track::-webkit-scrollbar { display: none; }
+.kp-slide {
+  flex: 0 0 100%;
+  height: 100%;
+  padding: 0;
+  border: 0;
+  background: none;
+  scroll-snap-align: start;
+  scroll-snap-stop: always;
+  cursor: zoom-in;
+  -webkit-tap-highlight-color: transparent;
+}
+.kp-slide__image { display: block; width: 100%; height: 100%; object-fit: cover; -webkit-user-drag: none; pointer-events: none; }
+.kp-pager { position: absolute; left: var(--spacing-standard-control); bottom: var(--spacing-standard-control); pointer-events: none; }
+
+/* ---------- Info ---------- */
+.kp-info { min-width: 0; max-width: var(--kp-info-max); display: flex; flex-direction: column; gap: var(--spacing-spacious-group); overflow-y: auto; padding-top: var(--spacing-compact-inline); scrollbar-width: none; }
+.kp-info::-webkit-scrollbar { display: none; }
+.kp-head { display: flex; flex-direction: column; }
+.kp-title {
+  margin: 0;
+  font-family: var(--font-family-sans);
+  font-weight: var(--font-weight-regular);
+  font-size: var(--kp-title-size);
+  line-height: var(--kp-title-line);
+  letter-spacing: var(--font-tracking-tight);
+  color: var(--color-ink);
+  text-wrap: balance;
+}
+.kp-kind { margin: var(--spacing-compact-inline) 0 0; color: var(--color-grey-7); }
+.kp-price {
+  margin: var(--spacing-standard-control) 0 0;
+  font-family: var(--font-family-sans);
+  font-weight: var(--font-weight-regular);
+  font-size: var(--kp-price-size);
+  line-height: var(--kp-price-line);
+  color: var(--color-ink);
+  font-variant-numeric: tabular-nums;
+}
+
+.kp-actions { display: flex; flex-direction: column; gap: var(--spacing-standard-text-group); max-width: var(--kp-cta-max); }
+.kp-status { display: flex; align-items: center; gap: var(--spacing-compact-inline); margin: 0; color: var(--color-ink); }
+.kp-status__icon { --corner-radius: 12px; display: grid; place-items: center; width: 24px; height: 24px; background: var(--color-ink); color: var(--color-white); }
+.kp-status.is-new { animation: kp-status-in 240ms var(--kc-ease); }
+@keyframes kp-status-in { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: none; } }
+.kp-note { margin: 0; color: var(--color-grey-7); }
+.kp-limit {
+  --corner-radius: var(--kc-menu-radius);
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--spacing-compact-stack);
+  padding: var(--spacing-standard-text-group) var(--spacing-standard-control);
+  background: var(--color-grey-1);
+  color: var(--color-ink);
+}
+.kp-limit p { margin: 0; }
+.kp-limit .ds-text-action { padding-left: 0; padding-right: 0; min-height: 32px; }
+.kp-limit.is-shown { animation: kp-status-in 220ms var(--kc-ease); }
+
+.kp-about { display: flex; flex-direction: column; gap: var(--spacing-standard-control); padding-top: var(--spacing-standard-block); box-shadow: inset 0 1px 0 var(--kiosk-hairline); }
+.kp-about__title { margin: 0; color: var(--color-grey-7); }
+.kp-details { display: grid; grid-template-columns: 112px minmax(0, 1fr); gap: var(--spacing-standard-text-group) var(--spacing-standard-control); margin: 0; align-items: baseline; }
+.kp-details__label { margin: 0; color: var(--color-grey-7); }
+.kp-details__value { margin: 0; color: var(--color-ink); }
+
+/* ---------- Fullscreen (PhotoSwipe): ink background, UI Kit icons ---------- */
+.kp-pswp { --pswp-bg: var(--color-ink); --pswp-icon-color: var(--color-white); --pswp-icon-color-secondary: var(--color-ink); --pswp-icon-stroke-width: 0; }
+.kp-pswp .pswp__icn { fill: none; stroke: currentColor; color: var(--color-white); width: 26px; height: 26px; position: static; top: auto; left: auto; overflow: visible; }
+.kp-pswp .pswp__button { display: grid; place-items: center; width: 64px; height: 64px; padding: 0; color: var(--color-white); opacity: .9; }
+.kp-pswp .pswp__button--close { margin-right: var(--spacing-compact-inline); }
+.kp-pswp .pswp__button--arrow { width: 72px; height: 96px; margin-top: -48px; }
+.kp-pswp .pswp__button--arrow .pswp__icn { width: 28px; height: 28px; }
+.kp-pswp .pswp__button--arrow--next .pswp__icn { transform: none; }
+.kp-pswp .pswp__top-bar { padding: var(--safe-top) var(--safe-right) 0 var(--safe-left); height: auto; }
+.kp-pswp .pswp__counter { font: var(--text-body-weight) var(--text-body-size) / 64px var(--font-family-sans); margin-left: var(--spacing-standard-block); opacity: .8; color: var(--color-white); text-shadow: none; }
+.kp-pswp .pswp__button--zoom { display: none; } /* zoom by pinch / double tap; the icon is a magnifier, not a zoom control */
+
+/* ---------- Catalog card opens the product ---------- */
+.kc-card__open {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-standard-text-group);
+  width: 100%;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+.kc-card__open:active .kc-card__media { opacity: .92; }
+.kc-card__open:focus-visible { outline: 2px solid var(--color-ink); outline-offset: 4px; }
+
+@media (prefers-reduced-motion: reduce) {
+  .kp.is-entering .kp-body, .kp-status.is-new, .kp-limit.is-shown { animation: none; }
+  .kp-thumb { transition: none; }
+}

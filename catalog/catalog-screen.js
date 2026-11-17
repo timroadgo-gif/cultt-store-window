@@ -1,15 +1,15 @@
 // Каталог витрины (iPad, landscape): шапка (логотип, поиск, фильтры), категории + сортировка, активные фильтры и
 // число лотов, сетка карточек с выбором на примерку, панель примерки. Состояние каталога — в памяти, сбрасывается
 // reset() (по бездействию). Выбор на примерку живёт в selection и не сбрасывается при поиске / фильтрах / сортировке.
-import { createButton } from "../design-system/components/button/button.js?v=9e6b2e092cb9";
-import { createTextAction } from "../design-system/components/text-action/text-action.js?v=9e6b2e092cb9";
-import { createIcon } from "../design-system/icons/icon.js?v=9e6b2e092cb9";
+import { createButton } from "../design-system/components/button/button.js?v=5bc579cdda05";
+import { createTextAction } from "../design-system/components/text-action/text-action.js?v=5bc579cdda05";
+import { createIcon } from "../design-system/icons/icon.js?v=5bc579cdda05";
 import {
   CATEGORIES, SORT_OPTIONS, applyCatalog, activeFilterChips, clearFilters, createCatalogState, lotsWord, money,
-} from "./filters.js?v=9e6b2e092cb9";
-import { openFilterSheet } from "./filter-sheet.js?v=9e6b2e092cb9";
-import { createFittingPanel } from "./fitting-panel.js?v=9e6b2e092cb9";
-import { createFittingSheet } from "./fitting-sheet.js?v=9e6b2e092cb9";
+} from "./filters.js?v=5bc579cdda05";
+import { openFilterSheet } from "./filter-sheet.js?v=5bc579cdda05";
+import { createFittingPanel } from "./fitting-panel.js?v=5bc579cdda05";
+import { createFittingSheet } from "./fitting-sheet.js?v=5bc579cdda05";
 
 const h = (tag, className, ...children) => {
   const n = document.createElement(tag);
@@ -22,7 +22,7 @@ const FILTERS_ICON_URL = "assets/filters.svg";
 let filtersIconMarkup = null;
 const loadFiltersIcon = () => (filtersIconMarkup ??= fetch(FILTERS_ICON_URL).then((r) => r.text()).catch(() => ""));
 
-export function mountCatalog(root, { products, selection, onSubmitFitting }) {
+export function mountCatalog(root, { products, selection, onSubmitFitting, onOpenProduct, onAddMore }) {
   const state = createCatalogState();
   const byId = new Map(products.map((p) => [p.id, p]));
 
@@ -99,7 +99,7 @@ export function mountCatalog(root, { products, selection, onSubmitFitting }) {
   toast.hidden = true;
 
   // «Открыть примерку» → bottom sheet over the catalog; it reads and edits the same selection.
-  const fittingSheet = createFittingSheet({ byId, selection, onSubmit: () => onSubmitFitting?.() });
+  const fittingSheet = createFittingSheet({ byId, selection, onSubmit: () => onSubmitFitting?.(), onAddMore: () => onAddMore?.() });
   const panel = createFittingPanel({ byId, limit: selection.limit, onOpen: () => { closeMenu(); hideToast(); fittingSheet.open(); } });
   root.append(top, nav, scroller, toast, panel.el);
 
@@ -128,7 +128,12 @@ export function mountCatalog(root, { products, selection, onSubmitFitting }) {
       name,
       h("p", "kc-card__price ds-text-body", money(p.price)),
     );
-    const card = h("article", "kc-card", media, add, info);
+    // Photo and text open the product page; the «+» control keeps its own job (selection).
+    const open = h("button", "kc-card__open", media, info);
+    open.type = "button";
+    open.setAttribute("aria-label", `${p.brand} ${p.name}, ${p.condition.toLowerCase()}, ${money(p.price)} — открыть`);
+    open.addEventListener("click", () => onOpenProduct?.(p.id));
+    const card = h("article", "kc-card", open, add);
     card.dataset.id = p.id;
     card.setAttribute("role", "listitem");
     paintCard(card, p);
@@ -303,5 +308,5 @@ export function mountCatalog(root, { products, selection, onSubmitFitting }) {
   }
 
   update();
-  return { reset, onSelectionChange, get state() { return state; }, scroller, closeOverlays: () => { closeMenu(); sheet?.close({ immediate: true }); fittingSheet.close({ immediate: true }); }, fittingSheet };
+  return { reset, onSelectionChange, get state() { return state; }, scroller, closeOverlays: () => { closeMenu(); sheet?.close({ immediate: true }); }, fittingSheet, panel, closeFittingSheet: () => fittingSheet.close({ immediate: true }) };
 }

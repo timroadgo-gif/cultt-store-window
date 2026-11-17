@@ -10,10 +10,10 @@
   --kc-product-radius: 4px; /* = mobile catalog .collection-product-media */
   --kc-add-visual: 28px;
   --kc-add-radius: 6px;
-  --kc-panel-height: 66px;
+  --kc-panel-height: 76px;
   --kc-panel-radius: 16px;
   --kc-panel-bottom: var(--spacing-standard-control);
-  --kc-thumb: 40px;
+  --kc-thumb: 44px;
   --kc-thumb-radius: 6px;
   --kc-sheet-width: 400px;
   --kc-sheet-radius: 16px;
@@ -76,8 +76,10 @@
 .kc-controls { flex: none; display: flex; align-items: center; gap: var(--spacing-compact-inline); }
 .kc-filters-slot { flex: none; min-width: 132px; display: flex; justify-content: flex-end; }
 .kc-sort-wrap { position: relative; flex: none; }
-.kc-sort .ds-button__icon { transition: transform var(--motion-duration-fast) ease; }
-.kc-sort[aria-expanded="true"] .ds-button__icon { transform: rotate(180deg); }
+.kc-sort { gap: var(--spacing-compact-inline); }
+.ds-button.kc-sort .kc-sort__icon { order: -1; } /* stays before the label even in the trailing-icon variant; sized by the button like the filters icon */
+.kc-sort__chevron { color: var(--color-grey-7); transition: transform var(--motion-duration-fast) ease; }
+.kc-sort[aria-expanded="true"] .kc-sort__chevron { transform: rotate(180deg); }
 
 /* ---------- Categories + sort ---------- */
 .kc-nav {
@@ -296,9 +298,13 @@
   gap: var(--spacing-standard-block);
   height: var(--kc-panel-height);
   padding: 0 var(--spacing-standard-text-group) 0 var(--spacing-standard-block);
-  background: var(--color-white);
+  /* floating utility: light neutral surface, defined hairline, soft two-layer shadow */
+  background: var(--color-grey-1);
   color: var(--color-ink);
-  box-shadow: inset 0 0 0 1px var(--kiosk-hairline), 0 4px 16px color-mix(in srgb, var(--color-ink) 6%, transparent);
+  box-shadow:
+    inset 0 0 0 1px color-mix(in srgb, var(--color-ink) 10%, transparent),
+    0 1px 3px color-mix(in srgb, var(--color-ink) 6%, transparent),
+    0 12px 32px color-mix(in srgb, var(--color-ink) 12%, transparent);
   transition: transform 360ms var(--kc-ease), opacity 240ms var(--kc-ease);
 }
 .kc-panel[data-state="hidden"] { transform: translateY(calc(100% + var(--kc-panel-bottom) + var(--safe-bottom))); opacity: 0; pointer-events: none; }
@@ -318,12 +324,20 @@
   width: var(--kc-thumb);
   height: var(--kc-thumb);
   overflow: hidden;
-  background: var(--color-grey-1);
+  background: var(--color-white);
+  box-shadow: inset 0 0 0 1px var(--kiosk-hairline);
 }
 .kc-panel__thumb img { display: block; width: 100%; height: 100%; object-fit: cover; }
 .kc-panel__thumb.is-new { animation: kc-thumb-in 240ms var(--kc-ease); }
 @keyframes kc-thumb-in { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
-.kc-panel__cta { flex: none; }
+.kc-panel__cta {
+  flex: none;
+  --_height: 52px;
+  --_pad: var(--spacing-spacious-group);
+  --corner-radius: 26px;
+  --_fs: var(--text-heading-s-size); /* 16 px label, as on the start-screen CTA */
+  --_lh: var(--text-heading-s-line-height);
+}
 
 /* ---------- Filters panel (modal, right) ---------- */
 .kc-sheet {

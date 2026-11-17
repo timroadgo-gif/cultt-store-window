@@ -3,7 +3,7 @@
 // by exactly one sequence (translateY 0 → -50 %, or the reverse), so the last frame equals the first.
 // Every card carries its own trailing gap (margin-bottom), so one sequence is exactly half the track.
 // Duration = sequence height / speed, so both columns move at the same constant px/s at any screen size.
-import { SHOWCASE_SPEED_PX_S } from "./config.js?v=ae10f1e9ab31";
+import { SHOWCASE_SPEED_PX_S } from "./config.js?v=15334e469b43";
 
 const card = ({ name, image }) => {
   const el = document.createElement("figure");

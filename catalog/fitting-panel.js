@@ -1,7 +1,7 @@
 // Панель примерки: плавающая полоса внизу экрана каталога. Скрыта, пока ничего не выбрано; появляется с первым
 // лотом, обновляет счетчик и миниатюры, уходит, когда выбор пуст. Каталог добавляет снизу отступ под нее
 // (data-panel на экране), поэтому она не закрывает карточки и их кнопки.
-import { createButton } from "../design-system/components/button/button.js?v=ae10f1e9ab31";
+import { createButton } from "../design-system/components/button/button.js?v=15334e469b43";
 
 export function createFittingPanel({ byId, limit, onOpen }) {
   const el = document.createElement("section");
@@ -22,6 +22,7 @@ export function createFittingPanel({ byId, limit, onOpen }) {
   thumbs.setAttribute("aria-label", "Выбранные лоты");
   const cta = createButton({ label: "Открыть примерку", variant: "primary", onClick: () => onOpen() });
   cta.classList.add("kc-panel__cta");
+  cta.dataset.corner = "circular"; // capsule, like the start-screen CTA
   const lead = document.createElement("div");
   lead.className = "kc-panel__lead";
   lead.append(title, thumbs);

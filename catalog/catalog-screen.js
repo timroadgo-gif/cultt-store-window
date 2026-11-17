@@ -1,15 +1,15 @@
 // Каталог витрины (iPad, landscape): шапка (логотип, поиск, фильтры), категории + сортировка, активные фильтры и
 // число лотов, сетка карточек с выбором на примерку, панель примерки. Состояние каталога — в памяти, сбрасывается
 // reset() (по бездействию). Выбор на примерку живёт в selection и не сбрасывается при поиске / фильтрах / сортировке.
-import { createButton } from "../design-system/components/button/button.js?v=ae10f1e9ab31";
-import { createTextAction } from "../design-system/components/text-action/text-action.js?v=ae10f1e9ab31";
-import { createIcon } from "../design-system/icons/icon.js?v=ae10f1e9ab31";
+import { createButton } from "../design-system/components/button/button.js?v=15334e469b43";
+import { createTextAction } from "../design-system/components/text-action/text-action.js?v=15334e469b43";
+import { createIcon } from "../design-system/icons/icon.js?v=15334e469b43";
 import {
   CATEGORIES, SORT_OPTIONS, applyCatalog, activeFilterChips, clearFilters, createCatalogState, lotsWord, money,
-} from "./filters.js?v=ae10f1e9ab31";
-import { openFilterSheet } from "./filter-sheet.js?v=ae10f1e9ab31";
-import { createFittingPanel } from "./fitting-panel.js?v=ae10f1e9ab31";
-import { createFittingSheet } from "./fitting-sheet.js?v=ae10f1e9ab31";
+} from "./filters.js?v=15334e469b43";
+import { openFilterSheet } from "./filter-sheet.js?v=15334e469b43";
+import { createFittingPanel } from "./fitting-panel.js?v=15334e469b43";
+import { createFittingSheet } from "./fitting-sheet.js?v=15334e469b43";
 
 const h = (tag, className, ...children) => {
   const n = document.createElement(tag);
@@ -19,8 +19,10 @@ const h = (tag, className, ...children) => {
 };
 
 const FILTERS_ICON_URL = "assets/filters.svg";
-let filtersIconMarkup = null;
-const loadFiltersIcon = () => (filtersIconMarkup ??= fetch(FILTERS_ICON_URL).then((r) => r.text()).catch(() => ""));
+const SORT_ICON_URL = "assets/sort.svg";
+const iconCache = new Map();
+const loadIcon = (url) => { if (!iconCache.has(url)) iconCache.set(url, fetch(url).then((r) => r.text()).catch(() => "")); return iconCache.get(url); };
+const loadFiltersIcon = () => loadIcon(FILTERS_ICON_URL);
 
 export function mountCatalog(root, { products, selection, onSubmitFitting, onOpenProduct, onAddMore }) {
   const state = createCatalogState();
@@ -49,8 +51,17 @@ export function mountCatalog(root, { products, selection, onSubmitFitting, onOpe
 
   const filtersSlot = h("div", "kc-filters-slot");
   // Sort lives with Filters in the first row (filter + sort = one control group); the menu drops below it.
+  // Sort: UI Kit secondary button = sort arrows (same icon as the mobile catalog's sort chip) + label + chevron.
   const sortButton = createButton({ label: "Сначала новые", variant: "secondary", iconPosition: "trailing", icon: "chevron-down" });
   sortButton.classList.add("kc-sort");
+  sortButton.querySelector(".ds-button__icon").classList.add("kc-sort__chevron");
+  loadIcon(SORT_ICON_URL).then((svg) => {
+    if (!svg) return;
+    const lead = h("span", "ds-button__icon kc-sort__icon");
+    lead.setAttribute("aria-hidden", "true");
+    lead.innerHTML = svg;
+    sortButton.prepend(lead);
+  });
   sortButton.setAttribute("aria-haspopup", "menu");
   sortButton.setAttribute("aria-expanded", "false");
   const sortLabel = sortButton.querySelector(".ds-button__label");

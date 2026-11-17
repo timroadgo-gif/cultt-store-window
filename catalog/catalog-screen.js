@@ -1,16 +1,16 @@
 // Каталог витрины (iPad, landscape): шапка (логотип, поиск, фильтры), категории + сортировка, активные фильтры и
 // число лотов, сетка карточек с выбором на примерку, панель примерки. Состояние каталога — в памяти, сбрасывается
 // reset() (по бездействию). Выбор на примерку живёт в selection и не сбрасывается при поиске / фильтрах / сортировке.
-import { createButton } from "../design-system/components/button/button.js?v=be4f822cd987";
-import { createTextAction } from "../design-system/components/text-action/text-action.js?v=be4f822cd987";
-import { createIcon } from "../design-system/icons/icon.js?v=be4f822cd987";
+import { createButton } from "../design-system/components/button/button.js?v=9b084982c555";
+import { createTextAction } from "../design-system/components/text-action/text-action.js?v=9b084982c555";
+import { createIcon } from "../design-system/icons/icon.js?v=9b084982c555";
 import {
-  CATEGORIES, SORT_OPTIONS, applyCatalog, activeFilterChips, clearFilters, createCatalogState, lotsWord, money,
-} from "./filters.js?v=be4f822cd987";
-import { openFilterSheet } from "./filter-sheet.js?v=be4f822cd987";
-import { pill } from "./ui.js?v=be4f822cd987";
-import { createFittingPanel } from "./fitting-panel.js?v=be4f822cd987";
-import { createFittingSheet } from "./fitting-sheet.js?v=be4f822cd987";
+  CATEGORIES, SORT_OPTIONS, applyCatalog, activeFilterChips, assignFilters, clearFilters, createCatalogState, lotsWord, money,
+} from "./filters.js?v=9b084982c555";
+import { openFilterSheet } from "./filter-sheet.js?v=9b084982c555";
+import { pill } from "./ui.js?v=9b084982c555";
+import { createFittingPanel } from "./fitting-panel.js?v=9b084982c555";
+import { createFittingSheet } from "./fitting-sheet.js?v=9b084982c555";
 
 const h = (tag, className, ...children) => {
   const n = document.createElement(tag);
@@ -53,15 +53,17 @@ export function mountCatalog(root, { products, selection, onSubmitFitting, onOpe
   const filtersSlot = h("div", "kc-filters-slot");
   // Sort lives with Filters in the first row (filter + sort = one control group); the menu drops below it.
   // Sort: UI Kit secondary button = sort arrows (same icon as the mobile catalog's sort chip) + label + chevron.
-  const sortButton = createButton({ label: "Сначала новые", variant: "secondary", iconPosition: "trailing", icon: "chevron-down" });
-  sortButton.classList.add("kc-sort", "kc-tool");
-  sortButton.querySelector(".ds-button__icon").classList.add("kc-sort__chevron");
+  // Sort: one compact control = sort arrows + the current order (Shopify / iOS menu-button pattern), no chevron;
+  // the arrows say «sorting», the label says which. Same neutral surface and height as Filters and the search field.
+  const sortButton = createButton({ label: "Сначала новые", variant: "secondary" });
+  sortButton.classList.add("kc-sort", "kc-tool", "kiosk-neutral");
   loadIcon(SORT_ICON_URL).then((svg) => {
     if (!svg) return;
     const lead = h("span", "ds-button__icon kc-sort__icon");
     lead.setAttribute("aria-hidden", "true");
     lead.innerHTML = svg;
     sortButton.prepend(lead);
+    sortButton.dataset.iconPosition = "leading";
   });
   sortButton.setAttribute("aria-haspopup", "menu");
   sortButton.setAttribute("aria-expanded", "false");
@@ -240,12 +242,13 @@ export function mountCatalog(root, { products, selection, onSubmitFitting, onOpe
       closeMenu();
       sheet = openFilterSheet({
         state, products,
-        countFor: (draft) => applyCatalog(products, draft).length,
-        onChange: () => update({ animate: true }),
+        // count = what the catalog would show: current category + search, with the draft filters
+        countFor: (draft) => applyCatalog(products, { ...state, ...draft }).length,
+        onApply: (draft) => { assignFilters(state, draft); update({ animate: true, scrollTop: true }); },
         onClose: () => { sheet = null; },
       });
     } });
-    filtersButton.classList.add("kc-filters", "kc-tool");
+    filtersButton.classList.add("kc-filters", "kc-tool", "kiosk-neutral");
     filtersSlot.append(filtersButton);
     paintFiltersButton();
   });
@@ -275,6 +278,7 @@ export function mountCatalog(root, { products, selection, onSubmitFitting, onOpe
       b.tabIndex = on ? 0 : -1;
     }
     sortLabel.textContent = SORT_OPTIONS.find((o) => o.id === state.sort).label;
+    sortButton.setAttribute("aria-label", `Сортировка: ${sortLabel.textContent}`);
     for (const b of menuItems) b.setAttribute("aria-checked", String(b.dataset.sort === state.sort));
     clearSearch.hidden = !state.query;
 

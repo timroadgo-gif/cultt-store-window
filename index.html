@@ -7,13 +7,13 @@
     <meta name="description" content="Симулятор iPad для прототипа витрины THE CULTT: выбор устройства и фиксированный экран в горизонтальной ориентации" />
     <title>Витрина THE CULTT — симулятор iPad</title>
     <link rel="icon" type="image/png" sizes="32x32" href="./icons/favicon-32.png" />
-    <link rel="stylesheet" href="./design-system/fonts/fonts.css?v=be4f822cd987" />
-    <link rel="stylesheet" href="./design-system/tokens/tokens.css?v=be4f822cd987" />
-    <link rel="stylesheet" href="./design-system/css/corners.css?v=be4f822cd987" />
-    <link rel="stylesheet" href="./design-system/css/typography.css?v=be4f822cd987" />
-    <link rel="stylesheet" href="./simulator/simulator.css?v=be4f822cd987" />
-    <meta name="build" content="be4f822cd987" />
-  <meta name="app-build" content="be4f822cd987" />
+    <link rel="stylesheet" href="./design-system/fonts/fonts.css?v=9b084982c555" />
+    <link rel="stylesheet" href="./design-system/tokens/tokens.css?v=9b084982c555" />
+    <link rel="stylesheet" href="./design-system/css/corners.css?v=9b084982c555" />
+    <link rel="stylesheet" href="./design-system/css/typography.css?v=9b084982c555" />
+    <link rel="stylesheet" href="./simulator/simulator.css?v=9b084982c555" />
+    <meta name="build" content="9b084982c555" />
+  <meta name="app-build" content="9b084982c555" />
   <script>(()=>{const m=document.querySelector('meta[name="app-build"]');if(!m||!window.fetch)return;const cur=m.content;const url=new URL('version.json',document.baseURI);const check=()=>fetch(url+'?t='+Date.now(),{cache:'no-store'}).then(r=>r.ok?r.json():null).then(v=>{if(!v||!v.build||v.build===cur)return;const k='app-build-reload:'+v.build;try{if(sessionStorage.getItem(k))return;sessionStorage.setItem(k,'1')}catch(e){}const u=new URL(location.href);u.searchParams.set('v',v.build);location.replace(u.href)}).catch(()=>{});check();document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible')check()});addEventListener('pageshow',e=>{if(e.persisted)check()})})();</script>
   </head>
   <!-- Desktop simulator shell (not customer-facing). The real app is app.html, loaded unchanged in an iframe whose
@@ -59,6 +59,6 @@
       </div>
     </section>
 
-    <script type="module" src="./simulator/simulator.js?v=be4f822cd987"></script>
+    <script type="module" src="./simulator/simulator.js?v=9b084982c555"></script>
   </body>
 </html>

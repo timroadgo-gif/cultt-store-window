@@ -10,8 +10,8 @@
 // flashes the catalog or the fitting sheet. The 10-second countdown starts only then. «Готово» and the countdown share
 // one exit: cancel the timer, fade the layer out (360 ms) over the welcome screen, remove it.
 // prefers-reduced-motion: no movement, content shown at once, countdown starts immediately.
-import { createButton } from "../design-system/components/button/button.js?v=be4f822cd987";
-import { pill } from "./ui.js?v=be4f822cd987";
+import { createButton } from "../design-system/components/button/button.js?v=9b084982c555";
+import { pill } from "./ui.js?v=9b084982c555";
 
 const h = (tag, className, ...children) => {
   const n = document.createElement(tag);

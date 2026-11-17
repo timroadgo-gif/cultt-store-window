@@ -4,19 +4,19 @@
 // confirmation screen (request number, 10 s) covers everything and then returns to the welcome screen.
 // Visitor state (catalog search / filters / sort, fitting selection) lives in memory only; it is cleared by the
 // inactivity warning (restart / timeout) and after a confirmed fitting request.
-import { createButton } from "./design-system/components/button/button.js?v=be4f822cd987";
-import { pill } from "./catalog/ui.js?v=be4f822cd987";
-import { idleTimeoutMs, warningSeconds } from "./config.js?v=be4f822cd987";
-import { createIdleTimer } from "./idle.js?v=be4f822cd987";
-import { mountShowcase } from "./showcase.js?v=be4f822cd987";
-import { SHOWCASE_COLUMNS } from "./products.js?v=be4f822cd987";
-import { CATALOG_PRODUCTS } from "./catalog/products.js?v=be4f822cd987";
-import { createSelection } from "./catalog/selection.js?v=be4f822cd987";
-import { mountCatalog } from "./catalog/catalog-screen.js?v=be4f822cd987";
-import { submitFittingRequest } from "./catalog/request.js?v=be4f822cd987";
-import { createConfirmScreen } from "./catalog/confirm-screen.js?v=be4f822cd987";
-import { createIdleWarning } from "./catalog/idle-warning.js?v=be4f822cd987";
-import { mountProduct } from "./catalog/product-screen.js?v=be4f822cd987";
+import { createButton } from "./design-system/components/button/button.js?v=9b084982c555";
+import { pill } from "./catalog/ui.js?v=9b084982c555";
+import { idleTimeoutMs, warningSeconds } from "./config.js?v=9b084982c555";
+import { createIdleTimer } from "./idle.js?v=9b084982c555";
+import { mountShowcase } from "./showcase.js?v=9b084982c555";
+import { SHOWCASE_COLUMNS } from "./products.js?v=9b084982c555";
+import { CATALOG_PRODUCTS } from "./catalog/products.js?v=9b084982c555";
+import { createSelection } from "./catalog/selection.js?v=9b084982c555";
+import { mountCatalog } from "./catalog/catalog-screen.js?v=9b084982c555";
+import { submitFittingRequest } from "./catalog/request.js?v=9b084982c555";
+import { createConfirmScreen } from "./catalog/confirm-screen.js?v=9b084982c555";
+import { createIdleWarning } from "./catalog/idle-warning.js?v=9b084982c555";
+import { mountProduct } from "./catalog/product-screen.js?v=9b084982c555";
 
 const ROUTES = { welcome: "#/", catalog: "#/catalog", product: "#/product/" };
 const $ = (sel) => document.querySelector(sel);
@@ -151,5 +151,5 @@ window.__kiosk = {
   get session() { return { startedAt, selectedLots: selection.size, selection: selection.ids }; },
   get product() { return product.state; },
   get confirm() { return confirm.state; },
-  get catalog() { const s = catalog.state; return { query: s.query, category: s.category, sort: s.sort, brands: [...s.brands], conditions: [...s.conditions], priceMax: s.priceMax, scrollTop: catalog.scroller.scrollTop }; },
+  get catalog() { const s = catalog.state; return { query: s.query, category: s.category, sort: s.sort, types: [...s.types], brands: [...s.brands], models: [...s.models], colors: [...s.colors], conditions: [...s.conditions], priceMin: s.priceMin, priceMax: s.priceMax, scrollTop: catalog.scroller.scrollTop }; },
 };

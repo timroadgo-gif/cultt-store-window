@@ -6,16 +6,16 @@
 //   внизу «Применить (N)» — возвращает на главный экран. Тип, Модель и Цвет — тот же экран (поиск, если вариантов > 8).
 // Изменения копятся в черновике: каталог меняется только по «Показать (N)». Закрытие крестиком, тапом по подложке
 // или Escape отменяет черновик; при следующем открытии панель показывает примененные фильтры.
-import { createModalBackdrop, openBackdrop, closeBackdrop } from "../design-system/backdrop/backdrop.js?v=9b084982c555";
-import { createButton } from "../design-system/components/button/button.js?v=9b084982c555";
-import { createCheckbox } from "../design-system/components/checkbox/checkbox.js?v=9b084982c555";
-import { createTextAction } from "../design-system/components/text-action/text-action.js?v=9b084982c555";
-import { createIcon } from "../design-system/icons/icon.js?v=9b084982c555";
-import { pill } from "./ui.js?v=9b084982c555";
+import { createModalBackdrop, openBackdrop, closeBackdrop } from "../design-system/backdrop/backdrop.js?v=00dd94ce5b19";
+import { createButton } from "../design-system/components/button/button.js?v=00dd94ce5b19";
+import { createCheckbox } from "../design-system/components/checkbox/checkbox.js?v=00dd94ce5b19";
+import { createTextAction } from "../design-system/components/text-action/text-action.js?v=00dd94ce5b19";
+import { createIcon } from "../design-system/icons/icon.js?v=00dd94ce5b19";
+import { pill } from "./ui.js?v=00dd94ce5b19";
 import {
   CONDITIONS, POPULAR_BRANDS, brandsOf, typesOf, colorsOf, modelsOf, priceBounds,
   copyFilters, createFilters, FILTER_SETS, money,
-} from "./filters.js?v=9b084982c555";
+} from "./filters.js?v=00dd94ce5b19";
 
 const h = (tag, className, ...children) => {
   const n = document.createElement(tag);

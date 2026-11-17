@@ -5,7 +5,7 @@
 // The app (app.html) runs in an iframe of exactly the device's landscape CSS viewport; only a CSS transform on the
 // whole device scales it visually, so the app's innerWidth / innerHeight and media queries never see the window size.
 // One iframe for the whole session: switching devices resizes it and keeps the app state.
-import { DEVICES, deviceById } from "./devices.js?v=9b084982c555";
+import { DEVICES, deviceById } from "./devices.js?v=00dd94ce5b19";
 
 const $ = (id) => document.getElementById(id);
 const els = {
@@ -105,6 +105,21 @@ function route() {
   if (current?.id !== d.id) applyDevice(d);
   else layout();
 }
+
+// Product page variant (EXPERIMENT «Галерея»): kept in the shell URL (?pdp=gallery), passed to the app on load and
+// switched live through the app's simulator hook.
+const pdpButtons = [...document.querySelectorAll("[data-pdp]")];
+let pdp = new URLSearchParams(location.search).get("pdp") === "gallery" ? "gallery" : "standard";
+function paintPdp() { for (const b of pdpButtons) b.setAttribute("aria-pressed", String(b.dataset.pdp === pdp)); document.body.dataset.pdpVariant = pdp; }
+for (const b of pdpButtons) b.addEventListener("click", () => {
+  pdp = b.dataset.pdp;
+  const url = new URL(location.href);
+  if (pdp === "gallery") url.searchParams.set("pdp", "gallery"); else url.searchParams.delete("pdp");
+  history.replaceState(null, "", url);
+  els.app.contentWindow?.__kiosk?.setPdpVariant(pdp);
+  paintPdp();
+});
+paintPdp();
 
 els.back.addEventListener("click", () => { location.hash = ""; });
 els.select.addEventListener("change", () => { location.hash = els.select.value + (zoom === "100" ? "/100" : ""); });

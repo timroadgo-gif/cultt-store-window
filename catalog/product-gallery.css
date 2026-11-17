@@ -1,0 +1,114 @@
+/* EXPERIMENT — gallery product page (catalog/product-gallery-screen.js), Hermès-inspired composition, THE CULTT identity.
+   Full-height 3:4 photos in a horizontal strip · glass back control · compact white panel bottom-right that grows upward.
+   Kiosk-only values below (pending design approval); colours, type and spacing are UI Kit tokens. */
+:root {
+  --kpx-panel-w: clamp(320px, 29vw, 400px);
+  --kpx-edge: var(--spacing-standard-block);
+  --kpx-gap: 2px;
+  --kpx-bottom: calc(var(--kc-panel-height) + var(--kc-panel-bottom) * 2 + var(--safe-bottom)); /* above the fitting tray band */
+}
+.kpx { position: relative; isolation: isolate; height: 100dvh; min-height: 100%; overflow: hidden; background: var(--color-grey-1); }
+.kpx.is-entering .kpx-gallery { animation: kp-in 260ms var(--kc-ease); }
+
+/* Gallery: photo height = screen height, width = height × 3/4 (no crop, no stretch); the strip runs off the right edge. */
+.kpx-gallery { position: absolute; inset: 0; }
+.kpx-track {
+  display: flex;
+  gap: var(--kpx-gap);
+  height: 100%;
+  overflow-x: auto;
+  overflow-y: hidden;
+  scroll-snap-type: x proximity;
+  overscroll-behavior-x: contain;
+  scrollbar-width: none;
+  touch-action: pan-x;
+  padding-inline-end: calc(var(--kpx-panel-w) + var(--kpx-edge) * 2); /* the last photo can be seen fully left of the panel */
+}
+.kpx-track::-webkit-scrollbar { display: none; }
+.kpx-photo { flex: none; height: 100%; aspect-ratio: 3 / 4; padding: 0; border: 0; background: var(--color-grey-1); scroll-snap-align: start; cursor: zoom-in; -webkit-tap-highlight-color: transparent; }
+.kpx-photo__image { display: block; width: 100%; height: 100%; object-fit: cover; pointer-events: none; -webkit-user-drag: none; }
+.kpx-counter {
+  --corner-radius: 999px;
+  position: absolute;
+  left: calc(var(--kpx-edge) + var(--safe-left));
+  bottom: var(--kpx-bottom);
+  margin: 0;
+  padding: var(--spacing-compact-stack) var(--spacing-standard-text-group);
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--color-white) 88%, transparent);
+  font: var(--font-weight-regular) var(--text-body-s-size) / var(--text-body-s-line-height) var(--font-family-sans);
+  color: var(--color-ink);
+  font-variant-numeric: tabular-nums;
+  pointer-events: none;
+}
+
+.kpx-top { position: absolute; z-index: 5; top: calc(var(--spacing-standard-control) + var(--safe-top)); left: calc(var(--spacing-standard-control) + var(--safe-left)); }
+
+/* Floating panel: bottom edge anchored above the fitting tray; grows upward; scrolls inside when taller than the room. */
+.kpx-panel {
+  --corner-radius: 12px;
+  position: absolute;
+  z-index: 3;
+  right: calc(var(--kpx-edge) + var(--safe-right));
+  bottom: var(--kpx-bottom);
+  width: var(--kpx-panel-w);
+  max-height: calc(100% - var(--kpx-bottom) - 44px - var(--spacing-standard-control) * 2 - var(--safe-top));
+  display: flex;
+  flex-direction: column;
+  background: var(--color-white);
+  box-shadow: 0 0 0 1px color-mix(in srgb, var(--color-ink) 6%, transparent);
+}
+.kpx-panel__scroll { min-height: 0; overflow-y: auto; overscroll-behavior: contain; padding: var(--spacing-standard-block); scrollbar-width: thin; }
+.kpx-head { display: flex; flex-direction: column; }
+.kpx-condition { margin: 0; }
+.kpx-condition { color: var(--color-grey-7); }
+.kpx-name {
+  margin: var(--spacing-compact-stack) 0 0;
+  font: var(--font-weight-regular) clamp(18px, 2.6vh, 22px) / 1.3 var(--font-family-sans);
+  letter-spacing: var(--font-tracking-snug);
+  color: var(--color-ink);
+  text-wrap: balance;
+}
+.kpx-price {
+  margin: var(--spacing-standard-text-group) 0 0;
+  font: var(--font-weight-regular) clamp(17px, 2.3vh, 20px) / 1.3 var(--font-family-sans);
+  color: var(--color-ink);
+  font-variant-numeric: tabular-nums;
+}
+.kpx-actions { display: flex; flex-direction: column; gap: var(--spacing-standard-text-group); margin-top: var(--spacing-standard-block); }
+.ds-button.kpx-cta { --_height: 52px; --_fs: var(--text-heading-s-size); --_lh: var(--text-heading-s-line-height); transition: background-color 180ms var(--kc-ease), color 180ms var(--kc-ease); }
+.ds-button.kpx-cta.is-changed { animation: kp-cta 220ms var(--kc-ease); }
+.kpx-limit { display: flex; flex-direction: column; align-items: flex-start; gap: var(--spacing-compact-stack); color: var(--color-grey-7); }
+.kpx-limit p { margin: 0; }
+.kpx-limit .ds-text-action { padding-inline: 0; min-height: 32px; }
+
+/* Accordions: hairline separators, kit plus / minus icons, height animated with grid rows. */
+.kpx-sections { margin-top: var(--spacing-standard-control); }
+.kpx-acc { box-shadow: inset 0 -1px 0 var(--kiosk-hairline); }
+.kpx-acc:first-child { box-shadow: inset 0 1px 0 var(--kiosk-hairline), inset 0 -1px 0 var(--kiosk-hairline); }
+.kpx-acc__head {
+  display: flex; align-items: center; justify-content: space-between; gap: var(--spacing-standard-text-group);
+  width: 100%; min-height: 52px; padding: 0; border: 0; background: none; color: var(--color-ink);
+  font: var(--font-weight-medium) var(--text-body-size) / var(--text-body-line-height) var(--font-family-sans);
+  text-align: left; cursor: pointer; -webkit-tap-highlight-color: transparent;
+}
+.kpx-acc__icon { position: relative; width: 20px; height: 20px; color: var(--color-ink); }
+.kpx-acc__plus, .kpx-acc__minus { position: absolute; inset: 0; display: grid; transition: opacity 180ms var(--kc-ease), transform 220ms var(--kc-ease); }
+.kpx-acc__minus { opacity: 0; transform: rotate(-90deg); }
+.kpx-acc[data-open] .kpx-acc__plus { opacity: 0; transform: rotate(90deg); }
+.kpx-acc[data-open] .kpx-acc__minus { opacity: 1; transform: none; }
+.kpx-acc__body { display: grid; grid-template-rows: 0fr; transition: grid-template-rows 260ms var(--kc-ease); }
+.kpx-acc[data-open] .kpx-acc__body { grid-template-rows: 1fr; }
+.kpx-acc__inner { min-height: 0; overflow: hidden; }
+.kpx-attrs { display: flex; flex-direction: column; gap: var(--spacing-compact-inline); margin: 0; padding: 0 0 var(--spacing-standard-control); }
+.kpx-attr { display: grid; grid-template-columns: 96px minmax(0, 1fr); gap: var(--spacing-standard-text-group); align-items: baseline; }
+.kpx-attr dt { margin: 0; color: var(--color-grey-7); }
+.kpx-attr dd { margin: 0; color: var(--color-ink); font-variant-numeric: tabular-nums; }
+.kpx-sizes { padding: 0 0 var(--spacing-standard-control); }
+.kpx-sizes p { margin: 0; }
+.kpx-sizes__empty { color: var(--color-grey-7); }
+
+@media (prefers-reduced-motion: reduce) {
+  .kpx.is-entering .kpx-gallery, .ds-button.kpx-cta.is-changed { animation: none; }
+  .kpx-acc__body, .kpx-acc__plus, .kpx-acc__minus { transition: none; }
+}

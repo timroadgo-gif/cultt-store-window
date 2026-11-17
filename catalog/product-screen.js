@@ -6,12 +6,12 @@
 //   • Справа колонка: «Бренд Модель», тип, цена → «Добавить в примерку» / «Убрать из примерки» → характеристики.
 //   • Без статуса «В примерке · N из 5»: выбор виден по кнопке и в панели примерки.
 // Выбор на примерку — общий selection (тот же, что у каталога, панели и шторки).
-import PhotoSwipe from "../vendor/photoswipe/photoswipe.esm.min.js?v=9b084982c555";
-import { createButton } from "../design-system/components/button/button.js?v=9b084982c555";
-import { createTextAction } from "../design-system/components/text-action/text-action.js?v=9b084982c555";
-import { createIcon, iconMarkup } from "../design-system/icons/icon.js?v=9b084982c555";
-import { money } from "./filters.js?v=9b084982c555";
-import { pill } from "./ui.js?v=9b084982c555";
+import { createButton } from "../design-system/components/button/button.js?v=00dd94ce5b19";
+import { createTextAction } from "../design-system/components/text-action/text-action.js?v=00dd94ce5b19";
+import { createIcon } from "../design-system/icons/icon.js?v=00dd94ce5b19";
+import { openFullscreen } from "./fullscreen.js?v=00dd94ce5b19";
+import { money } from "./filters.js?v=00dd94ce5b19";
+import { pill } from "./ui.js?v=00dd94ce5b19";
 
 const h = (tag, className, ...children) => {
   const n = document.createElement(tag);
@@ -20,7 +20,6 @@ const h = (tag, className, ...children) => {
   return n;
 };
 const reducedMotion = () => matchMedia("(prefers-reduced-motion: reduce)").matches;
-const PHOTO = { w: 960, h: 1280 };
 const VISIBLE = 2; // photos on screen at once
 
 export function mountProduct(root, { byId, selection, onBack, onOpenFitting }) {
@@ -89,7 +88,7 @@ export function mountProduct(root, { byId, selection, onBack, onOpenFitting }) {
       const slide = h("button", "kp-slide ds-corner", img);
       slide.type = "button";
       slide.setAttribute("aria-label", `Открыть фото ${i + 1} из ${imgs.length} на весь экран`);
-      slide.addEventListener("click", () => openFullscreen(i));
+      slide.addEventListener("click", () => openFullscreenAt(i));
       return slide;
     }));
     track.scrollLeft = 0;
@@ -116,47 +115,17 @@ export function mountProduct(root, { byId, selection, onBack, onOpenFitting }) {
   }, { passive: true });
   new ResizeObserver(() => { if (product) track.scrollLeft = index * step(); }).observe(track);
 
-  // ---------- Fullscreen (PhotoSwipe) ----------
-  const icon = (name, cls) => iconMarkup(name, { size: 24 }).replace('class="ds-icon"', `class="ds-icon pswp__icn ${cls}"`);
-  function openFullscreen(i) {
+  // ---------- Fullscreen (shared viewer, catalog/fullscreen.js) ----------
+  function openFullscreenAt(i) {
     if (pswp) return;
-    pswp = new PhotoSwipe({
-      dataSource: product.gallery.map((g) => ({ src: g.src, msrc: g.src, width: PHOTO.w, height: PHOTO.h, alt: `${product.brand} ${product.name}` })),
+    pswp = openFullscreen({
+      product,
       index: i,
-      bgOpacity: 1,
-      showHideAnimationType: reducedMotion() ? "none" : "zoom",
-      showAnimationDuration: 280,
-      hideAnimationDuration: 240,
-      initialZoomLevel: "fit",
-      secondaryZoomLevel: 1.5,
-      maxZoomLevel: 3,
-      wheelToZoom: true,
-      loop: false,
-      pinchToClose: false,
-      closeOnVerticalDrag: true,
-      imageClickAction: "zoom-or-close",
-      tapAction: "toggle-controls",
-      doubleTapAction: "zoom",
-      bgClickAction: "close",
-      paddingFn: () => ({ top: 24, bottom: 24, left: 72, right: 72 }),
-      closeTitle: "Закрыть",
-      zoomTitle: "Увеличить",
-      arrowPrevTitle: "Предыдущее фото",
-      arrowNextTitle: "Следующее фото",
-      indexIndicatorSep: " / ",
-      closeSVG: icon("close", "kp-pswp-close"),
-      zoomSVG: icon("search", "kp-pswp-zoom"),
-      arrowPrevSVG: icon("chevron-left", "kp-pswp-arrow"),
-      arrowNextSVG: icon("chevron-right", "kp-pswp-arrow"),
-      mainClass: "kp-pswp",
-      returnFocus: false, // the default would focus the photo it opened from and scroll the gallery back to it
+      thumbFor: (k) => track.children[k]?.querySelector("img"),
+      // Keep the viewed photo on screen in the gallery (it becomes the left one, or the right one at the end).
+      onChange: (k) => { if (k < index || k >= index + VISIBLE) goTo(k); },
+      onClose: () => { pswp = null; },
     });
-    pswp.addFilter("thumbEl", (el, data, k) => track.children[k]?.querySelector("img") ?? el);
-    pswp.addFilter("placeholderSrc", (src, slide) => product.gallery[slide.index]?.src ?? src);
-    // Keep the viewed photo on screen in the gallery (it becomes the left one, or the right one at the end).
-    pswp.on("change", () => { const k = pswp.currIndex; if (k < index || k >= index + VISIBLE) goTo(k); });
-    pswp.on("destroy", () => { pswp = null; });
-    pswp.init();
   }
   function closeFullscreen({ immediate = false } = {}) {
     if (!pswp) return;

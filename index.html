@@ -7,13 +7,13 @@
     <meta name="description" content="Симулятор iPad для прототипа витрины THE CULTT: выбор устройства и фиксированный экран в горизонтальной ориентации" />
     <title>Витрина THE CULTT — симулятор iPad</title>
     <link rel="icon" type="image/png" sizes="32x32" href="./icons/favicon-32.png" />
-    <link rel="stylesheet" href="./design-system/fonts/fonts.css?v=9b084982c555" />
-    <link rel="stylesheet" href="./design-system/tokens/tokens.css?v=9b084982c555" />
-    <link rel="stylesheet" href="./design-system/css/corners.css?v=9b084982c555" />
-    <link rel="stylesheet" href="./design-system/css/typography.css?v=9b084982c555" />
-    <link rel="stylesheet" href="./simulator/simulator.css?v=9b084982c555" />
-    <meta name="build" content="9b084982c555" />
-  <meta name="app-build" content="9b084982c555" />
+    <link rel="stylesheet" href="./design-system/fonts/fonts.css?v=00dd94ce5b19" />
+    <link rel="stylesheet" href="./design-system/tokens/tokens.css?v=00dd94ce5b19" />
+    <link rel="stylesheet" href="./design-system/css/corners.css?v=00dd94ce5b19" />
+    <link rel="stylesheet" href="./design-system/css/typography.css?v=00dd94ce5b19" />
+    <link rel="stylesheet" href="./simulator/simulator.css?v=00dd94ce5b19" />
+    <meta name="build" content="00dd94ce5b19" />
+  <meta name="app-build" content="00dd94ce5b19" />
   <script>(()=>{const m=document.querySelector('meta[name="app-build"]');if(!m||!window.fetch)return;const cur=m.content;const url=new URL('version.json',document.baseURI);const check=()=>fetch(url+'?t='+Date.now(),{cache:'no-store'}).then(r=>r.ok?r.json():null).then(v=>{if(!v||!v.build||v.build===cur)return;const k='app-build-reload:'+v.build;try{if(sessionStorage.getItem(k))return;sessionStorage.setItem(k,'1')}catch(e){}const u=new URL(location.href);u.searchParams.set('v',v.build);location.replace(u.href)}).catch(()=>{});check();document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible')check()});addEventListener('pageshow',e=>{if(e.persisted)check()})})();</script>
   </head>
   <!-- Desktop simulator shell (not customer-facing). The real app is app.html, loaded unchanged in an iframe whose
@@ -40,6 +40,10 @@
         <div class="sim-bar__group">
           <label class="sim-bar__label ds-text-body-s" for="deviceSelect">Устройство</label>
           <select class="sim-select" id="deviceSelect"></select>
+          <div class="sim-seg sim-seg--pdp" role="group" aria-label="Карточка товара">
+            <button class="sim-seg__btn" type="button" data-pdp="standard" aria-pressed="true">Карточка</button>
+            <button class="sim-seg__btn" type="button" data-pdp="gallery" aria-pressed="false">Галерея · эксп.</button>
+          </div>
           <div class="sim-seg" role="group" aria-label="Масштаб">
             <button class="sim-seg__btn" type="button" data-zoom="fit" aria-pressed="true">Fit</button>
             <button class="sim-seg__btn" type="button" data-zoom="100" aria-pressed="false">100%</button>
@@ -59,6 +63,6 @@
       </div>
     </section>
 
-    <script type="module" src="./simulator/simulator.js?v=9b084982c555"></script>
+    <script type="module" src="./simulator/simulator.js?v=00dd94ce5b19"></script>
   </body>
 </html>

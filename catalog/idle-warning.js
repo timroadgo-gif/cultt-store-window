@@ -8,10 +8,10 @@
 // the ring smoothly. It starts when the entrance (≈ 260 ms) has finished.
 // While open: the app underneath is inert, Escape and other keys are swallowed, background scroll is blocked; the
 // countdown's own updates are not user activity (the idle timer is stopped while the warning is open).
-import { createModalBackdrop, openBackdrop, closeBackdrop } from "../design-system/backdrop/backdrop.js?v=9b084982c555";
-import { createButton } from "../design-system/components/button/button.js?v=9b084982c555";
-import { createTextAction } from "../design-system/components/text-action/text-action.js?v=9b084982c555";
-import { pill } from "./ui.js?v=9b084982c555";
+import { createModalBackdrop, openBackdrop, closeBackdrop } from "../design-system/backdrop/backdrop.js?v=00dd94ce5b19";
+import { createButton } from "../design-system/components/button/button.js?v=00dd94ce5b19";
+import { createTextAction } from "../design-system/components/text-action/text-action.js?v=00dd94ce5b19";
+import { pill } from "./ui.js?v=00dd94ce5b19";
 
 const h = (tag, className, ...children) => {
   const n = document.createElement(tag);

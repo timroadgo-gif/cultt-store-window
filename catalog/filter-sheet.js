@@ -1,12 +1,12 @@
 // Фильтры каталога — модальная панель справа (iPad landscape) над ModalBackdrop UI Kit.
 // Изменения применяются сразу (сетка за подложкой обновляется), кнопка внизу показывает число лотов и закрывает
 // панель. Закрытие: кнопка, тап по подложке, Escape.
-import { createModalBackdrop, openBackdrop, closeBackdrop } from "../design-system/backdrop/backdrop.js?v=25bff0f871c8";
-import { createButton } from "../design-system/components/button/button.js?v=25bff0f871c8";
-import { createCheckbox } from "../design-system/components/checkbox/checkbox.js?v=25bff0f871c8";
-import { createTextAction } from "../design-system/components/text-action/text-action.js?v=25bff0f871c8";
-import { createIcon } from "../design-system/icons/icon.js?v=25bff0f871c8";
-import { CONDITIONS, PRICE_LIMITS, brandsOf, clearFilters, lotsWord, money } from "./filters.js?v=25bff0f871c8";
+import { createModalBackdrop, openBackdrop, closeBackdrop } from "../design-system/backdrop/backdrop.js?v=9e6b2e092cb9";
+import { createButton } from "../design-system/components/button/button.js?v=9e6b2e092cb9";
+import { createCheckbox } from "../design-system/components/checkbox/checkbox.js?v=9e6b2e092cb9";
+import { createTextAction } from "../design-system/components/text-action/text-action.js?v=9e6b2e092cb9";
+import { createIcon } from "../design-system/icons/icon.js?v=9e6b2e092cb9";
+import { CONDITIONS, PRICE_LIMITS, brandsOf, clearFilters, lotsWord, money } from "./filters.js?v=9e6b2e092cb9";
 
 const h = (tag, className, ...children) => {
   const n = document.createElement(tag);

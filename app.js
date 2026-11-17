@@ -2,15 +2,15 @@
 // Screens by hash: "#/" (or empty) = welcome / attract (idle state), "#/catalog" = catalog (the fitting selection is a
 // bottom sheet over it), "#/fitting-request" = placeholder for the step after «Заказать на примерку».
 // Visitor state (catalog search / filters / sort, fitting selection) lives in memory only and is cleared when the idle timer returns the kiosk to the welcome screen.
-import { createButton } from "./design-system/components/button/button.js?v=25bff0f871c8";
-import { idleTimeoutMs } from "./config.js?v=25bff0f871c8";
-import { createIdleTimer } from "./idle.js?v=25bff0f871c8";
-import { mountShowcase } from "./showcase.js?v=25bff0f871c8";
-import { SHOWCASE_COLUMNS } from "./products.js?v=25bff0f871c8";
-import { CATALOG_PRODUCTS } from "./catalog/products.js?v=25bff0f871c8";
-import { createSelection } from "./catalog/selection.js?v=25bff0f871c8";
-import { mountCatalog } from "./catalog/catalog-screen.js?v=25bff0f871c8";
-import { mountFitting } from "./catalog/fitting-screen.js?v=25bff0f871c8";
+import { createButton } from "./design-system/components/button/button.js?v=9e6b2e092cb9";
+import { idleTimeoutMs } from "./config.js?v=9e6b2e092cb9";
+import { createIdleTimer } from "./idle.js?v=9e6b2e092cb9";
+import { mountShowcase } from "./showcase.js?v=9e6b2e092cb9";
+import { SHOWCASE_COLUMNS } from "./products.js?v=9e6b2e092cb9";
+import { CATALOG_PRODUCTS } from "./catalog/products.js?v=9e6b2e092cb9";
+import { createSelection } from "./catalog/selection.js?v=9e6b2e092cb9";
+import { mountCatalog } from "./catalog/catalog-screen.js?v=9e6b2e092cb9";
+import { mountFitting } from "./catalog/fitting-screen.js?v=9e6b2e092cb9";
 
 const ROUTES = { welcome: "#/", catalog: "#/catalog", fitting: "#/fitting-request" };
 const $ = (sel) => document.querySelector(sel);

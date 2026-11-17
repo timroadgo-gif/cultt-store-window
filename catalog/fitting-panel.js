@@ -1,7 +1,7 @@
 // Панель примерки: плавающая полоса внизу экрана каталога. Скрыта, пока ничего не выбрано; появляется с первым
 // лотом, обновляет счетчик и миниатюры, уходит, когда выбор пуст. Каталог добавляет снизу отступ под нее
 // (data-panel на экране), поэтому она не закрывает карточки и их кнопки.
-import { createButton } from "../design-system/components/button/button.js?v=25bff0f871c8";
+import { createButton } from "../design-system/components/button/button.js?v=9e6b2e092cb9";
 
 export function createFittingPanel({ byId, limit, onOpen }) {
   const el = document.createElement("section");
@@ -10,13 +10,17 @@ export function createFittingPanel({ byId, limit, onOpen }) {
   el.dataset.state = "hidden";
   el.inert = true;
 
+  // «Примерка · N из 5»: only N changes, with a short fade/slide (aria-live reads the whole line).
   const title = document.createElement("p");
   title.className = "kc-panel__title";
   title.setAttribute("aria-live", "polite");
+  const countEl = document.createElement("span");
+  countEl.className = "kc-panel__count";
+  title.append("Примерка · ", countEl, ` из ${limit}`);
   const thumbs = document.createElement("ul");
   thumbs.className = "kc-panel__thumbs";
   thumbs.setAttribute("aria-label", "Выбранные лоты");
-  const cta = createButton({ label: "Открыть примерку", variant: "secondary", onClick: () => onOpen() });
+  const cta = createButton({ label: "Открыть примерку", variant: "primary", onClick: () => onOpen() });
   cta.classList.add("kc-panel__cta");
   const lead = document.createElement("div");
   lead.className = "kc-panel__lead";
@@ -36,7 +40,15 @@ export function createFittingPanel({ byId, limit, onOpen }) {
 
   function update(ids, change = {}) {
     const visible = ids.length > 0;
-    if (visible) title.textContent = `Примерка · ${ids.length} из ${limit}`;
+    if (visible && countEl.textContent !== String(ids.length)) {
+      const animate = countEl.textContent !== "" && el.dataset.state === "shown";
+      countEl.textContent = String(ids.length);
+      if (animate) {
+        countEl.classList.remove("is-changing");
+        void countEl.offsetWidth;
+        countEl.classList.add("is-changing");
+      }
+    }
     for (const [id, node] of thumbNodes) if (!ids.includes(id)) { node.remove(); thumbNodes.delete(id); }
     ids.forEach((id, i) => {
       let node = thumbNodes.get(id);

@@ -1,15 +1,15 @@
 // Каталог витрины (iPad, landscape): шапка (логотип, поиск, фильтры), категории + сортировка, активные фильтры и
 // число лотов, сетка карточек с выбором на примерку, панель примерки. Состояние каталога — в памяти, сбрасывается
 // reset() (по бездействию). Выбор на примерку живёт в selection и не сбрасывается при поиске / фильтрах / сортировке.
-import { createButton } from "../design-system/components/button/button.js?v=25bff0f871c8";
-import { createTextAction } from "../design-system/components/text-action/text-action.js?v=25bff0f871c8";
-import { createIcon } from "../design-system/icons/icon.js?v=25bff0f871c8";
+import { createButton } from "../design-system/components/button/button.js?v=9e6b2e092cb9";
+import { createTextAction } from "../design-system/components/text-action/text-action.js?v=9e6b2e092cb9";
+import { createIcon } from "../design-system/icons/icon.js?v=9e6b2e092cb9";
 import {
   CATEGORIES, SORT_OPTIONS, applyCatalog, activeFilterChips, clearFilters, createCatalogState, lotsWord, money,
-} from "./filters.js?v=25bff0f871c8";
-import { openFilterSheet } from "./filter-sheet.js?v=25bff0f871c8";
-import { createFittingPanel } from "./fitting-panel.js?v=25bff0f871c8";
-import { createFittingSheet } from "./fitting-sheet.js?v=25bff0f871c8";
+} from "./filters.js?v=9e6b2e092cb9";
+import { openFilterSheet } from "./filter-sheet.js?v=9e6b2e092cb9";
+import { createFittingPanel } from "./fitting-panel.js?v=9e6b2e092cb9";
+import { createFittingSheet } from "./fitting-sheet.js?v=9e6b2e092cb9";
 
 const h = (tag, className, ...children) => {
   const n = document.createElement(tag);
@@ -48,7 +48,14 @@ export function mountCatalog(root, { products, selection, onSubmitFitting }) {
   search.append(searchIcon, h("span", "ds-field__content", input), clearSearch);
 
   const filtersSlot = h("div", "kc-filters-slot");
-  const top = h("header", "kc-top", logo, search, filtersSlot);
+  // Sort lives with Filters in the first row (filter + sort = one control group); the menu drops below it.
+  const sortButton = createButton({ label: "Сначала новые", variant: "secondary", iconPosition: "trailing", icon: "chevron-down" });
+  sortButton.classList.add("kc-sort");
+  sortButton.setAttribute("aria-haspopup", "menu");
+  sortButton.setAttribute("aria-expanded", "false");
+  const sortLabel = sortButton.querySelector(".ds-button__label");
+  const sortWrap = h("div", "kc-sort-wrap", sortButton);
+  const top = h("header", "kc-top", logo, search, h("div", "kc-controls", filtersSlot, sortWrap));
 
   // ---------- Categories + sort ----------
   const tabs = h("div", "kc-tabs");
@@ -64,13 +71,8 @@ export function mountCatalog(root, { products, selection, onSubmitFitting }) {
   });
   tabs.append(...tabButtons);
 
-  const sortButton = h("button", "kc-sort ds-text-body");
-  sortButton.type = "button";
-  sortButton.setAttribute("aria-haspopup", "menu");
-  const sortLabel = h("span", "kc-sort__label");
-  sortButton.append(sortLabel, h("span", "kc-sort__chevron", createIcon("chevron-down", { size: 20 })));
-  const nav = h("nav", "kc-nav", tabs, sortButton);
-  nav.setAttribute("aria-label", "Категории и сортировка");
+  const nav = h("nav", "kc-nav", tabs);
+  nav.setAttribute("aria-label", "Категории");
 
   // ---------- Meta row: active filters + count ----------
   const chipsBox = h("div", "kc-chips");
@@ -118,10 +120,13 @@ export function mountCatalog(root, { products, selection, onSubmitFitting }) {
     add.append(visual);
     add.addEventListener("click", () => toggle(p.id));
 
+    // Same order as the mobile catalog card: condition → «Brand Model» on one line (ellipsis if too long) → price.
+    const name = h("p", "kc-card__name ds-text-body", h("span", "kc-card__brand", p.brand), " ", h("span", "kc-card__model", p.name));
+    name.title = `${p.brand} ${p.name}`;
     const info = h("div", "kc-card__info",
-      h("p", "kc-card__brand ds-text-body", p.brand),
-      h("p", "kc-card__model ds-text-body", p.name),
-      h("div", "kc-card__row", h("p", "kc-card__condition ds-text-body-s", p.condition), h("p", "kc-card__price ds-text-body", money(p.price))),
+      h("p", "kc-card__condition ds-text-body-s", p.condition),
+      name,
+      h("p", "kc-card__price ds-text-body", money(p.price)),
     );
     const card = h("article", "kc-card", media, add, info);
     card.dataset.id = p.id;
@@ -140,6 +145,12 @@ export function mountCatalog(root, { products, selection, onSubmitFitting }) {
 
   function toggle(id) {
     const res = selection.toggle(id);
+    if (res.ok) {
+      const visual = cards.get(id).querySelector(".kc-add__visual");
+      visual.classList.remove("is-toggled");
+      void visual.offsetWidth;
+      visual.classList.add("is-toggled");
+    }
     if (!res.ok && res.reason === "limit") {
       showToast(`В примерку — не больше ${selection.limit} лотов. Уберите один, чтобы добавить другой`);
       const card = cards.get(id);
@@ -189,7 +200,7 @@ export function mountCatalog(root, { products, selection, onSubmitFitting }) {
     return b;
   });
   menu.append(...menuItems);
-  nav.append(menu);
+  sortWrap.append(menu);
   const onOutside = (e) => { if (!menu.contains(e.target) && !sortButton.contains(e.target)) closeMenu(); };
   function openMenu() {
     menu.hidden = false;

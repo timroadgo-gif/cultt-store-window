@@ -10,10 +10,10 @@
   --kc-product-radius: 4px; /* = mobile catalog .collection-product-media */
   --kc-add-visual: 28px;
   --kc-add-radius: 6px;
-  --kc-panel-height: 72px;
+  --kc-panel-height: 66px;
   --kc-panel-radius: 16px;
   --kc-panel-bottom: var(--spacing-standard-control);
-  --kc-thumb: 44px;
+  --kc-thumb: 40px;
   --kc-thumb-radius: 6px;
   --kc-sheet-width: 400px;
   --kc-sheet-radius: 16px;
@@ -36,13 +36,15 @@
 }
 
 .kc-top {
+  position: relative;
+  z-index: 3; /* the sort menu drops over the tabs and the grid */
   flex: none;
   display: flex;
   align-items: center;
   gap: var(--spacing-standard-block);
   padding: calc(var(--spacing-standard-block) + var(--safe-top)) calc(var(--kc-pad) + var(--safe-right)) var(--spacing-standard-control) calc(var(--kc-pad) + var(--safe-left));
 }
-.kc-logo { flex: none; margin-right: var(--spacing-standard-control); }
+.kc-logo { flex: none; margin-right: var(--spacing-standard-control); color: var(--color-green-7); } /* brand green (= --green of the product card) */
 
 .kc-search {
   flex: 1 1 auto;
@@ -71,12 +73,15 @@
   color: var(--field-icon);
   cursor: pointer;
 }
+.kc-controls { flex: none; display: flex; align-items: center; gap: var(--spacing-compact-inline); }
 .kc-filters-slot { flex: none; min-width: 132px; display: flex; justify-content: flex-end; }
+.kc-sort-wrap { position: relative; flex: none; }
+.kc-sort .ds-button__icon { transition: transform var(--motion-duration-fast) ease; }
+.kc-sort[aria-expanded="true"] .ds-button__icon { transform: rotate(180deg); }
 
 /* ---------- Categories + sort ---------- */
 .kc-nav {
   position: relative;
-  z-index: 3;
   flex: none;
   display: flex;
   align-items: stretch;
@@ -85,7 +90,7 @@
   margin: 0 calc(var(--kc-pad) + var(--safe-right)) 0 calc(var(--kc-pad) + var(--safe-left));
   box-shadow: inset 0 -1px 0 var(--kiosk-hairline);
 }
-.kc-tabs { display: flex; gap: var(--spacing-standard-block); }
+.kc-tabs { display: flex; gap: var(--spacing-standard-block); min-height: 48px; }
 .kc-tab {
   position: relative;
   min-height: 48px;
@@ -111,20 +116,6 @@
 .kc-tab[aria-selected="true"] { color: var(--color-ink); }
 .kc-tab[aria-selected="true"]::after { opacity: 1; }
 
-.kc-sort {
-  display: inline-flex;
-  align-items: center;
-  gap: var(--spacing-compact-stack);
-  min-height: 48px;
-  padding: 0 0 0 var(--spacing-compact-inline);
-  border: 0;
-  background: none;
-  color: var(--color-ink);
-  cursor: pointer;
-  -webkit-tap-highlight-color: transparent;
-}
-.kc-sort__chevron { display: grid; color: var(--color-grey-7); transition: transform var(--motion-duration-fast) ease; }
-.kc-sort[aria-expanded="true"] .kc-sort__chevron { transform: rotate(180deg); }
 
 .kc-menu {
   --corner-radius: var(--kc-menu-radius);
@@ -216,11 +207,12 @@
 
 .kc-card__info { display: flex; flex-direction: column; gap: var(--spacing-compact-stack); min-width: 0; }
 .kc-card__info p { margin: 0; }
-.kc-card__brand { color: var(--color-ink); }
-.kc-card__model { color: var(--color-ink); font-weight: var(--font-weight-light); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.kc-card__row { display: flex; align-items: baseline; justify-content: space-between; gap: var(--spacing-compact-inline); margin-top: var(--spacing-compact-stack); }
+/* Mobile catalog order and weights: condition (grey) → «Brand Model» one line, brand regular + model light → price. */
 .kc-card__condition { color: var(--color-grey-7); }
-.kc-card__price { color: var(--color-ink); white-space: nowrap; font-variant-numeric: tabular-nums; }
+.kc-card__name { color: var(--color-ink); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.kc-card__brand { font-weight: var(--font-weight-regular); }
+.kc-card__model { font-weight: var(--font-weight-light); }
+.kc-card__price { color: var(--color-ink); font-weight: var(--font-weight-light); white-space: nowrap; font-variant-numeric: tabular-nums; }
 
 /* Add-to-fitting: 44 × 44 touch target in the photo's corner, small 28 visual (mobile catalog: 24 on 44). */
 .kc-add {
@@ -248,12 +240,15 @@
   color: var(--color-ink);
   transition: background-color 180ms var(--kc-ease), color 180ms var(--kc-ease), opacity 180ms var(--kc-ease);
 }
-.kc-add__icon { position: absolute; inset: 0; display: grid; place-items: center; transition: opacity 160ms var(--kc-ease); }
-.kc-add__icon--check { opacity: 0; }
+.kc-add__icon { position: absolute; inset: 0; display: grid; place-items: center; transition: opacity 200ms var(--kc-ease), transform 220ms var(--kc-ease); }
+.kc-add__icon--check { opacity: 0; transform: scale(.6); }
 .kc-add:active .kc-add__visual { background: var(--color-white); }
-.kc-card[data-selected] .kc-add__visual { background: var(--color-green-7); color: var(--color-white); }
-.kc-card[data-selected] .kc-add__icon--plus { opacity: 0; }
-.kc-card[data-selected] .kc-add__icon--check { opacity: 1; }
+/* Selected: compact monochrome chip, same size/place/radius as «+»; «+» turns away, the check scales in. */
+.kc-card[data-selected] .kc-add__visual { background: var(--color-ink); color: var(--color-white); }
+.kc-card[data-selected] .kc-add__icon--plus { opacity: 0; transform: rotate(90deg) scale(.6); }
+.kc-card[data-selected] .kc-add__icon--check { opacity: 1; transform: none; }
+.kc-add__visual.is-toggled { animation: kc-press 220ms var(--kc-ease); }
+@keyframes kc-press { 0% { transform: scale(1); } 40% { transform: scale(.86); } 100% { transform: scale(1); } }
 .kc-add:focus-visible { outline: none; }
 .kc-add:focus-visible .kc-add__visual { outline: 2px solid var(--color-ink); outline-offset: 2px; }
 /* Limit reached: free «+» stay tappable (they explain the limit) but read as unavailable. */
@@ -287,7 +282,7 @@
 }
 .kc-toast[data-state="open"] { opacity: 1; transform: translate(-50%, 0); }
 
-/* ---------- Fitting panel ---------- */
+/* ---------- Fitting panel: light persistent utility (white, hairline, minimal shadow) ---------- */
 .kc-panel {
   --corner-radius: var(--kc-panel-radius);
   position: absolute;
@@ -301,9 +296,9 @@
   gap: var(--spacing-standard-block);
   height: var(--kc-panel-height);
   padding: 0 var(--spacing-standard-text-group) 0 var(--spacing-standard-block);
-  background: var(--color-green-9);
-  color: var(--color-white);
-  box-shadow: var(--kc-shadow);
+  background: var(--color-white);
+  color: var(--color-ink);
+  box-shadow: inset 0 0 0 1px var(--kiosk-hairline), 0 4px 16px color-mix(in srgb, var(--color-ink) 6%, transparent);
   transition: transform 360ms var(--kc-ease), opacity 240ms var(--kc-ease);
 }
 .kc-panel[data-state="hidden"] { transform: translateY(calc(100% + var(--kc-panel-bottom) + var(--safe-bottom))); opacity: 0; pointer-events: none; }
@@ -311,9 +306,12 @@
 .kc-panel__title {
   margin: 0;
   white-space: nowrap;
-  font: var(--text-heading-s-weight) var(--text-heading-s-size) / var(--text-heading-s-line-height) var(--font-family-sans);
+  font: var(--text-body-weight) var(--text-body-size) / var(--text-body-line-height) var(--font-family-sans);
   font-variant-numeric: tabular-nums;
 }
+.kc-panel__count { display: inline-block; }
+.kc-panel__count.is-changing { animation: kc-count 220ms var(--kc-ease); }
+@keyframes kc-count { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: none; } }
 .kc-panel__thumbs { display: flex; gap: var(--spacing-compact-inline); margin: 0; padding: 0; list-style: none; }
 .kc-panel__thumb {
   --corner-radius: var(--kc-thumb-radius);
@@ -323,7 +321,7 @@
   background: var(--color-grey-1);
 }
 .kc-panel__thumb img { display: block; width: 100%; height: 100%; object-fit: cover; }
-.kc-panel__thumb.is-new { animation: kc-thumb-in 260ms var(--kc-ease); }
+.kc-panel__thumb.is-new { animation: kc-thumb-in 240ms var(--kc-ease); }
 @keyframes kc-thumb-in { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
 .kc-panel__cta { flex: none; }
 
@@ -373,8 +371,8 @@
 .kf-note { margin: 0; color: var(--color-grey-7); }
 
 @media (prefers-reduced-motion: reduce) {
-  .kc-grid.is-entering, .kc-panel__thumb.is-new, .kc-card.is-refused .kc-add__visual { animation: none; }
-  .kc-panel, .kc-sheet, .kc-toast, .kc-scroll, .kc-add__visual, .kc-add__icon { transition: none; }
+  .kc-grid.is-entering, .kc-panel__thumb.is-new, .kc-card.is-refused .kc-add__visual, .kc-add__visual.is-toggled, .kc-panel__count.is-changing { animation: none; }
+  .kc-panel, .kc-sheet, .kc-toast, .kc-scroll, .kc-add__visual, .kc-add__icon, .kc-sort .ds-button__icon { transition: none; }
 }
 
 /* ---------- Fitting sheet (bottom, modal, one state, no drag handle) ---------- */

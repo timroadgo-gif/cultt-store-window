@@ -46,7 +46,7 @@
   margin-top: var(--spacing-compact-inline);
   font-size: var(--kconf-number-size);
   line-height: 1;
-  font-weight: var(--font-weight-medium); /* the system's maximum weight (500) */
+  font-weight: var(--font-weight-regular); /* display-size digits: regular reads as confident without weight */
   letter-spacing: -0.04em;
   color: var(--color-green-9);
   font-variant-numeric: tabular-nums lining-nums;
@@ -74,8 +74,8 @@
 .ds-button.kconf__done {
   --_height: 56px;
   --_pad: var(--spacing-spacious-hero);
-  --_fs: var(--text-heading-s-size);
-  --_lh: var(--text-heading-s-line-height);
+  --_fs: var(--kiosk-btn-fs);
+  --_lh: var(--kiosk-btn-lh);
   min-width: 220px;
 }
 .kconf__countdown {

@@ -169,7 +169,7 @@ body.sim {
 
 @media (max-width: 900px) { .sim-bar__meta, .sim-bar__label { display: none; } }
 
-/* Product page variant switch: the experimental option is marked so it is never mistaken for the default. */
-.sim-seg--pdp .sim-seg__btn[data-pdp="gallery"][aria-pressed="true"] { background: var(--color-green-7); color: var(--color-white); }
+/* Product page switch: the previous page is marked so it is never mistaken for the main one. */
+.sim-seg--pdp .sim-seg__btn[data-pdp="standard"][aria-pressed="true"] { background: var(--color-grey-7); color: var(--color-white); }
 .sim-btn, .sim-seg__btn, .sim-select { white-space: nowrap; }
 @media (max-width: 1560px) { .sim-bar__meta, .sim-bar__label { display: none; } }

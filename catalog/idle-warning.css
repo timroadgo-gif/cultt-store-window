@@ -37,7 +37,7 @@
 .kidle__progress { fill: none; stroke: var(--color-green-7); stroke-width: 3; stroke-linecap: round; }
 .kidle__number {
   position: relative;
-  font: var(--font-weight-medium) 32px / 1 var(--font-family-sans);
+  font: var(--font-weight-regular) 32px / 1 var(--font-family-sans);
   letter-spacing: -0.02em;
   font-variant-numeric: tabular-nums lining-nums;
   color: var(--color-green-9);
@@ -55,7 +55,7 @@
   text-wrap: balance;
 }
 .kidle__actions { align-self: stretch; display: flex; flex-direction: column; align-items: center; gap: var(--spacing-compact-inline); margin-top: var(--spacing-standard-block); }
-.ds-button.kidle__continue { --_height: 52px; --_fs: var(--text-heading-s-size); --_lh: var(--text-heading-s-line-height); }
+.ds-button.kidle__continue { --_height: var(--kiosk-action-height); --_fs: var(--kiosk-btn-fs); --_lh: var(--kiosk-btn-lh); }
 .kidle__restart { min-height: 44px; }
 
 @media (prefers-reduced-motion: reduce) {

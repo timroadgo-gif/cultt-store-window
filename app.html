@@ -17,28 +17,28 @@
     <link rel="icon" type="image/png" sizes="32x32" href="./icons/favicon-32.png" />
     <link rel="preload" href="./design-system/fonts/manrope-cyrillic-wght-normal.woff2" as="font" type="font/woff2" crossorigin />
     <link rel="preload" href="./design-system/fonts/manrope-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin />
-    <link rel="stylesheet" href="./design-system/fonts/fonts.css?v=00dd94ce5b19" />
-    <link rel="stylesheet" href="./design-system/tokens/tokens.css?v=00dd94ce5b19" />
-    <link rel="stylesheet" href="./design-system/css/corners.css?v=00dd94ce5b19" />
-    <link rel="stylesheet" href="./design-system/css/typography.css?v=00dd94ce5b19" />
-    <link rel="stylesheet" href="./design-system/icons/icon.css?v=00dd94ce5b19" />
-    <link rel="stylesheet" href="./design-system/css/backdrop.css?v=00dd94ce5b19" />
-    <link rel="stylesheet" href="./design-system/css/glass.css?v=00dd94ce5b19" />
-    <link rel="stylesheet" href="./design-system/components/icon-button/icon-button.css?v=00dd94ce5b19" />
-    <link rel="stylesheet" href="./design-system/components/button/button.css?v=00dd94ce5b19" />
-    <link rel="stylesheet" href="./design-system/components/field/field.css?v=00dd94ce5b19" />
-    <link rel="stylesheet" href="./design-system/components/checkbox/checkbox.css?v=00dd94ce5b19" />
-    <link rel="stylesheet" href="./design-system/components/text-action/text-action.css?v=00dd94ce5b19" />
-    <link rel="stylesheet" href="./design-system/components/gallery-pager/gallery-pager.css?v=00dd94ce5b19" />
-    <link rel="stylesheet" href="./vendor/photoswipe/photoswipe.css?v=00dd94ce5b19" />
-    <link rel="stylesheet" href="./styles.css?v=00dd94ce5b19" />
-    <link rel="stylesheet" href="./catalog/catalog.css?v=00dd94ce5b19" />
-    <link rel="stylesheet" href="./catalog/product.css?v=00dd94ce5b19" />
-    <link rel="stylesheet" href="./catalog/product-gallery.css?v=00dd94ce5b19" />
-    <link rel="stylesheet" href="./catalog/confirm.css?v=00dd94ce5b19" />
-    <link rel="stylesheet" href="./catalog/idle-warning.css?v=00dd94ce5b19" />
-    <meta name="build" content="00dd94ce5b19" />
-  <meta name="app-build" content="00dd94ce5b19" />
+    <link rel="stylesheet" href="./design-system/fonts/fonts.css?v=984b1ae84d9b" />
+    <link rel="stylesheet" href="./design-system/tokens/tokens.css?v=984b1ae84d9b" />
+    <link rel="stylesheet" href="./design-system/css/corners.css?v=984b1ae84d9b" />
+    <link rel="stylesheet" href="./design-system/css/typography.css?v=984b1ae84d9b" />
+    <link rel="stylesheet" href="./design-system/icons/icon.css?v=984b1ae84d9b" />
+    <link rel="stylesheet" href="./design-system/css/backdrop.css?v=984b1ae84d9b" />
+    <link rel="stylesheet" href="./design-system/css/glass.css?v=984b1ae84d9b" />
+    <link rel="stylesheet" href="./design-system/components/icon-button/icon-button.css?v=984b1ae84d9b" />
+    <link rel="stylesheet" href="./design-system/components/button/button.css?v=984b1ae84d9b" />
+    <link rel="stylesheet" href="./design-system/components/field/field.css?v=984b1ae84d9b" />
+    <link rel="stylesheet" href="./design-system/components/checkbox/checkbox.css?v=984b1ae84d9b" />
+    <link rel="stylesheet" href="./design-system/components/text-action/text-action.css?v=984b1ae84d9b" />
+    <link rel="stylesheet" href="./design-system/components/gallery-pager/gallery-pager.css?v=984b1ae84d9b" />
+    <link rel="stylesheet" href="./vendor/photoswipe/photoswipe.css?v=984b1ae84d9b" />
+    <link rel="stylesheet" href="./styles.css?v=984b1ae84d9b" />
+    <link rel="stylesheet" href="./catalog/catalog.css?v=984b1ae84d9b" />
+    <link rel="stylesheet" href="./catalog/product.css?v=984b1ae84d9b" />
+    <link rel="stylesheet" href="./catalog/product-gallery.css?v=984b1ae84d9b" />
+    <link rel="stylesheet" href="./catalog/confirm.css?v=984b1ae84d9b" />
+    <link rel="stylesheet" href="./catalog/idle-warning.css?v=984b1ae84d9b" />
+    <meta name="build" content="984b1ae84d9b" />
+  <meta name="app-build" content="984b1ae84d9b" />
   <script>(()=>{const m=document.querySelector('meta[name="app-build"]');if(!m||!window.fetch)return;const cur=m.content;const url=new URL('version.json',document.baseURI);const check=()=>fetch(url+'?t='+Date.now(),{cache:'no-store'}).then(r=>r.ok?r.json():null).then(v=>{if(!v||!v.build||v.build===cur)return;const k='app-build-reload:'+v.build;try{if(sessionStorage.getItem(k))return;sessionStorage.setItem(k,'1')}catch(e){}const u=new URL(location.href);u.searchParams.set('v',v.build);location.replace(u.href)}).catch(()=>{});check();document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible')check()});addEventListener('pageshow',e=>{if(e.persisted)check()})})();</script>
   </head>
   <body>
@@ -72,13 +72,13 @@
     <!-- Catalog (catalog/catalog-screen.js builds the content). -->
     <main class="kc" id="catalogScreen" data-screen-id="catalog" aria-label="Каталог" hidden></main>
 
-    <!-- Product page (catalog/product-screen.js). -->
+    <!-- Previous product page (catalog/product-screen.js), route #/product/<id>; simulator switch «Прежняя». -->
     <main class="kp" id="productScreen" data-screen-id="product" aria-labelledby="productTitle" hidden></main>
 
-    <!-- EXPERIMENT: gallery product page (catalog/product-gallery-screen.js), route #/product-x/<id>. -->
+    <!-- Product page (main): gallery layout (catalog/product-gallery-screen.js), route #/product-x/<id>. -->
     <main class="kpx" id="productXScreen" data-screen-id="productx" aria-labelledby="productXTitle" hidden></main>
 
 
-    <script type="module" src="./app.js?v=00dd94ce5b19"></script>
+    <script type="module" src="./app.js?v=984b1ae84d9b"></script>
   </body>
 </html>

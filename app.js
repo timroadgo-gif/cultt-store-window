@@ -4,20 +4,20 @@
 // confirmation screen (request number, 10 s) covers everything and then returns to the welcome screen.
 // Visitor state (catalog search / filters / sort, fitting selection) lives in memory only; it is cleared by the
 // inactivity warning (restart / timeout) and after a confirmed fitting request.
-import { createButton } from "./design-system/components/button/button.js?v=00dd94ce5b19";
-import { pill } from "./catalog/ui.js?v=00dd94ce5b19";
-import { idleTimeoutMs, warningSeconds } from "./config.js?v=00dd94ce5b19";
-import { createIdleTimer } from "./idle.js?v=00dd94ce5b19";
-import { mountShowcase } from "./showcase.js?v=00dd94ce5b19";
-import { SHOWCASE_COLUMNS } from "./products.js?v=00dd94ce5b19";
-import { CATALOG_PRODUCTS } from "./catalog/products.js?v=00dd94ce5b19";
-import { createSelection } from "./catalog/selection.js?v=00dd94ce5b19";
-import { mountCatalog } from "./catalog/catalog-screen.js?v=00dd94ce5b19";
-import { submitFittingRequest } from "./catalog/request.js?v=00dd94ce5b19";
-import { createConfirmScreen } from "./catalog/confirm-screen.js?v=00dd94ce5b19";
-import { createIdleWarning } from "./catalog/idle-warning.js?v=00dd94ce5b19";
-import { mountProduct } from "./catalog/product-screen.js?v=00dd94ce5b19";
-import { mountProductGallery } from "./catalog/product-gallery-screen.js?v=00dd94ce5b19";
+import { createButton } from "./design-system/components/button/button.js?v=984b1ae84d9b";
+import { pill } from "./catalog/ui.js?v=984b1ae84d9b";
+import { idleTimeoutMs, warningSeconds } from "./config.js?v=984b1ae84d9b";
+import { createIdleTimer } from "./idle.js?v=984b1ae84d9b";
+import { mountShowcase } from "./showcase.js?v=984b1ae84d9b";
+import { SHOWCASE_COLUMNS } from "./products.js?v=984b1ae84d9b";
+import { CATALOG_PRODUCTS } from "./catalog/products.js?v=984b1ae84d9b";
+import { createSelection } from "./catalog/selection.js?v=984b1ae84d9b";
+import { mountCatalog } from "./catalog/catalog-screen.js?v=984b1ae84d9b";
+import { submitFittingRequest } from "./catalog/request.js?v=984b1ae84d9b";
+import { createConfirmScreen } from "./catalog/confirm-screen.js?v=984b1ae84d9b";
+import { createIdleWarning } from "./catalog/idle-warning.js?v=984b1ae84d9b";
+import { mountProduct } from "./catalog/product-screen.js?v=984b1ae84d9b";
+import { mountProductGallery } from "./catalog/product-gallery-screen.js?v=984b1ae84d9b";
 
 const ROUTES = { welcome: "#/", catalog: "#/catalog", product: "#/product/", productX: "#/product-x/" };
 const $ = (sel) => document.querySelector(sel);
@@ -34,10 +34,10 @@ const catalog = mountCatalog($("#catalogScreen"), {
   onAddMore: () => { if (currentRoute() === "product") go("catalog"); },
 });
 const product = mountProduct($("#productScreen"), { byId, selection, onBack: () => go("catalog"), onOpenFitting: () => catalog.fittingSheet.open() });
-// EXPERIMENT: gallery product page. Which product page the catalog opens: "standard" (default) or "gallery".
-// Chosen in the desktop simulator (or ?pdp=gallery); both variants share data and the fitting selection.
+// Product page: the gallery page (product-gallery-screen.js) is the main one since 2026-11-17; the previous page
+// (product-screen.js) stays available through the simulator switch «Прежняя» (or ?pdp=classic). Same data, same selection.
 const productX = mountProductGallery($("#productXScreen"), { byId, selection, onBack: () => go("catalog"), onOpenFitting: () => catalog.fittingSheet.open() });
-let pdpVariant = new URLSearchParams(location.search).get("pdp") === "gallery" ? "gallery" : "standard";
+let pdpVariant = new URLSearchParams(location.search).get("pdp") === "classic" ? "standard" : "gallery";
 
 // Catalog scroll position survives a visit to a product page (the catalog is hidden, not rebuilt).
 let catalogScroll = 0;

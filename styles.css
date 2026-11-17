@@ -16,6 +16,15 @@
   --kiosk-card-radius: 8px;
   --kiosk-cta-height: 56px;       /* pill CTA (task requirement; UI Kit Button has only the 50 px size) */
   --kiosk-cta-pad: var(--spacing-spacious-group);
+  /* Button roles (one source for every screen): hero CTA 56 (welcome, confirmation) · action 52 (product, tray, sheets,
+     filters, inactivity) · tool 44 (catalog toolbar). Labels: Manrope 500 — 15 px on pill actions (was 16; lighter,
+     same height), 14 px on tools (kit button size). Icons 20 px, icon–label gap 8 px (kit). */
+  --kiosk-action-height: 52px;
+  --kiosk-action-pad: var(--spacing-spacious-group);
+  --kiosk-btn-fs: 15px;
+  --kiosk-btn-lh: 20px;
+  --kiosk-tool-height: 44px;
+  --kiosk-tool-pad: var(--spacing-standard-control);
   --kiosk-panel-pad: var(--spacing-spacious-group);
   --kiosk-intro-pad-inline: var(--spacing-spacious-hero);
   --kiosk-intro-pad-block: var(--spacing-spacious-section);
@@ -47,7 +56,7 @@
 *, *::before, *::after { box-sizing: border-box; }
 
 /* Pill action buttons (catalog/ui.js → pill()): UI Kit Button, radius 9999px via the kit corner system. */
-.ds-button.kiosk-pill { --corner-radius: 9999px; }
+.ds-button.kiosk-pill { --corner-radius: 9999px; --_height: var(--kiosk-action-height); --_pad: var(--kiosk-action-pad); --_fs: var(--kiosk-btn-fs); --_lh: var(--kiosk-btn-lh); }
 
 html, body {
   height: 100%;
@@ -171,8 +180,8 @@ body { position: fixed; inset: 0; } /* no rubber-band scroll in iPad Safari / Ho
 .welcome__cta .ds-button {
   --_height: var(--kiosk-cta-height);
   --_pad: var(--kiosk-cta-pad);
-  --_fs: var(--text-heading-s-size);
-  --_lh: var(--text-heading-s-line-height);
+  --_fs: var(--kiosk-btn-fs);
+  --_lh: var(--kiosk-btn-lh);
   min-width: 264px;
 }
 

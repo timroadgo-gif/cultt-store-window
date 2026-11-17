@@ -123,9 +123,9 @@
 /* CTA: UI Kit Button (primary → secondary when selected), capsule like the other kiosk CTAs; one fixed size. */
 .kp-actions { display: flex; flex-direction: column; gap: var(--spacing-standard-text-group); }
 .ds-button.kp-cta {
-  --_height: 52px;
-  --_fs: var(--text-heading-s-size);
-  --_lh: var(--text-heading-s-line-height);
+  --_height: var(--kiosk-action-height);
+  --_fs: var(--kiosk-btn-fs);
+  --_lh: var(--kiosk-btn-lh);
   transition: background-color 180ms var(--kc-ease), color 180ms var(--kc-ease);
 }
 .ds-button.kp-cta.is-changed { animation: kp-cta 220ms var(--kc-ease); }

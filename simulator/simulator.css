@@ -173,3 +173,7 @@ body.sim {
 .sim-seg--pdp .sim-seg__btn[data-pdp="standard"][aria-pressed="true"] { background: var(--color-grey-7); color: var(--color-white); }
 .sim-btn, .sim-seg__btn, .sim-select { white-space: nowrap; }
 @media (max-width: 1560px) { .sim-bar__meta, .sim-bar__label { display: none; } }
+
+/* Connection test controls: simulated states are tinted so a test state is never mistaken for the real one. */
+.sim-seg--net .sim-seg__btn[data-net="offline"][aria-pressed="true"],
+.sim-seg--net .sim-seg__btn[data-net="reconnecting"][aria-pressed="true"] { background: var(--color-grey-7); color: var(--color-white); }

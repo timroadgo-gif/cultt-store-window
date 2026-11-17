@@ -1,16 +1,16 @@
 // Каталог витрины (iPad, landscape): шапка (логотип, поиск, фильтры), категории + сортировка, активные фильтры и
 // число лотов, сетка карточек с выбором на примерку, панель примерки. Состояние каталога — в памяти, сбрасывается
 // reset() (по бездействию). Выбор на примерку живёт в selection и не сбрасывается при поиске / фильтрах / сортировке.
-import { createButton } from "../design-system/components/button/button.js?v=984b1ae84d9b";
-import { createTextAction } from "../design-system/components/text-action/text-action.js?v=984b1ae84d9b";
-import { createIcon } from "../design-system/icons/icon.js?v=984b1ae84d9b";
+import { createButton } from "../design-system/components/button/button.js?v=7a26db7e6a78";
+import { createTextAction } from "../design-system/components/text-action/text-action.js?v=7a26db7e6a78";
+import { createIcon } from "../design-system/icons/icon.js?v=7a26db7e6a78";
 import {
-  CATEGORIES, SORT_OPTIONS, applyCatalog, activeFilterChips, assignFilters, clearFilters, createCatalogState, lotsWord, money,
-} from "./filters.js?v=984b1ae84d9b";
-import { openFilterSheet } from "./filter-sheet.js?v=984b1ae84d9b";
-import { pill } from "./ui.js?v=984b1ae84d9b";
-import { createFittingPanel } from "./fitting-panel.js?v=984b1ae84d9b";
-import { createFittingSheet } from "./fitting-sheet.js?v=984b1ae84d9b";
+  CATEGORIES, FILTER_SETS, SORT_OPTIONS, applyCatalog, activeFilterChips, assignFilters, clearFilters, createCatalogState, createFilters, lotsWord, money,
+} from "./filters.js?v=7a26db7e6a78";
+import { openFilterSheet } from "./filter-sheet.js?v=7a26db7e6a78";
+import { pill } from "./ui.js?v=7a26db7e6a78";
+import { createFittingPanel } from "./fitting-panel.js?v=7a26db7e6a78";
+import { createFittingSheet } from "./fitting-sheet.js?v=7a26db7e6a78";
 
 const h = (tag, className, ...children) => {
   const n = document.createElement(tag);
@@ -25,7 +25,7 @@ const iconCache = new Map();
 const loadIcon = (url) => { if (!iconCache.has(url)) iconCache.set(url, fetch(url).then((r) => r.text()).catch(() => "")); return iconCache.get(url); };
 const loadFiltersIcon = () => loadIcon(FILTERS_ICON_URL);
 
-export function mountCatalog(root, { products, selection, onSubmitFitting, onOpenProduct, onAddMore }) {
+export function mountCatalog(root, { products, selection, network, onSubmitFitting, onOpenProduct, onAddMore }) {
   const state = createCatalogState();
   const byId = new Map(products.map((p) => [p.id, p]));
 
@@ -99,12 +99,18 @@ export function mountCatalog(root, { products, selection, onSubmitFitting, onOpe
   // ---------- Grid ----------
   const grid = h("div", "kc-grid");
   grid.setAttribute("role", "list");
+  // Empty result: ONE component, content and actions by context (emptyContent below). Product data is local and
+  // synchronous, so an empty list here always means a completed search / filtering returned nothing — there is no
+  // loading state, and the connection does not affect it (offline is shown by the offline notice, not here).
   const empty = h("div", "kc-empty");
   empty.hidden = true;
+  empty.setAttribute("role", "status");
+  const emptyIcon = h("span", "kc-empty__icon", createIcon("search", { size: 24 }));
+  emptyIcon.setAttribute("aria-hidden", "true");
   const emptyTitle = h("p", "kc-empty__title");
-  const emptyText = h("p", "kc-empty__text ds-text-body");
-  const emptyAction = h("div", "kc-empty__action");
-  empty.append(emptyTitle, emptyText, emptyAction);
+  const emptyText = h("p", "kc-empty__text");
+  const emptyAction = h("div", "kc-empty__actions");
+  empty.append(emptyIcon, emptyTitle, emptyText, emptyAction);
   const scroller = h("div", "kc-scroll", meta, grid, empty);
   scroller.dataset.scrollReset = "";
 
@@ -113,7 +119,7 @@ export function mountCatalog(root, { products, selection, onSubmitFitting, onOpe
   toast.hidden = true;
 
   // «Открыть примерку» → bottom sheet over the catalog; it reads and edits the same selection.
-  const fittingSheet = createFittingSheet({ byId, selection, onSubmit: (ids) => onSubmitFitting?.(ids), onAddMore: () => onAddMore?.() });
+  const fittingSheet = createFittingSheet({ byId, selection, network, onSubmit: (ids) => onSubmitFitting?.(ids), onAddMore: () => onAddMore?.() });
   const panel = createFittingPanel({ byId, limit: selection.limit, onOpen: () => { closeMenu(); hideToast(); fittingSheet.open(); } });
   root.append(top, nav, scroller, toast, panel.el);
 
@@ -293,20 +299,54 @@ export function mountCatalog(root, { products, selection, onSubmitFitting, onOpe
     }));
     if (chips.length) chipsBox.append(resetAll);
     meta.toggleAttribute("data-has-chips", chips.length > 0);
-    count.textContent = `${list.length} ${lotsWord(list.length)} ${list.length === 1 ? "доступен" : "доступны"} к примерке`;
+    count.textContent = list.length ? `${list.length} ${lotsWord(list.length)} ${list.length === 1 ? "доступен" : "доступны"} к примерке` : `0 ${lotsWord(0)}`;
     paintFiltersButton();
 
     empty.hidden = list.length > 0;
-    if (!list.length) {
-      const narrowed = state.query || chips.length;
-      const catLabel = CATEGORIES.find((c) => c.id === state.category).label;
-      emptyTitle.textContent = narrowed ? "Ничего не нашлось" : `${catLabel} — пока нет лотов`;
-      emptyText.textContent = narrowed ? "Попробуйте изменить запрос или фильтры" : "В прототипе пока только сумки";
-      emptyAction.replaceChildren(pill(createButton({
-        label: narrowed ? "Сбросить поиск и фильтры" : "Показать все лоты", variant: "secondary",
-        onClick: () => { input.value = ""; state.query = ""; clearFilters(state); state.category = "all"; update({ animate: true }); },
-      })));
-    }
+    scroller.toggleAttribute("data-empty", !list.length);
+    if (!list.length) paintEmpty(emptyContent(chips.length > 0));
+  }
+
+  // ---------- Empty result ----------
+  // «Показать все …» opens the current category without search / filters (sort and the fitting selection stay);
+  // a category with no lots at all in the catalogue falls back to «Все».
+  const SHOW_ALL = { all: "Показать все лоты", bags: "Показать все сумки", shoes: "Показать всю обувь", jewelry: "Показать все украшения", watches: "Показать все часы", accessories: "Показать все аксессуары" };
+  const hasLots = (category) => products.some((p) => p.availability === "available" && (category === "all" || p.category === category));
+  const clearQuery = () => { input.value = ""; state.query = ""; };
+  function emptyContent(hasFilters) {
+    const hasQuery = !!state.query.trim();
+    const target = hasLots(state.category) ? state.category : "all";
+    const showAll = { label: SHOW_ALL[target], run: () => { clearQuery(); clearFilters(state); state.category = target; } };
+    if (hasQuery && hasFilters) return {
+      kind: "search-filters", title: "Ничего не найдено", text: "Попробуйте изменить запрос или фильтры.",
+      primary: { label: "Сбросить поиск и фильтры", run: () => { clearQuery(); clearFilters(state); } }, secondary: showAll,
+    };
+    if (hasQuery) return {
+      kind: "search", title: "Ничего не найдено", text: "Попробуйте изменить запрос или посмотрите другие товары.",
+      primary: { label: "Очистить поиск", run: clearQuery }, secondary: showAll,
+    };
+    if (hasFilters) return {
+      kind: "filters", title: "По выбранным фильтрам ничего не найдено", text: "Попробуйте изменить параметры поиска или сбросить фильтры.",
+      primary: { label: "Сбросить фильтры", run: () => clearFilters(state) }, secondary: showAll,
+    };
+    // No search, no filters: the category itself has no lots (the prototype data has bags only).
+    const catLabel = CATEGORIES.find((c) => c.id === state.category).label;
+    return {
+      kind: "category", title: `${catLabel} — пока нет лотов`, text: "Загляните в другие категории или спросите консультанта.",
+      primary: { label: "Показать все лоты", run: () => { state.category = "all"; } }, secondary: null,
+    };
+  }
+  function paintEmpty(c) {
+    empty.dataset.kind = c.kind;
+    emptyTitle.textContent = c.title;
+    emptyText.textContent = c.text;
+    const act = (a, variant) => {
+      const b = pill(createButton({ label: a.label, variant, onClick: () => { a.run(); update({ animate: true, scrollTop: true }); } }));
+      if (variant === "secondary") b.classList.add("kiosk-neutral");
+      b.classList.add("kc-empty__action");
+      return b;
+    };
+    emptyAction.replaceChildren(act(c.primary, "primary"), ...(c.secondary ? [act(c.secondary, "secondary")] : []));
   }
 
   // Next visitor: everything back to the initial state (selection is cleared by app.js).
@@ -324,5 +364,14 @@ export function mountCatalog(root, { products, selection, onSubmitFitting, onOpe
   }
 
   update();
-  return { reset, onSelectionChange, get state() { return state; }, scroller, closeOverlays: () => { closeMenu(); sheet?.close({ immediate: true }); }, fittingSheet, panel, closeFittingSheet: () => fittingSheet.close({ immediate: true }) };
+  // Automated checks only: apply filters exactly as the filters panel's «Показать» does.
+  function applyFilters(f) {
+    const next = createFilters();
+    for (const k of FILTER_SETS) if (f[k]) next[k] = new Set(f[k]);
+    if ("priceMin" in f) next.priceMin = f.priceMin;
+    if ("priceMax" in f) next.priceMax = f.priceMax;
+    assignFilters(state, next);
+    update({ animate: true, scrollTop: true });
+  }
+  return { reset, onSelectionChange, applyFilters, get state() { return state; }, get empty() { return empty.hidden ? null : { kind: empty.dataset.kind, title: emptyTitle.textContent, text: emptyText.textContent, actions: [...emptyAction.children].map((b) => b.textContent.trim()), count: count.textContent }; }, scroller, header: top, closeOverlays: () => { closeMenu(); sheet?.close({ immediate: true }); }, fittingSheet, panel, closeFittingSheet: () => fittingSheet.close({ immediate: true }) };
 }

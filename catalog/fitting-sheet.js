@@ -5,12 +5,16 @@
 //   • Последний лот убран → шторка закрывается, панель примерки в каталоге скрывается (selection пуст).
 //   • «Добавить еще» закрывает шторку (выбор сохраняется); при 5 из 5 скрыта.
 //   • «Заказать на примерку» → onSubmit (следующий шаг), выбор не очищается.
+//   • Без связи шторка работает как обычно (убрать, «Добавить еще», закрыть); заблокирована только отправка: кнопка
+//     в состоянии disabled UI Kit, под ней — причина. Связь вернулась → кнопка снова активна, короткое подтверждение.
+//     Ошибка отправки (сервис не ответил, таймаут, ошибка сервиса) — пояснение под кнопкой, выбор сохраняется.
 // Подложка — ModalBackdrop UI Kit (легкое затемнение + небольшой размытие, слой целиком плавно появляется).
-import { createModalBackdrop, openBackdrop, closeBackdrop } from "../design-system/backdrop/backdrop.js?v=984b1ae84d9b";
-import { createButton, setButtonState } from "../design-system/components/button/button.js?v=984b1ae84d9b";
-import { createIcon } from "../design-system/icons/icon.js?v=984b1ae84d9b";
-import { money } from "./filters.js?v=984b1ae84d9b";
-import { pill } from "./ui.js?v=984b1ae84d9b";
+import { createModalBackdrop, openBackdrop, closeBackdrop } from "../design-system/backdrop/backdrop.js?v=7a26db7e6a78";
+import { createButton, setButtonState } from "../design-system/components/button/button.js?v=7a26db7e6a78";
+import { createIcon } from "../design-system/icons/icon.js?v=7a26db7e6a78";
+import { money } from "./filters.js?v=7a26db7e6a78";
+import { pill } from "./ui.js?v=7a26db7e6a78";
+import { offlineIcon } from "./offline.js?v=7a26db7e6a78";
 
 const h = (tag, className, ...children) => {
   const n = document.createElement(tag);
@@ -25,7 +29,17 @@ const REMOVE_FADE_MS = 160;
 const MOVE_MS = 280;
 const reducedMotion = () => matchMedia("(prefers-reduced-motion: reduce)").matches;
 
-export function createFittingSheet({ byId, selection, onAddMore, onSubmit }) {
+const NOTE_DEFAULT = "Принесем со склада — обычно это несколько минут";
+const NOTES = {
+  offline: "Нет подключения к интернету. Заказать получится, когда связь вернется — выбранные лоты сохранятся",
+  service: "Сервис примерки недоступен. Заказать получится, когда связь вернется — выбранные лоты сохранятся",
+  restored: "Связь восстановлена — можно заказывать",
+  timeout: "Сервис не ответил вовремя. Выбранные лоты сохранены — попробуйте еще раз",
+  server: "Не получилось отправить заявку. Выбранные лоты сохранены — попробуйте еще раз или обратитесь к консультанту",
+};
+const RESTORED_MS = 4000;
+
+export function createFittingSheet({ byId, selection, network, onAddMore, onSubmit }) {
   let backdrop = null;
   let el = null;
   let refs = null;
@@ -46,7 +60,11 @@ export function createFittingSheet({ byId, selection, onAddMore, onSubmit }) {
     addMore.classList.add("kfs__add-more", "kiosk-neutral");
     const submit = pill(createButton({ label: "Заказать на примерку", variant: "primary", width: "fill", onClick: () => submitRequest() }));
     submit.classList.add("kfs__submit");
-    const note = h("p", "kfs__note", "Принесем со склада — обычно это несколько минут");
+    const noteIcon = h("span", "kfs__note-icon");
+    noteIcon.innerHTML = offlineIcon(16);
+    const noteText = h("span", "kfs__note-text", NOTE_DEFAULT);
+    const note = h("p", "kfs__note", noteIcon, noteText);
+    note.setAttribute("role", "status");
     const primary = h("div", "kfs__primary", submit, note);
     const actions = h("div", "kfs__actions", addMore, primary);
 
@@ -55,7 +73,7 @@ export function createFittingSheet({ byId, selection, onAddMore, onSubmit }) {
     sheet.setAttribute("role", "dialog");
     sheet.setAttribute("aria-modal", "true");
     sheet.setAttribute("aria-labelledby", "kfsTitle");
-    refs = { title, slots, addMore, closeBtn, submit };
+    refs = { title, slots, addMore, closeBtn, submit, note, noteText };
     return sheet;
   }
 
@@ -139,19 +157,54 @@ export function createFittingSheet({ byId, selection, onAddMore, onSubmit }) {
   // «Заказать на примерку»: one request at a time (the button turns into the kit loading state); the confirmation is
   // shown by onSubmit only after the (mock) submission resolved. On failure the button comes back.
   let submitting = false;
+  let error = null; // last failed attempt: "offline" | "unreachable" | "timeout" | "server"
+  let restoredUntil = 0;
+  let restoredTimer = null;
+  let wasShown = network?.state.shown ?? false;
   async function submitRequest() {
     if (submitting || !selection.size) return;
+    if (network && !network.canOrder) { error = network.state.reason === "service" ? "unreachable" : "offline"; paintNet(); return; } // no request at all
     submitting = true;
+    error = null;
     setButtonState(refs.submit, "loading");
     refs.closeBtn.disabled = true;
+    paintNet();
     try {
       await onSubmit?.(selection.ids);
-    } catch {
-      if (refs) { setButtonState(refs.submit, "default"); refs.closeBtn.disabled = false; }
+    } catch (e) {
+      error = e?.kind ?? "server";
+      if (refs) refs.closeBtn.disabled = false;
     } finally {
       submitting = false;
+      paintNet();
     }
   }
+
+  // Button + note from the connection state and the last attempt. The selection is never touched here.
+  function paintNet() {
+    if (!refs) return;
+    const s = network?.state ?? { shown: false, online: true, reason: null };
+    const blocked = s.shown || (!s.online && (error === "offline" || error === "unreachable"));
+    if (!submitting) setButtonState(refs.submit, blocked ? "disabled" : "default");
+    let kind = "default";
+    if (blocked) kind = s.reason === "service" ? "service" : "offline";
+    else if (error === "timeout" || error === "server" || error === "unreachable") kind = error === "unreachable" ? "timeout" : error;
+    else if (Date.now() < restoredUntil) kind = "restored";
+    refs.note.dataset.kind = kind;
+    const text = kind === "default" ? NOTE_DEFAULT : NOTES[kind];
+    if (refs.noteText.textContent !== text) refs.noteText.textContent = text;
+  }
+  network?.subscribe((s) => {
+    if (wasShown && !s.shown) { // recovered: confirm briefly, then the usual note
+      error = null;
+      restoredUntil = Date.now() + RESTORED_MS;
+      clearTimeout(restoredTimer);
+      restoredTimer = setTimeout(paintNet, RESTORED_MS + 20);
+    }
+    if (s.shown) restoredUntil = 0;
+    wasShown = s.shown;
+    paintNet();
+  });
 
   // Called by the catalog on every selection change while the sheet exists.
   function update() {
@@ -168,6 +221,8 @@ export function createFittingSheet({ byId, selection, onAddMore, onSubmit }) {
     backdrop = createModalBackdrop({ onDismiss: () => close() });
     el = build();
     render();
+    error = null;
+    paintNet();
     document.body.append(backdrop, el);
     openBackdrop(backdrop);
     void el.offsetWidth;
@@ -187,5 +242,9 @@ export function createFittingSheet({ byId, selection, onAddMore, onSubmit }) {
     else closeTimer = setTimeout(done, CLOSE_MS);
   }
 
-  return { open, close, update, get isOpen() { return !!el && el.dataset.state === "open"; } };
+  return {
+    open, close, update,
+    get isOpen() { return !!el && el.dataset.state === "open"; },
+    get state() { return { open: !!el && el.dataset.state === "open", submit: refs?.submit.dataset.state ?? null, note: refs?.note.dataset.kind ?? null, noteText: refs?.noteText.textContent ?? null, error }; },
+  };
 }

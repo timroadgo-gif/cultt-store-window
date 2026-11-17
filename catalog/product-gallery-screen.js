@@ -14,14 +14,14 @@
 //     галерея заканчивается у верхнего края панели (перекрытие 8 px), фото уменьшаются с сохранением 3:4. Переход
 //     анимирован (360 мс, как выезд панели; без анимации при reduced motion), позиция прокрутки сохраняется.
 // Выбор на примерку — общий selection (каталог, панель примерки, шторка).
-import { createButton } from "../design-system/components/button/button.js?v=984b1ae84d9b";
-import { createTextAction } from "../design-system/components/text-action/text-action.js?v=984b1ae84d9b";
-import { createIconButton } from "../design-system/components/icon-button/icon-button.js?v=984b1ae84d9b";
-import { createIcon } from "../design-system/icons/icon.js?v=984b1ae84d9b";
-import { money } from "./filters.js?v=984b1ae84d9b";
-import { pill } from "./ui.js?v=984b1ae84d9b";
-import { openFullscreen } from "./fullscreen.js?v=984b1ae84d9b";
-import { lotDetails } from "./lot-details.js?v=984b1ae84d9b";
+import { createButton } from "../design-system/components/button/button.js?v=7a26db7e6a78";
+import { createTextAction } from "../design-system/components/text-action/text-action.js?v=7a26db7e6a78";
+import { createIconButton } from "../design-system/components/icon-button/icon-button.js?v=7a26db7e6a78";
+import { createIcon } from "../design-system/icons/icon.js?v=7a26db7e6a78";
+import { money } from "./filters.js?v=7a26db7e6a78";
+import { pill } from "./ui.js?v=7a26db7e6a78";
+import { openFullscreen } from "./fullscreen.js?v=7a26db7e6a78";
+import { lotDetails } from "./lot-details.js?v=7a26db7e6a78";
 
 const h = (tag, className, ...children) => {
   const n = document.createElement(tag);

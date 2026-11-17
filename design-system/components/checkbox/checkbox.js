@@ -1,5 +1,5 @@
 // Checkbox factory (Figma «Check Boxes» M). createCheckbox({ label, checked, onChange }) → <label>.
-import { createIcon } from "../../icons/icon.js?v=984b1ae84d9b";
+import { createIcon } from "../../icons/icon.js?v=7a26db7e6a78";
 
 export function createCheckbox({ label, checked = false, name, onChange } = {}) {
   if (!label) throw new Error("Checkbox: label is required");

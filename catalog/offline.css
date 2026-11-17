@@ -1,0 +1,123 @@
+/* Offline experience — catalog/offline.js, catalog/network.js.
+   Notice: compact horizontal card, near-white surface + hairline, small outline icon, Manrope 500 / 400, no red.
+   Inline in the catalog (under the header, pushes the content down — never covers controls or cards); floating
+   top-right over the photos on the product pages and the welcome screen. Restrained fade / slide, reduced motion = none. */
+.knet {
+  --knet-motion: 320ms var(--motion-easing-standard);
+  --knet-radius: 14px;
+  font-family: var(--font-family-sans);
+}
+.knet__card {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-standard-text-group);
+  padding: var(--spacing-standard-text-group) var(--spacing-standard-control);
+  border-radius: var(--knet-radius);
+  background: var(--color-grey-1);
+  box-shadow: inset 0 0 0 1px var(--kiosk-hairline);
+  color: var(--color-ink);
+}
+.knet__icon { flex: none; display: grid; color: var(--color-ink); }
+.knet__text { flex: 1 1 auto; min-width: 0; display: flex; flex-wrap: wrap; column-gap: var(--spacing-compact-inline); row-gap: 0; align-items: baseline; }
+.knet__title { margin: 0; font: var(--font-weight-medium) 14px / 20px var(--font-family-sans); }
+.knet__body { margin: 0; font: var(--font-weight-regular) 14px / 20px var(--font-family-sans); color: var(--color-grey-7); }
+/* Retry indicator: always in the layout (no reflow), visible only while a check is running. */
+.knet__status {
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--spacing-compact-inline);
+  font: var(--font-weight-regular) 13px / 18px var(--font-family-sans);
+  color: var(--color-grey-7);
+  opacity: 0;
+  transition: opacity 200ms var(--motion-easing-standard);
+}
+.knet[data-checking] .knet__status { opacity: 1; }
+.knet__spinner {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  border: 1.5px solid color-mix(in srgb, currentColor 30%, transparent);
+  border-top-color: currentColor;
+  animation: knet-spin 900ms linear infinite;
+}
+@keyframes knet-spin { to { transform: rotate(360deg); } }
+
+/* Inline (catalog): the row opens with grid rows 0fr → 1fr, so the content below moves smoothly, nothing is covered. */
+.knet[data-placement="inline"] {
+  flex: none;
+  display: grid;
+  grid-template-rows: 0fr;
+  padding: 0 calc(var(--kc-pad) + var(--safe-right)) 0 calc(var(--kc-pad) + var(--safe-left));
+  opacity: 0;
+  visibility: hidden;
+  transition: grid-template-rows var(--knet-motion), opacity 220ms var(--motion-easing-standard), visibility 0s linear 320ms;
+}
+.knet[data-placement="inline"][data-state="shown"] { grid-template-rows: 1fr; opacity: 1; visibility: visible; transition-delay: 0s; }
+.knet__clip { min-height: 0; overflow: hidden; }
+.knet[data-placement="inline"] .knet__card { margin-bottom: var(--spacing-compact-inline); }
+.knet[data-placement="inline"] .knet__text { flex-wrap: nowrap; }
+.knet[data-placement="inline"] .knet__body { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+@media (max-width: 1240px) { /* iPad mini / Air: title over text */
+  .knet[data-placement="inline"] .knet__text { flex-direction: column; align-items: flex-start; }
+  .knet[data-placement="inline"] .knet__body { white-space: normal; }
+}
+
+/* Floating (product pages, welcome): white card with a restrained shadow, top-right, level with the back control. */
+.welcome { position: relative; }
+.knet[data-placement="float"] {
+  position: absolute;
+  z-index: 6;
+  top: calc(var(--spacing-standard-control) + var(--safe-top));
+  right: calc(var(--spacing-standard-block) + var(--safe-right));
+  width: min(500px, calc(100% - 2 * var(--spacing-standard-block) - 60px));
+  pointer-events: none;
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(-6px);
+  transition: opacity 240ms var(--motion-easing-standard), transform var(--knet-motion), visibility 0s linear 320ms;
+}
+.knet[data-placement="float"][data-state="shown"] { opacity: 1; visibility: visible; transform: none; transition-delay: 0s; }
+.knet[data-placement="float"] .knet__card {
+  align-items: flex-start;
+  background: var(--color-white);
+  box-shadow: 0 0 0 1px color-mix(in srgb, var(--color-ink) 6%, transparent), 0 6px 20px color-mix(in srgb, var(--color-ink) 7%, transparent);
+}
+.knet[data-placement="float"] .knet__icon { margin-top: 0; }
+.knet[data-placement="float"] .knet__text { flex-direction: column; align-items: flex-start; }
+.knet[data-placement="float"] .knet__status { position: absolute; right: var(--spacing-standard-control); top: var(--spacing-standard-text-group); line-height: 20px; }
+.knet[data-placement="float"] .knet__status-label { display: none; } /* compact: spinner only */
+.knet[data-placement="float"][data-checking] .knet__title { padding-right: 20px; }
+
+/* ---------- Photos that could not load without a connection ---------- */
+img[data-unavailable] { visibility: hidden; }
+.kimg-host { position: relative; }
+.kimg-off {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  align-content: center;
+  justify-items: center;
+  gap: var(--spacing-compact-inline);
+  padding: var(--spacing-standard-text-group);
+  background: var(--color-grey-1);
+  color: var(--color-grey-6);
+  text-align: center;
+  pointer-events: none;
+}
+.kimg-off__text { max-width: 22ch; font: var(--font-weight-regular) 13px / 18px var(--font-family-sans); text-wrap: balance; }
+
+/* ---------- Fitting sheet note (catalog/fitting-sheet.js) ---------- */
+.kfs__note { text-wrap: balance; transition: color 200ms var(--motion-easing-standard); }
+.kfs__note-icon { display: none; margin-right: 6px; vertical-align: -3px; }
+.kfs__note[data-kind="offline"], .kfs__note[data-kind="service"] { color: var(--color-ink); font-weight: var(--font-weight-regular); }
+.kfs__note[data-kind="offline"] .kfs__note-icon, .kfs__note[data-kind="service"] .kfs__note-icon { display: inline-block; }
+.kfs__note-icon svg { display: block; }
+.kfs__note[data-kind="timeout"], .kfs__note[data-kind="server"] { color: var(--color-red-7); font-weight: var(--font-weight-regular); } /* the one sparing use of red: a failed attempt */
+.kfs__note[data-kind="restored"] { color: var(--color-green-7); font-weight: var(--font-weight-regular); }
+
+
+@media (prefers-reduced-motion: reduce) {
+  .knet, .knet[data-placement], .knet__status, .kfs__note { transition: none; }
+  .knet__spinner { animation: none; border-color: currentColor; border-radius: 50%; width: 6px; height: 6px; background: currentColor; }
+}

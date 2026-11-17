@@ -64,6 +64,7 @@
 .kc-search__icon { flex: none; display: grid; color: var(--field-icon); }
 .kc-search .ds-field__content { flex: 1; min-width: 0; }
 .kc-search__input { width: 100%; }
+.kc-search__input:not(:focus) { text-overflow: ellipsis; } /* a long query never widens the field; while editing it scrolls as usual */
 .kc-search__input::-webkit-search-cancel-button, .kc-search__input::-webkit-search-decoration { -webkit-appearance: none; appearance: none; }
 .kc-search__input { -webkit-user-select: text; user-select: text; }
 .kc-search__clear {
@@ -272,11 +273,18 @@
 .kc-card.is-refused .kc-add__visual { animation: kc-refuse 600ms var(--kc-ease); }
 @keyframes kc-refuse { 0%, 100% { opacity: .45; } 30% { opacity: 1; } }
 
-.kc-empty { display: flex; flex-direction: column; align-items: center; gap: var(--spacing-standard-text-group); padding: var(--space-96) 0; text-align: center; }
+/* Empty result (one component for filters / search / both / empty category): thin kit search icon without a
+   container, Manrope 500 22 px heading, 400 15 px grey text (max two lines), two pill actions of equal weight.
+   Centred in the area between the meta row and the fitting tray (the scroller already reserves the tray's height). */
+.kc-scroll[data-empty] { display: flex; flex-direction: column; }
+.kc-scroll[data-empty] .kc-grid { display: none; }
+.kc-empty { flex: 1 0 auto; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: var(--spacing-spacious-group) 0 var(--space-96); text-align: center; }
 .kc-empty p { margin: 0; }
-.kc-empty__title { font: var(--text-heading-l-weight) var(--text-heading-l-size) / var(--text-heading-l-line-height) var(--font-family-sans); letter-spacing: var(--text-heading-l-letter-spacing); color: var(--color-ink); }
-.kc-empty__text { color: var(--color-grey-7); }
-.kc-empty__action { margin-top: var(--spacing-standard-text-group); }
+.kc-empty__icon { display: grid; color: var(--color-grey-7); margin-bottom: var(--spacing-standard-control); }
+.kc-empty__title { max-width: 30ch; font: var(--font-weight-medium) 22px / 28px var(--font-family-sans); letter-spacing: var(--font-tracking-snug, 0); color: var(--color-ink); text-wrap: balance; }
+.kc-empty__text { max-width: 44ch; margin-top: var(--spacing-compact-inline) !important; font: var(--font-weight-regular) 15px / 22px var(--font-family-sans); color: var(--color-grey-7); text-wrap: balance; }
+.kc-empty__actions { display: flex; flex-wrap: wrap; justify-content: center; gap: var(--spacing-standard-text-group); margin-top: var(--spacing-spacious-group); }
+.ds-button.kc-empty__action { min-width: 220px; }
 
 /* ---------- Toast (limit) ---------- */
 .kc-toast {

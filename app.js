@@ -4,31 +4,43 @@
 // confirmation screen (request number, 10 s) covers everything and then returns to the welcome screen.
 // Visitor state (catalog search / filters / sort, fitting selection) lives in memory only; it is cleared by the
 // inactivity warning (restart / timeout) and after a confirmed fitting request.
-import { createButton } from "./design-system/components/button/button.js?v=984b1ae84d9b";
-import { pill } from "./catalog/ui.js?v=984b1ae84d9b";
-import { idleTimeoutMs, warningSeconds } from "./config.js?v=984b1ae84d9b";
-import { createIdleTimer } from "./idle.js?v=984b1ae84d9b";
-import { mountShowcase } from "./showcase.js?v=984b1ae84d9b";
-import { SHOWCASE_COLUMNS } from "./products.js?v=984b1ae84d9b";
-import { CATALOG_PRODUCTS } from "./catalog/products.js?v=984b1ae84d9b";
-import { createSelection } from "./catalog/selection.js?v=984b1ae84d9b";
-import { mountCatalog } from "./catalog/catalog-screen.js?v=984b1ae84d9b";
-import { submitFittingRequest } from "./catalog/request.js?v=984b1ae84d9b";
-import { createConfirmScreen } from "./catalog/confirm-screen.js?v=984b1ae84d9b";
-import { createIdleWarning } from "./catalog/idle-warning.js?v=984b1ae84d9b";
-import { mountProduct } from "./catalog/product-screen.js?v=984b1ae84d9b";
-import { mountProductGallery } from "./catalog/product-gallery-screen.js?v=984b1ae84d9b";
+// Connectivity (catalog/network.js): one monitor for all screens. Without a connection everything local keeps working
+// (catalog, filters, sort, product pages, the fitting selection and its sheet); only sending the fitting request is
+// blocked. A compact notice (catalog/offline.js) is placed per screen; recovery is automatic and keeps all state.
+import { createButton } from "./design-system/components/button/button.js?v=7a26db7e6a78";
+import { pill } from "./catalog/ui.js?v=7a26db7e6a78";
+import { idleTimeoutMs, warningSeconds } from "./config.js?v=7a26db7e6a78";
+import { createIdleTimer } from "./idle.js?v=7a26db7e6a78";
+import { mountShowcase } from "./showcase.js?v=7a26db7e6a78";
+import { SHOWCASE_COLUMNS } from "./products.js?v=7a26db7e6a78";
+import { CATALOG_PRODUCTS } from "./catalog/products.js?v=7a26db7e6a78";
+import { createSelection } from "./catalog/selection.js?v=7a26db7e6a78";
+import { mountCatalog } from "./catalog/catalog-screen.js?v=7a26db7e6a78";
+import { OrderError, nextOrderFailure, setNextOrderFailure, submitFittingRequest } from "./catalog/request.js?v=7a26db7e6a78";
+import { createNetwork } from "./catalog/network.js?v=7a26db7e6a78";
+import { createOfflineBanner, watchImages } from "./catalog/offline.js?v=7a26db7e6a78";
+import { createConfirmScreen } from "./catalog/confirm-screen.js?v=7a26db7e6a78";
+import { createIdleWarning } from "./catalog/idle-warning.js?v=7a26db7e6a78";
+import { mountProduct } from "./catalog/product-screen.js?v=7a26db7e6a78";
+import { mountProductGallery } from "./catalog/product-gallery-screen.js?v=7a26db7e6a78";
 
 const ROUTES = { welcome: "#/", catalog: "#/catalog", product: "#/product/", productX: "#/product-x/" };
 const $ = (sel) => document.querySelector(sel);
 const byId = new Map(CATALOG_PRODUCTS.map((p) => [p.id, p]));
 
 let startedAt = null;
+const network = createNetwork();
+const offlineBanner = createOfflineBanner(network);
+const images = watchImages(network);
+{ // simulator: ?net=offline | reconnecting opens the app in that state
+  const sim = new URLSearchParams(location.search).get("net");
+  if (sim) network.simulate(sim);
+}
 const showcase = mountShowcase($("#showcase"), SHOWCASE_COLUMNS);
 
 const selection = createSelection({ onChange: (change) => { catalog.onSelectionChange(change); product.onSelectionChange(change); productX.onSelectionChange(change); } });
 const catalog = mountCatalog($("#catalogScreen"), {
-  products: CATALOG_PRODUCTS, selection,
+  products: CATALOG_PRODUCTS, selection, network,
   onSubmitFitting: (ids) => submitAndConfirm(ids),
   onOpenProduct: (id) => openProduct(id),
   onAddMore: () => { if (currentRoute() === "product") go("catalog"); },
@@ -52,8 +64,14 @@ const confirm = createConfirmScreen({
   onEntered: () => { resetSession(); go("welcome", { replace: true }); },
 });
 async function submitAndConfirm(ids) {
-  const request = await submitFittingRequest(ids); // throws → the sheet restores its button
-  confirm.show(request);
+  try {
+    const request = await submitFittingRequest(ids, { network });
+    confirm.show(request);
+  } catch (e) {
+    // Only network failures go to the monitor (it re-checks; one failed call is not proof the device is offline).
+    if (e instanceof OrderError && e.kind !== "server") network.reportFailure(e.kind);
+    throw e; // the sheet explains it and keeps the selection
+  }
 }
 
 const welcomeCta = createButton({
@@ -138,6 +156,9 @@ function render() {
   // One fitting tray, shown on the catalog and on the product page.
   const trayHost = { catalog: "#catalogScreen", product: "#productScreen", productx: "#productXScreen" }[route];
   if (trayHost) $(trayHost).append(catalog.panel.el);
+  // Offline notice: in the catalog flow under the header; floating top-right elsewhere (not on the confirmation).
+  if (route === "catalog") offlineBanner.place(null, { placement: "inline", after: catalog.header });
+  else offlineBanner.place($({ welcome: "#welcomeScreen", product: "#productScreen", productx: "#productXScreen" }[route] ?? "#welcomeScreen"));
   if (route === "catalog" && (lastRoute === "product" || lastRoute === "productx")) catalog.scroller.scrollTop = catalogScroll;
   lastRoute = route;
   // The welcome screen is the idle state: the showcase runs there, the idle timer runs everywhere else.
@@ -171,5 +192,14 @@ window.__kiosk = {
     return pdpVariant;
   },
   get confirm() { return confirm.state; },
+  get network() { return { ...network.state, canOrder: network.canOrder, failedImages: images.failed, nextOrderFailure: nextOrderFailure() }; },
+  get fitting() { return catalog.fittingSheet.state; },
+  get empty() { return catalog.empty; },
+  // Automated checks only: same as applying the filters panel.
+  applyFilters(f) { catalog.applyFilters(f); },
+  // Simulator control (prototype testing only): "online" (= real connection) | "offline" | "reconnecting".
+  setNetwork(mode) { return network.simulate(mode === "online" ? null : mode); },
+  // Simulator control: make the next fitting request fail although the connection is fine ("server" | "timeout").
+  setNextOrderFailure(kind) { return setNextOrderFailure(kind); },
   get catalog() { const s = catalog.state; return { query: s.query, category: s.category, sort: s.sort, types: [...s.types], brands: [...s.brands], models: [...s.models], colors: [...s.colors], conditions: [...s.conditions], priceMin: s.priceMin, priceMax: s.priceMax, scrollTop: catalog.scroller.scrollTop }; },
 };

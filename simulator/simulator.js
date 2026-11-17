@@ -5,7 +5,7 @@
 // The app (app.html) runs in an iframe of exactly the device's landscape CSS viewport; only a CSS transform on the
 // whole device scales it visually, so the app's innerWidth / innerHeight and media queries never see the window size.
 // One iframe for the whole session: switching devices resizes it and keeps the app state.
-import { DEVICES, deviceById } from "./devices.js?v=984b1ae84d9b";
+import { DEVICES, deviceById } from "./devices.js?v=7a26db7e6a78";
 
 const $ = (id) => document.getElementById(id);
 const els = {
@@ -120,6 +120,26 @@ for (const b of pdpButtons) b.addEventListener("click", () => {
   paintPdp();
 });
 paintPdp();
+
+// Connection test states (prototype only; the app never shows these controls): «Онлайн» = the real connection,
+// «Офлайн» / «Переподключение» are simulated inside the app (no real request is made while simulated).
+// ?net=offline|reconnecting in the shell URL is passed to the app on load and switched live through its hook.
+const netButtons = [...document.querySelectorAll("[data-net]")];
+let net = ["offline", "reconnecting"].includes(new URLSearchParams(location.search).get("net")) ? new URLSearchParams(location.search).get("net") : "online";
+function paintNet() { for (const b of netButtons) b.setAttribute("aria-pressed", String(b.dataset.net === net)); document.body.dataset.net = net; }
+for (const b of netButtons) b.addEventListener("click", () => {
+  net = b.dataset.net;
+  const url = new URL(location.href);
+  if (net === "online") url.searchParams.delete("net"); else url.searchParams.set("net", net);
+  history.replaceState(null, "", url);
+  els.app.contentWindow?.__kiosk?.setNetwork(net);
+  paintNet();
+});
+paintNet();
+// Next fitting request fails although the connection is fine (one request; the select resets after it is used).
+const orderFailure = document.getElementById("orderFailure");
+orderFailure.addEventListener("change", () => { els.app.contentWindow?.__kiosk?.setNextOrderFailure(orderFailure.value || null); });
+setInterval(() => { const k = els.app.contentWindow?.__kiosk; if (k && !k.network.nextOrderFailure && orderFailure.value) orderFailure.value = ""; }, 500);
 
 els.back.addEventListener("click", () => { location.hash = ""; });
 els.select.addEventListener("change", () => { location.hash = els.select.value + (zoom === "100" ? "/100" : ""); });

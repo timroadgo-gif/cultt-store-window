@@ -1,8 +1,8 @@
 // Shared fullscreen photo viewer for both product pages (standard and experimental gallery): PhotoSwipe 5 (vendored,
 // MIT) — swipe between photos, pinch / double-tap zoom, pan, counter, UI Kit icons, ink background.
 // The host keeps its gallery in sync through onChange(index) and gets the photo element for the open/close «zoom».
-import PhotoSwipe from "../vendor/photoswipe/photoswipe.esm.min.js?v=984b1ae84d9b";
-import { iconMarkup } from "../design-system/icons/icon.js?v=984b1ae84d9b";
+import PhotoSwipe from "../vendor/photoswipe/photoswipe.esm.min.js?v=7a26db7e6a78";
+import { iconMarkup } from "../design-system/icons/icon.js?v=7a26db7e6a78";
 
 const PHOTO = { w: 960, h: 1280 };
 const reducedMotion = () => matchMedia("(prefers-reduced-motion: reduce)").matches;
@@ -33,6 +33,7 @@ export function openFullscreen({ product, index, thumbFor, onChange, onClose }) 
     arrowPrevTitle: "Предыдущее фото",
     arrowNextTitle: "Следующее фото",
     indexIndicatorSep: " / ",
+    errorMsg: "Фото загрузится, когда вернется связь", // no connection and not cached yet
     closeSVG: icon("close", "kp-pswp-close"),
     zoomSVG: icon("search", "kp-pswp-zoom"),
     arrowPrevSVG: icon("chevron-left", "kp-pswp-arrow"),

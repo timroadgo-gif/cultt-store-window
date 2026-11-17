@@ -1,8 +1,8 @@
 // Панель примерки: плавающая полоса внизу экрана каталога. Скрыта, пока ничего не выбрано; появляется с первым
 // лотом, обновляет счетчик и миниатюры, уходит, когда выбор пуст. Каталог добавляет снизу отступ под нее
 // (data-panel на экране), поэтому она не закрывает карточки и их кнопки.
-import { createButton } from "../design-system/components/button/button.js?v=984b1ae84d9b";
-import { pill } from "./ui.js?v=984b1ae84d9b";
+import { createButton } from "../design-system/components/button/button.js?v=7a26db7e6a78";
+import { pill } from "./ui.js?v=7a26db7e6a78";
 
 export function createFittingPanel({ byId, limit, onOpen }) {
   const el = document.createElement("section");

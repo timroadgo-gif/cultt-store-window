@@ -3,16 +3,19 @@
    sizes or card radius. They are app-level values of this prototype, built from UI Kit primitives where possible,
    and are proposals pending design approval (not part of tokens.json). */
 :root {
-  --kiosk-text-hero-size: clamp(52px, 7.4vh, 76px);
-  --kiosk-text-hero-line-height: 1.06;
-  --kiosk-text-lead-size: 20px;
-  --kiosk-text-lead-line-height: 28px;
-  --kiosk-text-step-size: 17px;
-  --kiosk-text-step-line-height: 24px;
+  /* Welcome typography and rhythm scale with the iPad's height (mini 744 · Air 820 · Pro 1032):
+     headline 40 · 44 · 56, lead 16 · 17 · 20, steps 15 · 15.6 · 18, group gap 31 · 34 · 43. */
+  --kiosk-text-hero-size: clamp(38px, 5.4vh, 56px);
+  --kiosk-text-hero-line-height: 1.14;
+  --kiosk-text-lead-size: clamp(16px, 2.1vh, 20px);
+  --kiosk-text-lead-line-height: 1.5;
+  --kiosk-text-step-size: clamp(15px, 1.9vh, 18px);
+  --kiosk-text-step-line-height: 1.45;
+  --kiosk-welcome-gap: clamp(var(--spacing-standard-block), 4.2vh, var(--spacing-spacious-section));
+  --kiosk-welcome-text-gap: clamp(var(--spacing-standard-text-group), 2vh, var(--spacing-standard-block));
   --kiosk-card-radius: 8px;
-  --kiosk-cta-height: 64px;       /* pill CTA (task requirement; UI Kit Button has only the 50 px size) */
+  --kiosk-cta-height: 56px;       /* pill CTA (task requirement; UI Kit Button has only the 50 px size) */
   --kiosk-cta-pad: var(--spacing-spacious-group);
-  --kiosk-caption-line: 18px;     /* showcase caption: fixed line so a card is a whole number of pixels */
   --kiosk-panel-pad: var(--spacing-spacious-group);
   --kiosk-intro-pad-inline: var(--spacing-spacious-hero);
   --kiosk-intro-pad-block: var(--spacing-spacious-section);
@@ -97,22 +100,23 @@ body { position: fixed; inset: 0; } /* no rubber-band scroll in iPad Safari / Ho
     calc(var(--kiosk-intro-pad-inline) + var(--safe-left));
 }
 
+/* Logo at the top; headline, lead, steps and CTA form one group centred in the remaining height. */
+.welcome__intro { justify-content: space-between; }
 .welcome__content {
-  flex: 1 1 auto;
+  flex: 0 1 auto;
   min-height: 0;
   display: flex;
   flex-direction: column;
-  justify-content: center;
-  gap: var(--spacing-spacious-section);
-  padding-block: var(--spacing-spacious-group);
+  gap: var(--kiosk-welcome-gap);
+  margin-block: auto var(--kiosk-welcome-gap);
 }
 
-.welcome__text { display: flex; flex-direction: column; gap: var(--spacing-standard-block); }
+.welcome__text { display: flex; flex-direction: column; gap: var(--kiosk-welcome-text-gap); }
 
 .welcome__title {
   margin: 0;
   font-family: var(--font-family-sans);
-  font-weight: var(--font-weight-light);
+  font-weight: var(--font-weight-regular);
   font-size: var(--kiosk-text-hero-size);
   line-height: var(--kiosk-text-hero-line-height);
   letter-spacing: var(--font-tracking-tight);
@@ -122,7 +126,7 @@ body { position: fixed; inset: 0; } /* no rubber-band scroll in iPad Safari / Ho
 
 .welcome__lead {
   margin: 0;
-  max-width: 30ch;
+  max-width: 32ch;
   font-family: var(--font-family-sans);
   font-weight: var(--font-weight-light);
   font-size: var(--kiosk-text-lead-size);
@@ -135,17 +139,17 @@ body { position: fixed; inset: 0; } /* no rubber-band scroll in iPad Safari / Ho
   list-style: none;
   margin: 0;
   padding: 0;
-  max-width: 420px;
+  max-width: clamp(380px, 46vh, 460px);
   display: flex;
   flex-direction: column;
   box-shadow: inset 0 1px 0 var(--kiosk-hairline);
 }
 .steps__item {
   display: grid;
-  grid-template-columns: 40px minmax(0, 1fr);
+  grid-template-columns: 32px minmax(0, 1fr);
   align-items: baseline;
-  gap: var(--spacing-standard-control);
-  padding: var(--spacing-standard-control) 0;
+  gap: var(--spacing-standard-text-group);
+  padding: clamp(var(--spacing-standard-text-group), 1.6vh, var(--spacing-standard-control)) 0;
   box-shadow: inset 0 -1px 0 var(--kiosk-hairline);
   font-family: var(--font-family-sans);
   font-weight: var(--font-weight-regular);
@@ -154,7 +158,7 @@ body { position: fixed; inset: 0; } /* no rubber-band scroll in iPad Safari / Ho
   color: var(--color-ink);
 }
 .steps__num {
-  font-size: var(--text-body-s-size);
+  font-size: var(--text-caption-size);
   line-height: var(--kiosk-text-step-line-height);
   font-weight: var(--font-weight-medium);
   letter-spacing: var(--font-tracking-open);
@@ -162,7 +166,7 @@ body { position: fixed; inset: 0; } /* no rubber-band scroll in iPad Safari / Ho
   font-variant-numeric: tabular-nums;
 }
 
-.welcome__cta { flex: none; }
+.welcome__cta { flex: none; margin-bottom: auto; }
 /* Pill CTA: the UI Kit primary Button (brand green, Manrope 500) with a taller, fully rounded geometry. */
 .welcome__cta .ds-button {
   --_height: var(--kiosk-cta-height);
@@ -204,32 +208,31 @@ body { position: fixed; inset: 0; } /* no rubber-band scroll in iPad Safari / Ho
   to { transform: translate3d(0, 0, 0); }
 }
 
-/* Card = 3:4 photo + one-line caption on the green. Height is set in whole pixels by showcase.js. */
+/* Card = 3:4 photo with the name in a white capsule inside it. Height is set in whole pixels by showcase.js. */
 .showcase-card {
   position: relative;
   flex: none;
-  display: flex;
-  flex-direction: column;
-  gap: var(--spacing-compact-inline);
-  margin: 0 0 var(--spacing-standard-block); /* trailing gap per card: one sequence = exactly half the track */
+  margin: 0 0 var(--spacing-standard-control); /* trailing gap per card: one sequence = exactly half the track */
 }
 .showcase-card__media {
   --corner-radius: var(--kiosk-card-radius);
+  position: relative;
   height: var(--showcase-photo-height, auto);
   aspect-ratio: 3 / 4; /* fallback until showcase.js sets the whole-pixel height */
   overflow: hidden;
   background: var(--kiosk-card-bg);
 }
-.showcase-card__image { display: block; width: 100%; height: 100%; object-fit: cover; pointer-events: none; }
+.showcase-card__image { display: block; width: 100%; height: 100%; object-fit: cover; pointer-events: none; } /* photos are 3:4: nothing is cropped */
 .showcase-card__label {
+  --corner-radius: 999px;
+  position: absolute;
+  left: var(--spacing-standard-text-group);
+  bottom: var(--spacing-standard-text-group);
+  max-width: calc(100% - 2 * var(--spacing-standard-text-group));
   margin: 0;
-  height: var(--kiosk-caption-line);
-  font-family: var(--font-family-sans);
-  font-weight: var(--font-weight-light);
-  font-size: var(--text-body-s-size);
-  line-height: var(--kiosk-caption-line);
-  letter-spacing: var(--font-tracking-open);
-  color: color-mix(in srgb, var(--color-white) 78%, transparent);
+  padding: var(--spacing-compact-stack) var(--spacing-standard-text-group);
+  background: var(--color-white);
+  color: var(--color-ink);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;

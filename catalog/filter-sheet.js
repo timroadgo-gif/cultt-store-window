@@ -1,12 +1,12 @@
 // Фильтры каталога — боковая панель от правого края экрана на всю высоту (паттерн Dollar Shave Club / Upwork:
 // заголовок и крестик сверху, прокручиваемые группы, внизу «Сбросить» + «Показать N лотов»), над ModalBackdrop UI Kit.
 // Изменения применяются сразу (сетка за подложкой обновляется). Закрытие: крестик, «Показать», тап по подложке, Escape.
-import { createModalBackdrop, openBackdrop, closeBackdrop } from "../design-system/backdrop/backdrop.js?v=9354fc60204c";
-import { createButton } from "../design-system/components/button/button.js?v=9354fc60204c";
-import { createCheckbox } from "../design-system/components/checkbox/checkbox.js?v=9354fc60204c";
-import { createIcon } from "../design-system/icons/icon.js?v=9354fc60204c";
-import { pill } from "./ui.js?v=9354fc60204c";
-import { CONDITIONS, PRICE_LIMITS, brandsOf, clearFilters, lotsWord, money } from "./filters.js?v=9354fc60204c";
+import { createModalBackdrop, openBackdrop, closeBackdrop } from "../design-system/backdrop/backdrop.js?v=be4f822cd987";
+import { createButton } from "../design-system/components/button/button.js?v=be4f822cd987";
+import { createCheckbox } from "../design-system/components/checkbox/checkbox.js?v=be4f822cd987";
+import { createIcon } from "../design-system/icons/icon.js?v=be4f822cd987";
+import { pill } from "./ui.js?v=be4f822cd987";
+import { CONDITIONS, PRICE_LIMITS, brandsOf, clearFilters, lotsWord, money } from "./filters.js?v=be4f822cd987";
 
 const h = (tag, className, ...children) => {
   const n = document.createElement(tag);

@@ -4,19 +4,19 @@
 // confirmation screen (request number, 10 s) covers everything and then returns to the welcome screen.
 // Visitor state (catalog search / filters / sort, fitting selection) lives in memory only; it is cleared by the
 // inactivity warning (restart / timeout) and after a confirmed fitting request.
-import { createButton } from "./design-system/components/button/button.js?v=9354fc60204c";
-import { pill } from "./catalog/ui.js?v=9354fc60204c";
-import { idleTimeoutMs, warningSeconds } from "./config.js?v=9354fc60204c";
-import { createIdleTimer } from "./idle.js?v=9354fc60204c";
-import { mountShowcase } from "./showcase.js?v=9354fc60204c";
-import { SHOWCASE_COLUMNS } from "./products.js?v=9354fc60204c";
-import { CATALOG_PRODUCTS } from "./catalog/products.js?v=9354fc60204c";
-import { createSelection } from "./catalog/selection.js?v=9354fc60204c";
-import { mountCatalog } from "./catalog/catalog-screen.js?v=9354fc60204c";
-import { submitFittingRequest } from "./catalog/request.js?v=9354fc60204c";
-import { createConfirmScreen } from "./catalog/confirm-screen.js?v=9354fc60204c";
-import { createIdleWarning } from "./catalog/idle-warning.js?v=9354fc60204c";
-import { mountProduct } from "./catalog/product-screen.js?v=9354fc60204c";
+import { createButton } from "./design-system/components/button/button.js?v=be4f822cd987";
+import { pill } from "./catalog/ui.js?v=be4f822cd987";
+import { idleTimeoutMs, warningSeconds } from "./config.js?v=be4f822cd987";
+import { createIdleTimer } from "./idle.js?v=be4f822cd987";
+import { mountShowcase } from "./showcase.js?v=be4f822cd987";
+import { SHOWCASE_COLUMNS } from "./products.js?v=be4f822cd987";
+import { CATALOG_PRODUCTS } from "./catalog/products.js?v=be4f822cd987";
+import { createSelection } from "./catalog/selection.js?v=be4f822cd987";
+import { mountCatalog } from "./catalog/catalog-screen.js?v=be4f822cd987";
+import { submitFittingRequest } from "./catalog/request.js?v=be4f822cd987";
+import { createConfirmScreen } from "./catalog/confirm-screen.js?v=be4f822cd987";
+import { createIdleWarning } from "./catalog/idle-warning.js?v=be4f822cd987";
+import { mountProduct } from "./catalog/product-screen.js?v=be4f822cd987";
 
 const ROUTES = { welcome: "#/", catalog: "#/catalog", product: "#/product/" };
 const $ = (sel) => document.querySelector(sel);

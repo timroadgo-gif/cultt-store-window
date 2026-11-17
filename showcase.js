@@ -3,7 +3,7 @@
 // by exactly one sequence (translateY 0 → -50 %, or the reverse), so the last frame equals the first.
 // Every card carries its own trailing gap (margin-bottom), so one sequence is exactly half the track.
 // Duration = sequence height / speed, so both columns move at the same constant px/s at any screen size.
-import { SHOWCASE_SPEED_PX_S } from "./config.js?v=9354fc60204c";
+import { SHOWCASE_SPEED_PX_S } from "./config.js?v=be4f822cd987";
 
 const card = ({ name, image }) => {
   const el = document.createElement("figure");
@@ -16,11 +16,13 @@ const card = ({ name, image }) => {
   img.alt = "";
   img.decoding = "async";
   img.draggable = false;
+  // Name in a compact white capsule inside the photo, bottom-left (the earlier, approved treatment).
   const label = document.createElement("figcaption");
-  label.className = "showcase-card__label";
+  label.className = "showcase-card__label ds-corner ds-text-body-s";
+  label.dataset.corner = "circular";
   label.textContent = name;
-  media.append(img);
-  el.append(media, label);
+  media.append(img, label);
+  el.append(media);
   return el;
 };
 

@@ -1,0 +1,255 @@
+/* THE CULTT store-window kiosk (iPad, landscape). UI Kit: tokens, Manrope, typography, corners, Button.
+   Kiosk-only tokens below: the UI Kit scale is a compact phone scale (max 36px) and has no reading-from-a-distance
+   sizes or card radius. They are app-level values of this prototype, built from UI Kit primitives where possible,
+   and are proposals pending design approval (not part of tokens.json). */
+:root {
+  --kiosk-text-hero-size: clamp(56px, 7.6vh, 76px);
+  --kiosk-text-hero-line-height: 1.04;
+  --kiosk-text-lead-size: 22px;
+  --kiosk-text-lead-line-height: 30px;
+  --kiosk-text-step-size: 18px;
+  --kiosk-text-step-line-height: 24px;
+  --kiosk-step-marker: 40px;
+  --kiosk-card-radius: 12px;
+  --kiosk-cta-width: 320px;
+  --kiosk-panel-pad: var(--spacing-spacious-group);
+  --kiosk-intro-pad-inline: var(--spacing-spacious-hero);
+  --kiosk-intro-pad-block: var(--spacing-spacious-section);
+  --kiosk-surface: var(--color-white);
+  --kiosk-showcase-bg: var(--color-green-9);
+  --kiosk-card-bg: var(--color-grey-1);
+  --kiosk-hairline: var(--color-grey-2);
+
+  --safe-top: env(safe-area-inset-top, 0px);
+  --safe-right: env(safe-area-inset-right, 0px);
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
+  --safe-left: env(safe-area-inset-left, 0px);
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+
+html, body {
+  height: 100%;
+  margin: 0;
+  overflow: hidden;
+  overscroll-behavior: none;
+  background: var(--kiosk-surface);
+  color: var(--color-ink);
+  font-family: var(--font-family-sans);
+  -webkit-text-size-adjust: 100%;
+  -webkit-tap-highlight-color: transparent;
+  -webkit-user-select: none;
+  user-select: none;
+  -webkit-touch-callout: none;
+}
+body { position: fixed; inset: 0; } /* no rubber-band scroll in iPad Safari / Home Screen app */
+
+[hidden] { display: none !important; }
+
+/* ---------- Brand ---------- */
+.brand { display: inline-flex; flex-direction: column; align-items: flex-start; gap: var(--spacing-standard-text-group); }
+.brand__logo {
+  display: block;
+  width: 147px; /* logo.svg 123 × 20 at 1.2 */
+  aspect-ratio: 123 / 20;
+  background: currentColor;
+  -webkit-mask: url("assets/logo.svg") center / contain no-repeat;
+  mask: url("assets/logo.svg") center / contain no-repeat;
+}
+.brand__tagline { color: var(--color-grey-7); }
+.brand--compact .brand__logo { width: 123px; }
+
+/* ---------- Welcome: two panels ---------- */
+.welcome {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  height: 100dvh;
+  min-height: 100%;
+  overflow: hidden;
+}
+
+.welcome__intro {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  padding:
+    calc(var(--kiosk-intro-pad-block) + var(--safe-top))
+    var(--kiosk-intro-pad-inline)
+    calc(var(--kiosk-intro-pad-block) + var(--safe-bottom))
+    calc(var(--kiosk-intro-pad-inline) + var(--safe-left));
+}
+
+.welcome__content {
+  flex: 1 1 auto;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: var(--spacing-spacious-section);
+  padding-block: var(--spacing-spacious-group);
+}
+
+.welcome__text { display: flex; flex-direction: column; gap: var(--spacing-standard-block); }
+
+.welcome__title {
+  margin: 0;
+  font-family: var(--font-family-sans);
+  font-weight: var(--font-weight-regular);
+  font-size: var(--kiosk-text-hero-size);
+  line-height: var(--kiosk-text-hero-line-height);
+  letter-spacing: var(--font-tracking-tight);
+  color: var(--color-ink);
+  text-wrap: balance;
+}
+
+.welcome__lead {
+  margin: 0;
+  max-width: 30ch;
+  font-family: var(--font-family-sans);
+  font-weight: var(--font-weight-regular);
+  font-size: var(--kiosk-text-lead-size);
+  line-height: var(--kiosk-text-lead-line-height);
+  color: var(--color-grey-7);
+  text-wrap: pretty;
+}
+
+.steps {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-standard-control);
+}
+.steps__item {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-standard-block);
+  font-family: var(--font-family-sans);
+  font-weight: var(--font-weight-regular);
+  font-size: var(--kiosk-text-step-size);
+  line-height: var(--kiosk-text-step-line-height);
+  color: var(--color-ink);
+}
+.steps__num {
+  --corner-radius: calc(var(--kiosk-step-marker) / 2);
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: var(--kiosk-step-marker);
+  height: var(--kiosk-step-marker);
+  border: 1px solid var(--color-grey-6);
+  color: var(--color-grey-7);
+  font-size: var(--text-body-size);
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+}
+
+.welcome__cta { flex: none; width: var(--kiosk-cta-width); max-width: 100%; }
+
+/* ---------- Showcase ---------- */
+.showcase {
+  position: relative;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--spacing-standard-control);
+  min-height: 0;
+  padding: 0 calc(var(--kiosk-panel-pad) + var(--safe-right)) 0 var(--kiosk-panel-pad);
+  background: var(--kiosk-showcase-bg);
+  overflow: hidden;
+  contain: strict;
+}
+.showcase__column { position: relative; min-height: 0; height: 100%; overflow: hidden; }
+.showcase__track {
+  display: flex;
+  flex-direction: column;
+  will-change: transform;
+  backface-visibility: hidden;
+  animation: showcase-up var(--showcase-duration, 80s) linear infinite;
+}
+.showcase__track[data-direction="down"] { animation-name: showcase-down; }
+.showcase[data-running="false"] .showcase__track { animation-play-state: paused; }
+
+@keyframes showcase-up {
+  from { transform: translate3d(0, 0, 0); }
+  to { transform: translate3d(0, -50%, 0); }
+}
+@keyframes showcase-down {
+  from { transform: translate3d(0, -50%, 0); }
+  to { transform: translate3d(0, 0, 0); }
+}
+
+.showcase-card {
+  --corner-radius: var(--kiosk-card-radius);
+  position: relative;
+  flex: none;
+  margin: 0 0 var(--spacing-standard-control); /* trailing gap per card: one sequence = exactly half the track */
+  height: var(--showcase-card-height, auto);
+  aspect-ratio: 1; /* fallback until showcase.js sets the whole-pixel height */
+  overflow: hidden;
+  background: var(--kiosk-card-bg);
+}
+.showcase-card__image {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: 50% 92%;
+  pointer-events: none;
+}
+.showcase-card__label {
+  --corner-radius: var(--button-size-large-radius);
+  position: absolute;
+  left: var(--spacing-standard-text-group);
+  bottom: var(--spacing-standard-text-group);
+  max-width: calc(100% - 2 * var(--spacing-standard-text-group));
+  padding: var(--spacing-compact-stack) var(--spacing-compact-inline);
+  background: var(--color-white);
+  color: var(--color-ink);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .showcase__track { animation: none; transform: none; }
+}
+
+/* ---------- Catalog placeholder ---------- */
+.catalog {
+  display: flex;
+  flex-direction: column;
+  height: 100dvh;
+  min-height: 100%;
+  padding:
+    calc(var(--kiosk-intro-pad-block) + var(--safe-top))
+    calc(var(--kiosk-intro-pad-inline) + var(--safe-right))
+    calc(var(--kiosk-intro-pad-block) + var(--safe-bottom))
+    calc(var(--kiosk-intro-pad-inline) + var(--safe-left));
+  overflow: hidden;
+}
+.catalog__bar { display: flex; align-items: center; justify-content: space-between; gap: var(--spacing-standard-block); }
+.catalog__empty {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--spacing-standard-text-group);
+  text-align: center;
+}
+.catalog__title {
+  margin: 0;
+  font-family: var(--font-family-sans);
+  font-weight: var(--font-weight-regular);
+  font-size: var(--kiosk-text-hero-size);
+  line-height: var(--kiosk-text-hero-line-height);
+  letter-spacing: var(--font-tracking-tight);
+}
+.catalog__text {
+  margin: 0;
+  font-family: var(--font-family-sans);
+  font-size: var(--kiosk-text-lead-size);
+  line-height: var(--kiosk-text-lead-line-height);
+  color: var(--color-grey-7);
+}

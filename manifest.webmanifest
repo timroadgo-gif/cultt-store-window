@@ -3,7 +3,7 @@
   "short_name": "Витрина CULTT",
   "description": "Прототип витрины-каталога THE CULTT для iPad в бутике.",
   "lang": "ru",
-  "start_url": "./",
+  "start_url": "./app.html",
   "scope": "./",
   "display": "fullscreen",
   "display_override": ["fullscreen", "standalone"],

@@ -1,78 +1,63 @@
 <!doctype html>
-<html lang="ru" data-screen="welcome">
+<html lang="ru">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover" />
-    <meta name="apple-mobile-web-app-capable" content="yes" />
-    <meta name="mobile-web-app-capable" content="yes" />
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-    <meta name="apple-mobile-web-app-title" content="Витрина CULTT" />
-    <meta name="theme-color" content="#ffffff" />
-    <meta name="format-detection" content="telephone=no" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="robots" content="noindex, nofollow" />
-    <meta name="description" content="THE CULTT — витрина в бутике: каталог лотов для примерки (прототип для iPad)" />
-    <title>Витрина — THE CULTT</title>
-    <link rel="manifest" href="./manifest.webmanifest" />
-    <link rel="apple-touch-icon" href="./icons/apple-touch-icon.png" />
+    <meta name="description" content="Симулятор iPad для прототипа витрины THE CULTT: выбор устройства и фиксированный экран в горизонтальной ориентации" />
+    <title>Витрина THE CULTT — симулятор iPad</title>
     <link rel="icon" type="image/png" sizes="32x32" href="./icons/favicon-32.png" />
-    <link rel="preload" href="./design-system/fonts/manrope-cyrillic-wght-normal.woff2" as="font" type="font/woff2" crossorigin />
-    <link rel="preload" href="./design-system/fonts/manrope-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin />
-    <link rel="stylesheet" href="./design-system/fonts/fonts.css?v=5bc579cdda05" />
-    <link rel="stylesheet" href="./design-system/tokens/tokens.css?v=5bc579cdda05" />
-    <link rel="stylesheet" href="./design-system/css/corners.css?v=5bc579cdda05" />
-    <link rel="stylesheet" href="./design-system/css/typography.css?v=5bc579cdda05" />
-    <link rel="stylesheet" href="./design-system/icons/icon.css?v=5bc579cdda05" />
-    <link rel="stylesheet" href="./design-system/css/backdrop.css?v=5bc579cdda05" />
-    <link rel="stylesheet" href="./design-system/components/button/button.css?v=5bc579cdda05" />
-    <link rel="stylesheet" href="./design-system/components/field/field.css?v=5bc579cdda05" />
-    <link rel="stylesheet" href="./design-system/components/checkbox/checkbox.css?v=5bc579cdda05" />
-    <link rel="stylesheet" href="./design-system/components/text-action/text-action.css?v=5bc579cdda05" />
-    <link rel="stylesheet" href="./design-system/components/gallery-pager/gallery-pager.css?v=5bc579cdda05" />
-    <link rel="stylesheet" href="./vendor/photoswipe/photoswipe.css?v=5bc579cdda05" />
-    <link rel="stylesheet" href="./styles.css?v=5bc579cdda05" />
-    <link rel="stylesheet" href="./catalog/catalog.css?v=5bc579cdda05" />
-    <link rel="stylesheet" href="./catalog/product.css?v=5bc579cdda05" />
-    <meta name="build" content="5bc579cdda05" />
-  <meta name="app-build" content="5bc579cdda05" />
+    <link rel="stylesheet" href="./design-system/fonts/fonts.css?v=d13d2bae4b12" />
+    <link rel="stylesheet" href="./design-system/tokens/tokens.css?v=d13d2bae4b12" />
+    <link rel="stylesheet" href="./design-system/css/corners.css?v=d13d2bae4b12" />
+    <link rel="stylesheet" href="./design-system/css/typography.css?v=d13d2bae4b12" />
+    <link rel="stylesheet" href="./simulator/simulator.css?v=d13d2bae4b12" />
+    <meta name="build" content="d13d2bae4b12" />
+  <meta name="app-build" content="d13d2bae4b12" />
   <script>(()=>{const m=document.querySelector('meta[name="app-build"]');if(!m||!window.fetch)return;const cur=m.content;const url=new URL('version.json',document.baseURI);const check=()=>fetch(url+'?t='+Date.now(),{cache:'no-store'}).then(r=>r.ok?r.json():null).then(v=>{if(!v||!v.build||v.build===cur)return;const k='app-build-reload:'+v.build;try{if(sessionStorage.getItem(k))return;sessionStorage.setItem(k,'1')}catch(e){}const u=new URL(location.href);u.searchParams.set('v',v.build);location.replace(u.href)}).catch(()=>{});check();document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible')check()});addEventListener('pageshow',e=>{if(e.persisted)check()})})();</script>
   </head>
-  <body>
-    <!-- Welcome / attract screen. It is also the idle state the kiosk returns to. -->
-    <main class="welcome" data-screen-id="welcome" aria-labelledby="welcomeTitle">
-      <section class="welcome__intro">
-        <div class="brand" role="img" aria-label="THE CULTT, ресейл-платформа">
-          <span class="brand__logo" aria-hidden="true"></span>
-          <span class="brand__tagline ds-text-overline" aria-hidden="true">Ресейл-платформа</span>
-        </div>
+  <!-- Desktop simulator shell (not customer-facing). The real app is app.html, loaded unchanged in an iframe whose
+       size is the selected iPad's landscape CSS viewport; the device is scaled with a transform, never resized. -->
+  <body class="sim" data-view="picker">
+    <section class="sim-picker" id="picker" aria-labelledby="pickerTitle">
+      <div class="sim-picker__inner">
+        <p class="sim-picker__eyebrow ds-text-overline">Витрина THE CULTT · прототип</p>
+        <h1 class="sim-picker__title" id="pickerTitle">Выберите iPad</h1>
+        <p class="sim-picker__lead ds-text-body">Приложение откроется в горизонтальной ориентации с точным размером экрана выбранной модели</p>
+        <div class="sim-picker__list" id="deviceList"></div>
+        <a class="sim-picker__direct ds-text-body-s" href="./app.html">Открыть без симулятора — для самого iPad</a>
+      </div>
+    </section>
 
-        <div class="welcome__content">
-          <div class="welcome__text">
-            <h1 class="welcome__title" id="welcomeTitle">Более 7&nbsp;000 лотов доступны к&nbsp;примерке</h1>
-            <p class="welcome__lead">Выберите свои — принесем со&nbsp;склада за&nbsp;несколько минут</p>
+    <section class="sim-device" id="device" hidden aria-label="Симулятор iPad">
+      <header class="sim-bar" aria-label="Управление симулятором">
+        <div class="sim-bar__group">
+          <button class="sim-btn" type="button" id="backToPicker">← Все устройства</button>
+          <span class="sim-bar__name" id="deviceName"></span>
+          <span class="sim-bar__meta ds-text-body-s" id="deviceMeta"></span>
+        </div>
+        <div class="sim-bar__group">
+          <label class="sim-bar__label ds-text-body-s" for="deviceSelect">Устройство</label>
+          <select class="sim-select" id="deviceSelect"></select>
+          <div class="sim-seg" role="group" aria-label="Масштаб">
+            <button class="sim-seg__btn" type="button" data-zoom="fit" aria-pressed="true">Fit</button>
+            <button class="sim-seg__btn" type="button" data-zoom="100" aria-pressed="false">100%</button>
           </div>
-          <ol class="steps">
-            <li class="steps__item"><span class="steps__num ds-corner" data-corner="circular">1</span><span>Выберите лоты</span></li>
-            <li class="steps__item"><span class="steps__num ds-corner" data-corner="circular">2</span><span>Нажмите «Заказать на&nbsp;примерку»</span></li>
-            <li class="steps__item"><span class="steps__num ds-corner" data-corner="circular">3</span><span>Назовите номер консультанту</span></li>
-          </ol>
+          <span class="sim-bar__scale ds-text-body-s" id="scaleLabel"></span>
         </div>
+      </header>
+      <div class="sim-stage" id="stage">
+        <div class="sim-slot" id="slot">
+          <div class="ipad" id="ipad">
+            <span class="ipad__camera" aria-hidden="true"></span>
+            <div class="ipad__screen" id="screen">
+              <iframe class="ipad__app" id="app" title="Прототип витрины THE CULTT на iPad"></iframe>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
 
-        <div class="welcome__cta" id="welcomeCta"></div>
-      </section>
-
-      <!-- Decorative showcase: real catalogue lots, no per-card interaction. -->
-      <section class="showcase" id="showcase" aria-hidden="true" data-running="true"></section>
-    </main>
-
-    <!-- Catalog (catalog/catalog-screen.js builds the content). -->
-    <main class="kc" id="catalogScreen" data-screen-id="catalog" aria-label="Каталог" hidden></main>
-
-    <!-- Product page (catalog/product-screen.js). -->
-    <main class="kp" id="productScreen" data-screen-id="product" aria-labelledby="productTitle" hidden></main>
-
-    <!-- Placeholder for the step after «Заказать на примерку» (catalog/fitting-screen.js). -->
-    <main class="kf" id="fittingScreen" data-screen-id="fitting" aria-labelledby="fittingTitle" hidden></main>
-
-    <script type="module" src="./app.js?v=5bc579cdda05"></script>
+    <script type="module" src="./simulator/simulator.js?v=d13d2bae4b12"></script>
   </body>
 </html>

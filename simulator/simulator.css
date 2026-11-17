@@ -1,0 +1,169 @@
+/* Desktop simulator shell — development chrome, never part of the customer-facing app (app.html).
+   Frame colours are a physical "space grey" approximation, not product UI, so they live here as shell-only values. */
+:root {
+  --sim-desk: var(--color-grey-2);
+  --sim-bar-h: 64px;
+  --sim-alu-1: #3a3b3e;   /* enclosure, top-left light */
+  --sim-alu-2: #232426;   /* enclosure, body */
+  --sim-alu-edge: #0b0b0c;/* outer edge line */
+  --sim-glass: #050505;   /* bezel glass */
+  --sim-cam: #1c2430;     /* camera lens */
+  --sim-shadow: 0 1px 2px rgb(0 0 0 / .18), 0 24px 60px rgb(0 0 0 / .16), 0 8px 18px rgb(0 0 0 / .08);
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+html, body { height: 100%; margin: 0; }
+body.sim {
+  background: var(--sim-desk);
+  color: var(--color-ink);
+  font-family: var(--font-family-sans);
+  overflow: hidden;
+}
+[hidden] { display: none !important; }
+
+/* ---------- Picker ---------- */
+.sim-picker { height: 100%; overflow: auto; display: grid; place-items: center; padding: var(--space-48) var(--spacing-spacious-group); }
+.sim-picker__inner { display: flex; flex-direction: column; align-items: center; text-align: center; max-width: 1080px; width: 100%; }
+.sim-picker__eyebrow { margin: 0 0 var(--spacing-standard-text-group); color: var(--color-grey-7); }
+.sim-picker__title {
+  margin: 0;
+  font: var(--text-display-weight) var(--text-display-size) / var(--text-display-line-height) var(--font-family-sans);
+  letter-spacing: var(--text-display-letter-spacing);
+}
+.sim-picker__lead { margin: var(--spacing-standard-text-group) 0 0; color: var(--color-grey-7); }
+.sim-picker__list { display: flex; flex-wrap: wrap; justify-content: center; align-items: flex-end; gap: var(--spacing-spacious-group); margin-top: var(--space-48); }
+.sim-picker__direct { margin-top: var(--space-48); color: var(--color-grey-7); }
+
+.sim-card {
+  --corner-radius: 16px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--spacing-compact-inline);
+  min-width: 280px;
+  padding: var(--spacing-spacious-group) var(--spacing-standard-block) var(--spacing-standard-block);
+  border: 0;
+  border-radius: 16px;
+  background: var(--color-white);
+  color: inherit;
+  font: inherit;
+  cursor: pointer;
+  box-shadow: 0 0 0 1px rgb(0 0 0 / .04);
+  transition: box-shadow 160ms ease, transform 160ms ease;
+}
+.sim-card:hover { box-shadow: 0 0 0 1px rgb(0 0 0 / .08), 0 12px 32px rgb(0 0 0 / .08); }
+.sim-card:active { transform: translateY(1px); }
+.sim-card:focus-visible { outline: 2px solid var(--color-ink); outline-offset: 3px; }
+.sim-card__art { display: grid; place-items: end center; height: 200px; margin-bottom: var(--spacing-standard-text-group); }
+.sim-card__ipad {
+  position: relative;
+  display: block;
+  border-radius: var(--o);
+  background: linear-gradient(145deg, var(--sim-alu-1), var(--sim-alu-2) 45%);
+  box-shadow: inset 0 0 0 1px var(--sim-alu-edge), 0 10px 24px rgb(0 0 0 / .14);
+}
+.sim-card__screen {
+  position: absolute;
+  inset: var(--b);
+  border-radius: var(--r);
+  background: linear-gradient(180deg, #f6f6f4 0 100%);
+  box-shadow: inset 0 0 0 1px rgb(0 0 0 / .5);
+}
+.sim-card__screen::after { /* hint of the app: dark-green showcase half */
+  content: "";
+  position: absolute;
+  inset: 0 0 0 50%;
+  border-radius: 0 var(--r) var(--r) 0;
+  background: var(--color-green-9);
+}
+.sim-card__cam { position: absolute; width: 3px; height: 3px; border-radius: 50%; background: var(--sim-cam); }
+.sim-card__ipad[data-camera="top"] .sim-card__cam { top: calc(var(--b) / 2 - 1.5px); left: calc(50% - 1.5px); }
+.sim-card__ipad[data-camera="side"] .sim-card__cam { left: calc(var(--b) / 2 - 1.5px); top: calc(50% - 1.5px); }
+.sim-card__name { font: var(--text-heading-s-weight) var(--text-heading-s-size) / var(--text-heading-s-line-height) var(--font-family-sans); }
+.sim-card__spec { color: var(--color-grey-7); font-variant-numeric: tabular-nums; }
+
+/* ---------- Toolbar ---------- */
+.sim-device { height: 100%; display: flex; flex-direction: column; }
+.sim-bar {
+  flex: none;
+  height: var(--sim-bar-h);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--spacing-standard-block);
+  padding: 0 var(--spacing-standard-block);
+  background: var(--color-white);
+  box-shadow: 0 1px 0 rgb(0 0 0 / .06);
+  font-size: var(--text-body-size);
+}
+.sim-bar__group { display: flex; align-items: center; gap: var(--spacing-standard-text-group); min-width: 0; }
+.sim-bar__name { font-weight: var(--font-weight-medium); white-space: nowrap; }
+.sim-bar__meta, .sim-bar__label, .sim-bar__scale { color: var(--color-grey-7); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.sim-bar__scale { min-width: 40px; text-align: right; font-variant-numeric: tabular-nums; }
+.sim-btn, .sim-select, .sim-seg__btn {
+  height: 36px;
+  padding: 0 var(--spacing-standard-text-group);
+  border: 0;
+  border-radius: 8px;
+  background: var(--color-grey-1);
+  color: var(--color-ink);
+  font: inherit;
+  cursor: pointer;
+  box-shadow: inset 0 0 0 1px var(--color-grey-2);
+}
+.sim-btn:hover, .sim-select:hover, .sim-seg__btn:hover { background: var(--color-grey-2); }
+.sim-seg { display: inline-flex; padding: 2px; border-radius: 10px; background: var(--color-grey-1); box-shadow: inset 0 0 0 1px var(--color-grey-2); }
+.sim-seg__btn { height: 32px; background: transparent; box-shadow: none; }
+.sim-seg__btn[aria-pressed="true"] { background: var(--color-white); box-shadow: 0 1px 2px rgb(0 0 0 / .12); }
+
+/* ---------- Stage + device ---------- */
+.sim-stage { flex: 1; min-height: 0; display: grid; place-items: center; overflow: hidden; padding: 32px; }
+.sim-stage[data-zoom="100"] { overflow: auto; place-items: start center; }
+.sim-slot { position: relative; flex: none; }
+
+.ipad {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: calc(var(--w) + 2 * var(--bezel));
+  height: calc(var(--h) + 2 * var(--bezel));
+  transform-origin: 0 0;
+  border-radius: var(--outer-r);
+  /* aluminium enclosure seen from the front: a thin bright chamfer, then the black glass bezel */
+  background: linear-gradient(145deg, var(--sim-alu-1), var(--sim-alu-2) 40%, var(--sim-alu-2));
+  padding: 2px;
+  box-shadow: var(--sim-shadow), inset 0 0 0 1px var(--sim-alu-edge);
+}
+.ipad::before { /* black cover glass up to the screen */
+  content: "";
+  position: absolute;
+  inset: 2px;
+  border-radius: calc(var(--outer-r) - 2px);
+  background: var(--sim-glass);
+}
+.ipad__camera {
+  position: absolute;
+  z-index: 2;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 35%, #3b4a5e, var(--sim-cam) 60%);
+  box-shadow: 0 0 0 1.5px #111;
+}
+.ipad[data-camera="top"] .ipad__camera { top: calc(var(--bezel) / 2 - 3.5px); left: calc(50% - 3.5px); }
+.ipad[data-camera="side"] .ipad__camera { left: calc(var(--bezel) / 2 - 3.5px); top: calc(50% - 3.5px); }
+.ipad__screen {
+  position: absolute;
+  z-index: 1;
+  top: var(--bezel);
+  left: var(--bezel);
+  width: var(--w);
+  height: var(--h);
+  overflow: hidden;
+  border-radius: var(--screen-r);
+  background: var(--color-white);
+  isolation: isolate; /* clip the app (and its fixed layers) to the rounded screen */
+}
+.ipad__app { display: block; border: 0; width: var(--w); height: var(--h); background: var(--color-white); }
+
+@media (max-width: 900px) { .sim-bar__meta, .sim-bar__label { display: none; } }

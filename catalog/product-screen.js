@@ -6,11 +6,12 @@
 //   • Справа колонка: «Бренд Модель», тип, цена → «Добавить в примерку» / «Убрать из примерки» → характеристики.
 //   • Без статуса «В примерке · N из 5»: выбор виден по кнопке и в панели примерки.
 // Выбор на примерку — общий selection (тот же, что у каталога, панели и шторки).
-import PhotoSwipe from "../vendor/photoswipe/photoswipe.esm.min.js?v=c296ea813e20";
-import { createButton } from "../design-system/components/button/button.js?v=c296ea813e20";
-import { createTextAction } from "../design-system/components/text-action/text-action.js?v=c296ea813e20";
-import { createIcon, iconMarkup } from "../design-system/icons/icon.js?v=c296ea813e20";
-import { money } from "./filters.js?v=c296ea813e20";
+import PhotoSwipe from "../vendor/photoswipe/photoswipe.esm.min.js?v=0edeae3118e6";
+import { createButton } from "../design-system/components/button/button.js?v=0edeae3118e6";
+import { createTextAction } from "../design-system/components/text-action/text-action.js?v=0edeae3118e6";
+import { createIcon, iconMarkup } from "../design-system/icons/icon.js?v=0edeae3118e6";
+import { money } from "./filters.js?v=0edeae3118e6";
+import { pill } from "./ui.js?v=0edeae3118e6";
 
 const h = (tag, className, ...children) => {
   const n = document.createElement(tag);
@@ -61,7 +62,7 @@ export function mountProduct(root, { byId, selection, onBack, onOpenFitting }) {
   const price = h("p", "kp-price");
   const cta = createButton({ label: "Добавить в примерку", variant: "primary", width: "fill", onClick: () => toggle() });
   cta.classList.add("kp-cta");
-  cta.dataset.corner = "circular";
+  pill(cta);
   const ctaLabel = cta.querySelector(".ds-button__label");
   const limitText = h("p", "ds-text-body-s", "В примерку — не больше 5 лотов. Уберите один, чтобы добавить этот");
   const openFitting = createTextAction({ label: "Открыть примерку", onClick: () => onOpenFitting() });

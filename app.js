@@ -1,20 +1,22 @@
 // THE CULTT store-window kiosk (iPad, landscape).
 // Screens by hash: "#/" (or empty) = welcome / attract (idle state), "#/catalog" = catalog, "#/product/<id>" = product
-// page; the fitting tray and the fitting sheet are shared by both. "#/fitting-request" = placeholder for the step after
-// «Заказать на примерку».
+// page; the fitting tray and the fitting sheet are shared by both. After «Заказать на примерку» succeeds, the
+// confirmation screen (request number, 10 s) covers everything and then returns to the welcome screen.
 // Visitor state (catalog search / filters / sort, fitting selection) lives in memory only and is cleared when the idle timer returns the kiosk to the welcome screen.
-import { createButton } from "./design-system/components/button/button.js?v=c296ea813e20";
-import { idleTimeoutMs } from "./config.js?v=c296ea813e20";
-import { createIdleTimer } from "./idle.js?v=c296ea813e20";
-import { mountShowcase } from "./showcase.js?v=c296ea813e20";
-import { SHOWCASE_COLUMNS } from "./products.js?v=c296ea813e20";
-import { CATALOG_PRODUCTS } from "./catalog/products.js?v=c296ea813e20";
-import { createSelection } from "./catalog/selection.js?v=c296ea813e20";
-import { mountCatalog } from "./catalog/catalog-screen.js?v=c296ea813e20";
-import { mountFitting } from "./catalog/fitting-screen.js?v=c296ea813e20";
-import { mountProduct } from "./catalog/product-screen.js?v=c296ea813e20";
+import { createButton } from "./design-system/components/button/button.js?v=0edeae3118e6";
+import { pill } from "./catalog/ui.js?v=0edeae3118e6";
+import { idleTimeoutMs } from "./config.js?v=0edeae3118e6";
+import { createIdleTimer } from "./idle.js?v=0edeae3118e6";
+import { mountShowcase } from "./showcase.js?v=0edeae3118e6";
+import { SHOWCASE_COLUMNS } from "./products.js?v=0edeae3118e6";
+import { CATALOG_PRODUCTS } from "./catalog/products.js?v=0edeae3118e6";
+import { createSelection } from "./catalog/selection.js?v=0edeae3118e6";
+import { mountCatalog } from "./catalog/catalog-screen.js?v=0edeae3118e6";
+import { submitFittingRequest } from "./catalog/request.js?v=0edeae3118e6";
+import { createConfirmScreen } from "./catalog/confirm-screen.js?v=0edeae3118e6";
+import { mountProduct } from "./catalog/product-screen.js?v=0edeae3118e6";
 
-const ROUTES = { welcome: "#/", catalog: "#/catalog", fitting: "#/fitting-request", product: "#/product/" };
+const ROUTES = { welcome: "#/", catalog: "#/catalog", product: "#/product/" };
 const $ = (sel) => document.querySelector(sel);
 const byId = new Map(CATALOG_PRODUCTS.map((p) => [p.id, p]));
 
@@ -24,7 +26,7 @@ const showcase = mountShowcase($("#showcase"), SHOWCASE_COLUMNS);
 const selection = createSelection({ onChange: (change) => { catalog.onSelectionChange(change); product.onSelectionChange(change); } });
 const catalog = mountCatalog($("#catalogScreen"), {
   products: CATALOG_PRODUCTS, selection,
-  onSubmitFitting: () => go("fitting"),
+  onSubmitFitting: (ids) => submitAndConfirm(ids),
   onOpenProduct: (id) => openProduct(id),
   onAddMore: () => { if (currentRoute() === "product") go("catalog"); },
 });
@@ -36,7 +38,16 @@ function openProduct(id) {
   catalogScroll = catalog.scroller.scrollTop;
   location.hash = ROUTES.product + encodeURIComponent(id);
 }
-const fitting = mountFitting($("#fittingScreen"), { byId, selection, onBack: () => go("catalog") });
+// Confirmation: shown only after the (mock) submission resolved. Once its entrance is done, the session is reset under
+// the opaque layer (selection, catalog, overlays) and the welcome screen is set behind it; leaving just fades it out.
+const confirm = createConfirmScreen({
+  byId,
+  onEntered: () => { resetSession(); go("welcome", { replace: true }); },
+});
+async function submitAndConfirm(ids) {
+  const request = await submitFittingRequest(ids); // throws → the sheet restores its button
+  confirm.show(request);
+}
 
 const welcomeCta = createButton({
   label: "Выбрать лоты",
@@ -45,7 +56,7 @@ const welcomeCta = createButton({
   icon: "arrow-right",
   onClick: () => go("catalog"),
 });
-welcomeCta.dataset.corner = "circular"; // true capsule ends (corner rule exception for fully round elements)
+pill(welcomeCta);
 $("#welcomeCta").append(welcomeCta);
 
 const idle = createIdleTimer({ timeoutMs: idleTimeoutMs(), onIdle: () => returnToWelcome() });
@@ -79,14 +90,13 @@ const productIdFromHash = () => (location.hash.startsWith(ROUTES.product) ? deco
 function currentRoute() {
   if (location.hash === ROUTES.catalog) return "catalog";
   if (productIdFromHash()) return byId.has(productIdFromHash()) ? "product" : "catalog";
-  if (location.hash === ROUTES.fitting) return selection.size ? "fitting" : "catalog";
   return "welcome";
 }
 
 let lastRoute = null;
 function render() {
   const route = currentRoute();
-  if ((location.hash === ROUTES.fitting || productIdFromHash()) && route === "catalog") history.replaceState(null, "", ROUTES.catalog);
+  if (productIdFromHash() && route === "catalog") history.replaceState(null, "", ROUTES.catalog);
   document.documentElement.dataset.screen = route;
   for (const s of document.querySelectorAll("[data-screen-id]")) {
     const on = s.dataset.screenId === route;
@@ -100,7 +110,6 @@ function render() {
   // One fitting tray, shown on the catalog and on the product page.
   if (route === "catalog" || route === "product") $(route === "catalog" ? "#catalogScreen" : "#productScreen").append(catalog.panel.el);
   if (route === "catalog" && lastRoute === "product") catalog.scroller.scrollTop = catalogScroll;
-  if (route === "fitting") fitting.render();
   lastRoute = route;
   // The welcome screen is the idle state: the showcase runs there, the idle timer runs everywhere else.
   showcase.setRunning(route === "welcome");
@@ -122,5 +131,6 @@ window.__kiosk = {
   get idleTimeoutMs() { return idle.timeoutMs; },
   get session() { return { startedAt, selectedLots: selection.size, selection: selection.ids }; },
   get product() { return product.state; },
+  get confirm() { return confirm.state; },
   get catalog() { const s = catalog.state; return { query: s.query, category: s.category, sort: s.sort, brands: [...s.brands], conditions: [...s.conditions], priceMax: s.priceMax, scrollTop: catalog.scroller.scrollTop }; },
 };

@@ -42,6 +42,9 @@
 
 *, *::before, *::after { box-sizing: border-box; }
 
+/* Pill action buttons (catalog/ui.js → pill()): UI Kit Button, radius 9999px via the kit corner system. */
+.ds-button.kiosk-pill { --corner-radius: 9999px; }
+
 html, body {
   height: 100%;
   margin: 0;
@@ -165,7 +168,6 @@ body { position: fixed; inset: 0; } /* no rubber-band scroll in iPad Safari / Ho
   --_pad: var(--kiosk-cta-pad);
   --_fs: var(--text-heading-s-size);
   --_lh: var(--text-heading-s-line-height);
-  --corner-radius: calc(var(--kiosk-cta-height) / 2);
   min-width: 264px;
 }
 

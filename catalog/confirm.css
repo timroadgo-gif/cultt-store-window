@@ -1,0 +1,103 @@
+/* Confirmation screen (catalog/confirm-screen.js). Kiosk-only values below; colours, type and spacing are UI Kit tokens.
+   Hierarchy: number → instruction → lots → «Готово» → countdown. No cards, borders, shadows or decoration. */
+:root {
+  --kconf-number-size: clamp(150px, 28vh, 260px);
+  --kconf-thumb-w: 84px;
+  --kconf-thumb-h: 112px; /* 3:4 */
+  --kconf-ease: var(--motion-easing-standard);
+}
+
+.kconf {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  display: grid;
+  place-items: center;
+  padding: calc(var(--spacing-spacious-group) + var(--safe-top)) calc(var(--spacing-spacious-group) + var(--safe-right)) calc(var(--spacing-spacious-group) + var(--safe-bottom)) calc(var(--spacing-spacious-group) + var(--safe-left));
+  background: var(--color-white);
+  color: var(--color-ink);
+  font-family: var(--font-family-sans);
+  text-align: center;
+  overflow: hidden;
+  /* entrance: rises from the bottom and opens to the full screen */
+  clip-path: inset(100% 0 0 0);
+  transform: translateY(24px);
+}
+.kconf[data-state="in"], .kconf[data-state="shown"] {
+  clip-path: inset(0 0 0 0);
+  transform: none;
+  transition: clip-path 560ms var(--kconf-ease), transform 560ms var(--kconf-ease);
+}
+.kconf[data-state="out"] {
+  clip-path: inset(0 0 0 0);
+  transform: none;
+  opacity: 0;
+  transition: opacity 360ms var(--kconf-ease);
+}
+
+.kconf__eyebrow, .kconf__number, .kconf__text, .kconf__countdown { margin: 0; } /* no UA paragraph margins (1em of a 200 px number) */
+.kconf__inner { display: flex; flex-direction: column; align-items: center; max-width: 720px; }
+
+.kconf__eyebrow {
+  font: var(--font-weight-regular) var(--text-heading-s-size) / var(--text-heading-s-line-height) var(--font-family-sans);
+  color: var(--color-grey-7);
+}
+.kconf__number {
+  margin-top: var(--spacing-compact-inline);
+  font-size: var(--kconf-number-size);
+  line-height: 1;
+  font-weight: var(--font-weight-medium); /* the system's maximum weight (500) */
+  letter-spacing: -0.04em;
+  color: var(--color-green-9);
+  font-variant-numeric: tabular-nums lining-nums;
+}
+.kconf__digits { display: inline-flex; }
+.kconf__mask { display: inline-block; overflow: hidden; padding-block: 0.06em; margin-block: -0.06em; }
+.kconf__digit { display: inline-block; }
+.kconf__text {
+  margin-top: var(--spacing-standard-control);
+  max-width: 44ch; /* two lines */
+  font: var(--font-weight-light) 20px / 28px var(--font-family-sans);
+  color: var(--color-ink);
+  text-wrap: balance;
+}
+.kconf__thumbs { display: flex; justify-content: center; gap: var(--spacing-standard-text-group); margin: var(--spacing-standard-block) 0 0; padding: 0; list-style: none; }
+.kconf__thumb {
+  --corner-radius: var(--kc-product-radius);
+  width: var(--kconf-thumb-w);
+  height: var(--kconf-thumb-h);
+  overflow: hidden;
+  background: var(--color-grey-1);
+}
+.kconf__thumb img { display: block; width: 100%; height: 100%; object-fit: contain; }
+.kconf__actions { display: flex; flex-direction: column; align-items: center; gap: var(--spacing-standard-text-group); margin-top: var(--spacing-standard-block); }
+.ds-button.kconf__done {
+  --_height: 56px;
+  --_pad: var(--spacing-spacious-hero);
+  --_fs: var(--text-heading-s-size);
+  --_lh: var(--text-heading-s-line-height);
+  min-width: 220px;
+}
+.kconf__countdown {
+  font: var(--font-weight-light) var(--text-body-s-size) / var(--text-body-s-line-height) var(--font-family-sans);
+  color: var(--color-grey-7);
+  font-variant-numeric: tabular-nums;
+}
+
+/* Staggered reveal (one easing, short distances). */
+@keyframes kconf-rise { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+@keyframes kconf-digit { from { transform: translateY(105%); } to { transform: none; } }
+@keyframes kconf-fade { from { opacity: 0; } to { opacity: 1; } }
+.kconf[data-state="entering"] .kconf__eyebrow, .kconf[data-state="entering"] .kconf__digit,
+.kconf[data-state="entering"] .kconf__text, .kconf[data-state="entering"] .kconf__thumbs, .kconf[data-state="entering"] .kconf__actions { opacity: 0; }
+.kconf[data-state="in"] .kconf__eyebrow { animation: kconf-fade 360ms var(--kconf-ease) 240ms both; }
+.kconf[data-state="in"] .kconf__digit { animation: kconf-digit 520ms var(--kconf-ease) calc(300ms + var(--i) * 70ms) both; }
+.kconf[data-state="in"] .kconf__text { animation: kconf-rise 360ms var(--kconf-ease) 560ms both; }
+.kconf[data-state="in"] .kconf__thumbs { animation: kconf-rise 360ms var(--kconf-ease) 640ms both; }
+.kconf[data-state="in"] .kconf__actions { animation: kconf-rise 360ms var(--kconf-ease) 720ms both; }
+
+@media (prefers-reduced-motion: reduce) {
+  .kconf, .kconf[data-state] { clip-path: none; transform: none; transition: none; }
+  .kconf[data-state] * { animation: none !important; opacity: 1 !important; transform: none !important; }
+  .kconf[data-state="out"] { opacity: 0; }
+}

@@ -6,10 +6,11 @@
 //   • «Добавить еще» закрывает шторку (выбор сохраняется); при 5 из 5 скрыта.
 //   • «Заказать на примерку» → onSubmit (следующий шаг), выбор не очищается.
 // Подложка — ModalBackdrop UI Kit (легкое затемнение + небольшой размытие, слой целиком плавно появляется).
-import { createModalBackdrop, openBackdrop, closeBackdrop } from "../design-system/backdrop/backdrop.js?v=c296ea813e20";
-import { createButton } from "../design-system/components/button/button.js?v=c296ea813e20";
-import { createIcon } from "../design-system/icons/icon.js?v=c296ea813e20";
-import { money } from "./filters.js?v=c296ea813e20";
+import { createModalBackdrop, openBackdrop, closeBackdrop } from "../design-system/backdrop/backdrop.js?v=0edeae3118e6";
+import { createButton, setButtonState } from "../design-system/components/button/button.js?v=0edeae3118e6";
+import { createIcon } from "../design-system/icons/icon.js?v=0edeae3118e6";
+import { money } from "./filters.js?v=0edeae3118e6";
+import { pill } from "./ui.js?v=0edeae3118e6";
 
 const h = (tag, className, ...children) => {
   const n = document.createElement(tag);
@@ -33,17 +34,19 @@ export function createFittingSheet({ byId, selection, onAddMore, onSubmit }) {
   const onKey = (e) => { if (e.key === "Escape") close(); };
 
   function build() {
-    const title = h("h2", "kfs__title ds-text-heading-l");
+    const title = h("h2", "kfs__title");
     title.id = "kfsTitle";
     const closeBtn = createButton({ variant: "secondary", iconPosition: "only", icon: "close", ariaLabel: "Закрыть примерку", onClick: () => close() });
-    closeBtn.classList.add("kfs__close");
+    closeBtn.classList.add("kfs__close", "kc-tool");
+    closeBtn.dataset.corner = "circular";
     const slots = h("ul", "kfs__slots");
     slots.setAttribute("aria-label", "Выбранные лоты");
 
-    const addMore = createButton({ label: "Добавить еще", variant: "secondary", onClick: () => { close(); onAddMore?.(); } });
-    addMore.classList.add("kfs__add-more");
-    const submit = createButton({ label: "Заказать на примерку", variant: "primary", width: "fill", onClick: () => onSubmit?.() });
-    const note = h("p", "kfs__note ds-text-body-s", "Принесем со склада — обычно это несколько минут");
+    const addMore = pill(createButton({ label: "Добавить еще", variant: "secondary", onClick: () => { close(); onAddMore?.(); } }));
+    addMore.classList.add("kfs__add-more", "kiosk-neutral");
+    const submit = pill(createButton({ label: "Заказать на примерку", variant: "primary", width: "fill", onClick: () => submitRequest() }));
+    submit.classList.add("kfs__submit");
+    const note = h("p", "kfs__note", "Принесем со склада — обычно это несколько минут");
     const primary = h("div", "kfs__primary", submit, note);
     const actions = h("div", "kfs__actions", addMore, primary);
 
@@ -52,7 +55,7 @@ export function createFittingSheet({ byId, selection, onAddMore, onSubmit }) {
     sheet.setAttribute("role", "dialog");
     sheet.setAttribute("aria-modal", "true");
     sheet.setAttribute("aria-labelledby", "kfsTitle");
-    refs = { title, slots, addMore, closeBtn };
+    refs = { title, slots, addMore, closeBtn, submit };
     return sheet;
   }
 
@@ -67,10 +70,11 @@ export function createFittingSheet({ byId, selection, onAddMore, onSubmit }) {
     remove.addEventListener("click", () => removeItem(id));
     const node = h("li", "kfs-item",
       h("div", "kfs-item__media ds-corner", img, remove),
-      h("div", "kfs-item__info",
-        h("p", "kfs-item__brand ds-text-body", p.brand),
-        h("p", "kfs-item__model ds-text-body", p.name),
-        h("p", "kfs-item__price ds-text-body", money(p.price))));
+      // Same text block as the catalog card (kc-card__*): condition → «Brand Model» on one line → price.
+      h("div", "kc-card__info kfs-item__info",
+        h("p", "kc-card__condition ds-text-body-s", p.condition),
+        h("p", "kc-card__name ds-text-body", h("span", "kc-card__brand", p.brand), " ", h("span", "kc-card__model", p.name)),
+        h("p", "kc-card__price ds-text-body", money(p.price))));
     node.dataset.id = id;
     return node;
   }
@@ -130,6 +134,23 @@ export function createFittingSheet({ byId, selection, onAddMore, onSubmit }) {
     };
     if (reducedMotion()) return finish();
     node.animate([{ opacity: 1 }, { opacity: 0 }], { duration: REMOVE_FADE_MS, easing: "ease-in", fill: "forwards" }).finished.then(finish, finish);
+  }
+
+  // «Заказать на примерку»: one request at a time (the button turns into the kit loading state); the confirmation is
+  // shown by onSubmit only after the (mock) submission resolved. On failure the button comes back.
+  let submitting = false;
+  async function submitRequest() {
+    if (submitting || !selection.size) return;
+    submitting = true;
+    setButtonState(refs.submit, "loading");
+    refs.closeBtn.disabled = true;
+    try {
+      await onSubmit?.(selection.ids);
+    } catch {
+      if (refs) { setButtonState(refs.submit, "default"); refs.closeBtn.disabled = false; }
+    } finally {
+      submitting = false;
+    }
   }
 
   // Called by the catalog on every selection change while the sheet exists.

@@ -126,7 +126,6 @@
   --_height: 52px;
   --_fs: var(--text-heading-s-size);
   --_lh: var(--text-heading-s-line-height);
-  --corner-radius: 26px;
   transition: background-color 180ms var(--kc-ease), color 180ms var(--kc-ease);
 }
 .ds-button.kp-cta.is-changed { animation: kp-cta 220ms var(--kc-ease); }

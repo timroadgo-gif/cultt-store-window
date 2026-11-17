@@ -1,11 +1,12 @@
 // Фильтры каталога — боковая панель от правого края экрана на всю высоту (паттерн Dollar Shave Club / Upwork:
 // заголовок и крестик сверху, прокручиваемые группы, внизу «Сбросить» + «Показать N лотов»), над ModalBackdrop UI Kit.
 // Изменения применяются сразу (сетка за подложкой обновляется). Закрытие: крестик, «Показать», тап по подложке, Escape.
-import { createModalBackdrop, openBackdrop, closeBackdrop } from "../design-system/backdrop/backdrop.js?v=c296ea813e20";
-import { createButton } from "../design-system/components/button/button.js?v=c296ea813e20";
-import { createCheckbox } from "../design-system/components/checkbox/checkbox.js?v=c296ea813e20";
-import { createIcon } from "../design-system/icons/icon.js?v=c296ea813e20";
-import { CONDITIONS, PRICE_LIMITS, brandsOf, clearFilters, lotsWord, money } from "./filters.js?v=c296ea813e20";
+import { createModalBackdrop, openBackdrop, closeBackdrop } from "../design-system/backdrop/backdrop.js?v=0edeae3118e6";
+import { createButton } from "../design-system/components/button/button.js?v=0edeae3118e6";
+import { createCheckbox } from "../design-system/components/checkbox/checkbox.js?v=0edeae3118e6";
+import { createIcon } from "../design-system/icons/icon.js?v=0edeae3118e6";
+import { pill } from "./ui.js?v=0edeae3118e6";
+import { CONDITIONS, PRICE_LIMITS, brandsOf, clearFilters, lotsWord, money } from "./filters.js?v=0edeae3118e6";
 
 const h = (tag, className, ...children) => {
   const n = document.createElement(tag);
@@ -26,11 +27,12 @@ export function openFilterSheet({ state, products, countFor, onChange, onClose }
   const closeBtn = createButton({ variant: "secondary", iconPosition: "only", icon: "close", ariaLabel: "Закрыть фильтры", onClick: () => close() });
   closeBtn.classList.add("kc-tool");
   const head = h("div", "kc-sheet__head", title, closeBtn);
-  const reset = createButton({ label: "Сбросить", variant: "secondary", onClick: () => { clearFilters(state); changed(); rebuild(); } });
+  const reset = pill(createButton({ label: "Сбросить", variant: "secondary", onClick: () => { clearFilters(state); changed(); rebuild(); } }));
+  reset.classList.add("kiosk-neutral");
 
   const body = h("div", "kc-sheet__body");
   const footer = h("div", "kc-sheet__footer");
-  const show = createButton({ label: "Показать", width: "fill", onClick: () => close() });
+  const show = pill(createButton({ label: "Показать", width: "fill", onClick: () => close() }));
   footer.append(reset, show);
   panel.append(head, body, footer);
 

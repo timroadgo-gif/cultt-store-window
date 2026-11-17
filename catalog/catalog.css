@@ -344,7 +344,6 @@
   flex: none;
   --_height: 52px;
   --_pad: var(--spacing-spacious-group);
-  --corner-radius: 26px;
   --_fs: var(--text-heading-s-size); /* 16 px label, as on the start-screen CTA */
   --_lh: var(--text-heading-s-line-height);
 }
@@ -380,23 +379,6 @@
 .kc-sheet__footer { flex: none; display: flex; gap: var(--spacing-standard-text-group); padding: var(--spacing-standard-control) var(--spacing-standard-block) calc(var(--spacing-standard-block) + var(--safe-bottom)); box-shadow: inset 0 1px 0 var(--kiosk-hairline); }
 .kc-sheet__footer .ds-button:first-child { flex: none; }
 
-/* ---------- Fitting screen (minimal) ---------- */
-.kf { display: flex; flex-direction: column; height: 100dvh; min-height: 100%; overflow: hidden; }
-.kf-bar { flex: none; display: flex; align-items: center; justify-content: space-between; padding: calc(var(--spacing-standard-block) + var(--safe-top)) calc(var(--kc-pad) + var(--safe-right)) var(--spacing-standard-control) calc(var(--kc-pad) + var(--safe-left)); }
-.kf-body { flex: 1; min-height: 0; overflow-y: auto; padding: var(--spacing-spacious-group) calc(var(--space-96) + var(--safe-right)) calc(var(--spacing-spacious-section) + var(--safe-bottom)) calc(var(--space-96) + var(--safe-left)); display: flex; flex-direction: column; gap: var(--spacing-spacious-group); }
-.kf-head { display: flex; align-items: baseline; gap: var(--spacing-standard-control); }
-.kf-title { margin: 0; font: var(--text-display-weight) var(--text-display-size) / var(--text-display-line-height) var(--font-family-sans); letter-spacing: var(--text-display-letter-spacing); }
-.kf-sub { margin: 0; color: var(--color-grey-7); }
-.kf-list { margin: 0; padding: 0; list-style: none; display: flex; flex-direction: column; }
-.kf-item { display: grid; grid-template-columns: 96px 1fr; align-items: center; gap: var(--spacing-standard-block); padding: var(--spacing-standard-control) 0; box-shadow: inset 0 -1px 0 var(--kiosk-hairline); }
-.kf-item__media { --corner-radius: var(--kc-product-radius); width: 96px; aspect-ratio: 3 / 4; overflow: hidden; background: var(--color-grey-1); }
-.kf-item__image { display: block; width: 100%; height: 100%; object-fit: cover; }
-.kf-item__info { display: flex; flex-direction: column; gap: var(--spacing-compact-stack); }
-.kf-item__info p { margin: 0; }
-.kf-item__model { font-weight: var(--font-weight-light); }
-.kf-item__meta { color: var(--color-grey-7); }
-.kf-note { margin: 0; color: var(--color-grey-7); }
-
 @media (prefers-reduced-motion: reduce) {
   .kc-grid.is-entering, .kc-panel__thumb.is-new, .kc-card.is-refused .kc-add__visual, .kc-add__visual.is-toggled, .kc-panel__count.is-changing { animation: none; }
   .kc-panel, .kc-sheet, .kc-toast, .kc-scroll, .kc-add__visual, .kc-add__icon, .kc-sort .ds-button__icon { transition: none; }
@@ -405,10 +387,10 @@
 /* ---------- Fitting sheet (bottom, modal, one state, no drag handle) ---------- */
 :root {
   --kfs-radius: 24px;
-  --kfs-pad-inline: var(--spacing-spacious-section);
-  --kfs-pad-block: var(--spacing-spacious-group);
-  --kfs-gap: var(--spacing-standard-control);
-  --kfs-primary-width: 400px;
+  --kfs-pad-inline: var(--spacing-spacious-group);
+  --kfs-pad-block: var(--spacing-standard-block);
+  --kfs-gap: var(--spacing-standard-text-group);
+  --kfs-primary-width: 340px;
 }
 .kfs {
   --corner-radius: var(--kfs-radius);
@@ -421,7 +403,7 @@
   overscroll-behavior: contain;
   display: flex;
   flex-direction: column;
-  gap: var(--spacing-standard-block);
+  gap: var(--spacing-standard-control);
   padding:
     var(--kfs-pad-block)
     calc(var(--kfs-pad-inline) + var(--safe-right))
@@ -436,8 +418,14 @@
 .kfs[data-state="closing"] { transition-duration: 320ms; }
 
 .kfs__head { display: flex; align-items: center; justify-content: space-between; gap: var(--spacing-standard-block); }
-.kfs__title { margin: 0; font-variant-numeric: tabular-nums; }
-.kfs__close { flex: none; }
+.kfs__title {
+  margin: 0;
+  font: var(--font-weight-light) 20px / 28px var(--font-family-sans); /* a step under heading-l (24): readable, quieter than the photos */
+  letter-spacing: var(--font-tracking-snug);
+  color: var(--color-ink);
+  font-variant-numeric: tabular-nums;
+}
+.ds-button.kfs__close { flex: none; width: 44px; background: transparent; box-shadow: inset 0 0 0 1px var(--color-grey-2); color: var(--color-ink); }
 
 .kfs__slots {
   display: grid;
@@ -484,10 +472,7 @@
 .kfs-item__remove:focus-visible { outline: none; }
 .kfs-item__remove:focus-visible .kfs-item__remove-visual { outline: 2px solid var(--color-ink); outline-offset: 2px; }
 .kfs-item[data-removing] { pointer-events: none; }
-.kfs-item__info { display: flex; flex-direction: column; gap: var(--spacing-compact-stack); min-width: 0; }
-.kfs-item__info p { margin: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.kfs-item__model { font-weight: var(--font-weight-light); }
-.kfs-item__info .kfs-item__price { margin-top: var(--spacing-compact-stack); font-variant-numeric: tabular-nums; }
+.kfs-item__info { margin-top: 0; } /* typography and spacing come from .kc-card__info (catalog card) */
 
 /* Free position: a quiet outlined frame of the photo's size with a small «+», no text. */
 .kfs-empty { min-width: 0; }
@@ -509,9 +494,19 @@
 .kfs-empty__slot:active { background: var(--color-grey-1); }
 .kfs-empty__icon { display: grid; }
 
-.kfs__actions { display: flex; align-items: flex-start; justify-content: flex-end; gap: var(--kfs-gap); margin-top: var(--spacing-compact-inline); }
+.kfs__actions { display: flex; align-items: flex-start; justify-content: flex-end; gap: var(--spacing-standard-text-group); margin-top: var(--spacing-compact-stack); }
 .kfs__add-more { flex: none; }
 .kfs__primary { flex: 0 1 var(--kfs-primary-width); display: flex; flex-direction: column; align-items: stretch; gap: var(--spacing-compact-inline); }
-.kfs__note { margin: 0; color: var(--color-grey-7); text-align: center; }
+.kfs__note {
+  margin: 0;
+  font: var(--font-weight-light) var(--text-caption-size) / var(--text-caption-line-height) var(--font-family-sans);
+  letter-spacing: var(--text-caption-letter-spacing);
+  color: var(--color-grey-7);
+  text-align: center;
+}
+.ds-button.kfs__add-more { --_pad: var(--spacing-spacious-group); }
+/* Neutral secondary action (task requirement): same kit Button, grey surface + ink label instead of light green. */
+.ds-button.kiosk-neutral[data-variant="secondary"] { --_bg: var(--color-grey-1); --_fg: var(--color-ink); box-shadow: inset 0 0 0 1px var(--color-grey-2); }
+.ds-button.kiosk-neutral[data-variant="secondary"]:not([data-state="disabled"]):not([data-state="loading"]):active { --_bg: var(--color-grey-2); --_fg: var(--color-ink); }
 
 @media (prefers-reduced-motion: reduce) { .kfs { transition: none; } }

@@ -1,15 +1,16 @@
 // Каталог витрины (iPad, landscape): шапка (логотип, поиск, фильтры), категории + сортировка, активные фильтры и
 // число лотов, сетка карточек с выбором на примерку, панель примерки. Состояние каталога — в памяти, сбрасывается
 // reset() (по бездействию). Выбор на примерку живёт в selection и не сбрасывается при поиске / фильтрах / сортировке.
-import { createButton } from "../design-system/components/button/button.js?v=c296ea813e20";
-import { createTextAction } from "../design-system/components/text-action/text-action.js?v=c296ea813e20";
-import { createIcon } from "../design-system/icons/icon.js?v=c296ea813e20";
+import { createButton } from "../design-system/components/button/button.js?v=0edeae3118e6";
+import { createTextAction } from "../design-system/components/text-action/text-action.js?v=0edeae3118e6";
+import { createIcon } from "../design-system/icons/icon.js?v=0edeae3118e6";
 import {
   CATEGORIES, SORT_OPTIONS, applyCatalog, activeFilterChips, clearFilters, createCatalogState, lotsWord, money,
-} from "./filters.js?v=c296ea813e20";
-import { openFilterSheet } from "./filter-sheet.js?v=c296ea813e20";
-import { createFittingPanel } from "./fitting-panel.js?v=c296ea813e20";
-import { createFittingSheet } from "./fitting-sheet.js?v=c296ea813e20";
+} from "./filters.js?v=0edeae3118e6";
+import { openFilterSheet } from "./filter-sheet.js?v=0edeae3118e6";
+import { pill } from "./ui.js?v=0edeae3118e6";
+import { createFittingPanel } from "./fitting-panel.js?v=0edeae3118e6";
+import { createFittingSheet } from "./fitting-sheet.js?v=0edeae3118e6";
 
 const h = (tag, className, ...children) => {
   const n = document.createElement(tag);
@@ -110,7 +111,7 @@ export function mountCatalog(root, { products, selection, onSubmitFitting, onOpe
   toast.hidden = true;
 
   // «Открыть примерку» → bottom sheet over the catalog; it reads and edits the same selection.
-  const fittingSheet = createFittingSheet({ byId, selection, onSubmit: () => onSubmitFitting?.(), onAddMore: () => onAddMore?.() });
+  const fittingSheet = createFittingSheet({ byId, selection, onSubmit: (ids) => onSubmitFitting?.(ids), onAddMore: () => onAddMore?.() });
   const panel = createFittingPanel({ byId, limit: selection.limit, onOpen: () => { closeMenu(); hideToast(); fittingSheet.open(); } });
   root.append(top, nav, scroller, toast, panel.el);
 
@@ -297,10 +298,10 @@ export function mountCatalog(root, { products, selection, onSubmitFitting, onOpe
       const catLabel = CATEGORIES.find((c) => c.id === state.category).label;
       emptyTitle.textContent = narrowed ? "Ничего не нашлось" : `${catLabel} — пока нет лотов`;
       emptyText.textContent = narrowed ? "Попробуйте изменить запрос или фильтры" : "В прототипе пока только сумки";
-      emptyAction.replaceChildren(createButton({
+      emptyAction.replaceChildren(pill(createButton({
         label: narrowed ? "Сбросить поиск и фильтры" : "Показать все лоты", variant: "secondary",
         onClick: () => { input.value = ""; state.query = ""; clearFilters(state); state.category = "all"; update({ animate: true }); },
-      }));
+      })));
     }
   }
 

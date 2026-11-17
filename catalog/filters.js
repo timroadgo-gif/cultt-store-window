@@ -31,7 +31,8 @@ export const createCatalogState = () => ({
   priceMax: null,
 });
 
-export const money = (amount) => `${new Intl.NumberFormat("ru-RU").format(amount)} ₽`;
+// «292 000 ₽»: group separator and the space before «₽» are no-break spaces, so a price never wraps.
+export const money = (amount) => `${new Intl.NumberFormat("ru-RU").format(amount).replace(/\s/g, "\u00a0")}\u00a0₽`;
 
 // «Hermès» ≈ «hermes», «ё» ≈ «е», регистр не важен.
 const norm = (s) => String(s).toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g, "").replace(/ё/g, "е").trim();

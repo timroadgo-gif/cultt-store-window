@@ -5,7 +5,7 @@
 // The app (app.html) runs in an iframe of exactly the device's landscape CSS viewport; only a CSS transform on the
 // whole device scales it visually, so the app's innerWidth / innerHeight and media queries never see the window size.
 // One iframe for the whole session: switching devices resizes it and keeps the app state.
-import { DEVICES, deviceById } from "./devices.js?v=0edeae3118e6";
+import { DEVICES, deviceById } from "./devices.js?v=9354fc60204c";
 
 const $ = (id) => document.getElementById(id);
 const els = {

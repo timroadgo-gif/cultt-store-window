@@ -2,19 +2,21 @@
 // Screens by hash: "#/" (or empty) = welcome / attract (idle state), "#/catalog" = catalog, "#/product/<id>" = product
 // page; the fitting tray and the fitting sheet are shared by both. After «Заказать на примерку» succeeds, the
 // confirmation screen (request number, 10 s) covers everything and then returns to the welcome screen.
-// Visitor state (catalog search / filters / sort, fitting selection) lives in memory only and is cleared when the idle timer returns the kiosk to the welcome screen.
-import { createButton } from "./design-system/components/button/button.js?v=0edeae3118e6";
-import { pill } from "./catalog/ui.js?v=0edeae3118e6";
-import { idleTimeoutMs } from "./config.js?v=0edeae3118e6";
-import { createIdleTimer } from "./idle.js?v=0edeae3118e6";
-import { mountShowcase } from "./showcase.js?v=0edeae3118e6";
-import { SHOWCASE_COLUMNS } from "./products.js?v=0edeae3118e6";
-import { CATALOG_PRODUCTS } from "./catalog/products.js?v=0edeae3118e6";
-import { createSelection } from "./catalog/selection.js?v=0edeae3118e6";
-import { mountCatalog } from "./catalog/catalog-screen.js?v=0edeae3118e6";
-import { submitFittingRequest } from "./catalog/request.js?v=0edeae3118e6";
-import { createConfirmScreen } from "./catalog/confirm-screen.js?v=0edeae3118e6";
-import { mountProduct } from "./catalog/product-screen.js?v=0edeae3118e6";
+// Visitor state (catalog search / filters / sort, fitting selection) lives in memory only; it is cleared by the
+// inactivity warning (restart / timeout) and after a confirmed fitting request.
+import { createButton } from "./design-system/components/button/button.js?v=9354fc60204c";
+import { pill } from "./catalog/ui.js?v=9354fc60204c";
+import { idleTimeoutMs, warningSeconds } from "./config.js?v=9354fc60204c";
+import { createIdleTimer } from "./idle.js?v=9354fc60204c";
+import { mountShowcase } from "./showcase.js?v=9354fc60204c";
+import { SHOWCASE_COLUMNS } from "./products.js?v=9354fc60204c";
+import { CATALOG_PRODUCTS } from "./catalog/products.js?v=9354fc60204c";
+import { createSelection } from "./catalog/selection.js?v=9354fc60204c";
+import { mountCatalog } from "./catalog/catalog-screen.js?v=9354fc60204c";
+import { submitFittingRequest } from "./catalog/request.js?v=9354fc60204c";
+import { createConfirmScreen } from "./catalog/confirm-screen.js?v=9354fc60204c";
+import { createIdleWarning } from "./catalog/idle-warning.js?v=9354fc60204c";
+import { mountProduct } from "./catalog/product-screen.js?v=9354fc60204c";
 
 const ROUTES = { welcome: "#/", catalog: "#/catalog", product: "#/product/" };
 const $ = (sel) => document.querySelector(sel);
@@ -59,11 +61,27 @@ const welcomeCta = createButton({
 pill(welcomeCta);
 $("#welcomeCta").append(welcomeCta);
 
-const idle = createIdleTimer({ timeoutMs: idleTimeoutMs(), onIdle: () => returnToWelcome() });
+// One shared inactivity controller for the customer flow (catalog, product page, fitting sheet). Not on the welcome
+// screen (it is the idle state) nor on the confirmation (own 10 s timer); the device picker is outside the app.
+// IDLE_TIMEOUT_MS without activity → «Вы еще здесь?» with a WARNING_SECONDS countdown:
+//   «Да, продолжить» → same screen and state, idle re-armed; «Начать заново» → clean session, catalog;
+//   countdown at zero → clean session, welcome screen.
+const idle = createIdleTimer({
+  timeoutMs: idleTimeoutMs(),
+  onIdle: () => { if (confirm.state.open) idle.start(); else warning.show(); },
+});
+const warning = createIdleWarning({
+  seconds: warningSeconds(),
+  inertTargets: () => [...document.body.children].filter((n) => n.tagName !== "SCRIPT"),
+  onContinue: () => idle.start(),
+  onRestart: () => { resetSession(); go("catalog", { replace: true }); },
+  onTimeout: () => returnToWelcome(),
+});
 
 // Next visitor: clear the fitting selection, search, filters, sort, scroll and any open overlay.
 function resetSession() {
   startedAt = null;
+  if (warning.state.open) warning.dispose();
   selection.clear();
   product.reset();
   catalog.reset();
@@ -129,6 +147,7 @@ window.__kiosk = {
   get route() { return currentRoute(); },
   get idleActive() { return idle.active; },
   get idleTimeoutMs() { return idle.timeoutMs; },
+  get warning() { return warning.state; },
   get session() { return { startedAt, selectedLots: selection.size, selection: selection.ids }; },
   get product() { return product.state; },
   get confirm() { return confirm.state; },

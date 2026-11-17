@@ -28,15 +28,16 @@
 }
 
 /* «₽» (U+20BD) in Manrope. The UI Kit's Manrope woff2 subsets (design-system/fonts) have no ruble glyph, so browsers
-   drew it in a system font (STIX Two Math in Chrome). The full Manrope TTFs already used by the product-card prototype
-   (Проект/product-detail-mobile/assets) do have it: loaded here for U+20BD only (Manrope, SIL OFL — assets/fonts/OFL.txt). */
+   drew it in a system font. assets/fonts/manrope-ruble-wght.woff2 is the ruble glyph of the official variable Manrope
+   (Google Fonts, wght 200–800, SIL OFL — assets/fonts/OFL.txt; 1.2 KB, this one character only): the same design and
+   the same weight axis as the numerals, so «₽» matches light 300 catalog prices and 500 numbers alike (a static 400
+   TTF looked heavier than light numerals). The weight range is the kit's (300 500): a different range would make the
+   browser treat the face as a separate weight group and drop the kit faces for the rest of the text. */
 @font-face {
-  /* same weight range as the UI Kit faces (design-system/fonts/fonts.css): a different range would make the browser
-     treat it as a separate weight group and drop the kit faces for the rest of the text */
   font-family: "Manrope";
   font-weight: 300 500;
   font-display: block;
-  src: url("assets/fonts/manrope-400.ttf") format("truetype");
+  src: url("assets/fonts/manrope-ruble-wght.woff2") format("woff2");
   unicode-range: U+20BD;
 }
 

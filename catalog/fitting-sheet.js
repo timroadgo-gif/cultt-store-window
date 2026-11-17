@@ -6,11 +6,11 @@
 //   • «Добавить еще» закрывает шторку (выбор сохраняется); при 5 из 5 скрыта.
 //   • «Заказать на примерку» → onSubmit (следующий шаг), выбор не очищается.
 // Подложка — ModalBackdrop UI Kit (легкое затемнение + небольшой размытие, слой целиком плавно появляется).
-import { createModalBackdrop, openBackdrop, closeBackdrop } from "../design-system/backdrop/backdrop.js?v=0edeae3118e6";
-import { createButton, setButtonState } from "../design-system/components/button/button.js?v=0edeae3118e6";
-import { createIcon } from "../design-system/icons/icon.js?v=0edeae3118e6";
-import { money } from "./filters.js?v=0edeae3118e6";
-import { pill } from "./ui.js?v=0edeae3118e6";
+import { createModalBackdrop, openBackdrop, closeBackdrop } from "../design-system/backdrop/backdrop.js?v=9354fc60204c";
+import { createButton, setButtonState } from "../design-system/components/button/button.js?v=9354fc60204c";
+import { createIcon } from "../design-system/icons/icon.js?v=9354fc60204c";
+import { money } from "./filters.js?v=9354fc60204c";
+import { pill } from "./ui.js?v=9354fc60204c";
 
 const h = (tag, className, ...children) => {
   const n = document.createElement(tag);

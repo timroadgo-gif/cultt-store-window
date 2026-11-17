@@ -1,7 +1,7 @@
 // Заглушка следующего шага после «Заказать на примерку»: выбранные лоты (тот же selection, без изменений) и
 // возврат в каталог. Подтверждение заявки, номер и передача консультанту здесь не реализованы.
-import { createButton } from "../design-system/components/button/button.js?v=15334e469b43";
-import { money, lotsWord } from "./filters.js?v=15334e469b43";
+import { createButton } from "../design-system/components/button/button.js?v=99a3a2d742ee";
+import { money, lotsWord } from "./filters.js?v=99a3a2d742ee";
 
 const h = (tag, className, ...children) => {
   const n = document.createElement(tag);

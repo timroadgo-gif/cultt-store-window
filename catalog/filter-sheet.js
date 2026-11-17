@@ -1,12 +1,11 @@
-// Фильтры каталога — модальная панель справа (iPad landscape) над ModalBackdrop UI Kit.
-// Изменения применяются сразу (сетка за подложкой обновляется), кнопка внизу показывает число лотов и закрывает
-// панель. Закрытие: кнопка, тап по подложке, Escape.
-import { createModalBackdrop, openBackdrop, closeBackdrop } from "../design-system/backdrop/backdrop.js?v=15334e469b43";
-import { createButton } from "../design-system/components/button/button.js?v=15334e469b43";
-import { createCheckbox } from "../design-system/components/checkbox/checkbox.js?v=15334e469b43";
-import { createTextAction } from "../design-system/components/text-action/text-action.js?v=15334e469b43";
-import { createIcon } from "../design-system/icons/icon.js?v=15334e469b43";
-import { CONDITIONS, PRICE_LIMITS, brandsOf, clearFilters, lotsWord, money } from "./filters.js?v=15334e469b43";
+// Фильтры каталога — боковая панель от правого края экрана на всю высоту (паттерн Dollar Shave Club / Upwork:
+// заголовок и крестик сверху, прокручиваемые группы, внизу «Сбросить» + «Показать N лотов»), над ModalBackdrop UI Kit.
+// Изменения применяются сразу (сетка за подложкой обновляется). Закрытие: крестик, «Показать», тап по подложке, Escape.
+import { createModalBackdrop, openBackdrop, closeBackdrop } from "../design-system/backdrop/backdrop.js?v=99a3a2d742ee";
+import { createButton } from "../design-system/components/button/button.js?v=99a3a2d742ee";
+import { createCheckbox } from "../design-system/components/checkbox/checkbox.js?v=99a3a2d742ee";
+import { createIcon } from "../design-system/icons/icon.js?v=99a3a2d742ee";
+import { CONDITIONS, PRICE_LIMITS, brandsOf, clearFilters, lotsWord, money } from "./filters.js?v=99a3a2d742ee";
 
 const h = (tag, className, ...children) => {
   const n = document.createElement(tag);
@@ -17,20 +16,22 @@ const h = (tag, className, ...children) => {
 
 export function openFilterSheet({ state, products, countFor, onChange, onClose }) {
   const backdrop = createModalBackdrop({ onDismiss: () => close() });
-  const panel = h("aside", "kc-sheet ds-corner");
+  const panel = h("aside", "kc-sheet");
   panel.setAttribute("role", "dialog");
   panel.setAttribute("aria-modal", "true");
   panel.setAttribute("aria-labelledby", "kcSheetTitle");
 
   const title = h("h2", "kc-sheet__title ds-text-heading-l", "Фильтры");
   title.id = "kcSheetTitle";
-  const reset = createTextAction({ label: "Сбросить", onClick: () => { clearFilters(state); changed(); rebuild(); } });
-  const head = h("div", "kc-sheet__head", title, reset);
+  const closeBtn = createButton({ variant: "secondary", iconPosition: "only", icon: "close", ariaLabel: "Закрыть фильтры", onClick: () => close() });
+  closeBtn.classList.add("kc-tool");
+  const head = h("div", "kc-sheet__head", title, closeBtn);
+  const reset = createButton({ label: "Сбросить", variant: "secondary", onClick: () => { clearFilters(state); changed(); rebuild(); } });
 
   const body = h("div", "kc-sheet__body");
   const footer = h("div", "kc-sheet__footer");
   const show = createButton({ label: "Показать", width: "fill", onClick: () => close() });
-  footer.append(show);
+  footer.append(reset, show);
   panel.append(head, body, footer);
 
   const section = (label, ...content) => h("section", "kc-sheet__section", h("h3", "kc-sheet__label ds-text-overline", label), ...content);

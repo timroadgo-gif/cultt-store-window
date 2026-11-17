@@ -1,15 +1,15 @@
 // Каталог витрины (iPad, landscape): шапка (логотип, поиск, фильтры), категории + сортировка, активные фильтры и
 // число лотов, сетка карточек с выбором на примерку, панель примерки. Состояние каталога — в памяти, сбрасывается
 // reset() (по бездействию). Выбор на примерку живёт в selection и не сбрасывается при поиске / фильтрах / сортировке.
-import { createButton } from "../design-system/components/button/button.js?v=15334e469b43";
-import { createTextAction } from "../design-system/components/text-action/text-action.js?v=15334e469b43";
-import { createIcon } from "../design-system/icons/icon.js?v=15334e469b43";
+import { createButton } from "../design-system/components/button/button.js?v=99a3a2d742ee";
+import { createTextAction } from "../design-system/components/text-action/text-action.js?v=99a3a2d742ee";
+import { createIcon } from "../design-system/icons/icon.js?v=99a3a2d742ee";
 import {
   CATEGORIES, SORT_OPTIONS, applyCatalog, activeFilterChips, clearFilters, createCatalogState, lotsWord, money,
-} from "./filters.js?v=15334e469b43";
-import { openFilterSheet } from "./filter-sheet.js?v=15334e469b43";
-import { createFittingPanel } from "./fitting-panel.js?v=15334e469b43";
-import { createFittingSheet } from "./fitting-sheet.js?v=15334e469b43";
+} from "./filters.js?v=99a3a2d742ee";
+import { openFilterSheet } from "./filter-sheet.js?v=99a3a2d742ee";
+import { createFittingPanel } from "./fitting-panel.js?v=99a3a2d742ee";
+import { createFittingSheet } from "./fitting-sheet.js?v=99a3a2d742ee";
 
 const h = (tag, className, ...children) => {
   const n = document.createElement(tag);
@@ -53,7 +53,7 @@ export function mountCatalog(root, { products, selection, onSubmitFitting, onOpe
   // Sort lives with Filters in the first row (filter + sort = one control group); the menu drops below it.
   // Sort: UI Kit secondary button = sort arrows (same icon as the mobile catalog's sort chip) + label + chevron.
   const sortButton = createButton({ label: "Сначала новые", variant: "secondary", iconPosition: "trailing", icon: "chevron-down" });
-  sortButton.classList.add("kc-sort");
+  sortButton.classList.add("kc-sort", "kc-tool");
   sortButton.querySelector(".ds-button__icon").classList.add("kc-sort__chevron");
   loadIcon(SORT_ICON_URL).then((svg) => {
     if (!svg) return;
@@ -244,7 +244,7 @@ export function mountCatalog(root, { products, selection, onSubmitFitting, onOpe
         onClose: () => { sheet = null; },
       });
     } });
-    filtersButton.classList.add("kc-filters");
+    filtersButton.classList.add("kc-filters", "kc-tool");
     filtersSlot.append(filtersButton);
     paintFiltersButton();
   });

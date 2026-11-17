@@ -1,18 +1,18 @@
 // THE CULTT store-window kiosk (iPad, landscape).
-// Screens by hash: "#/" (or empty) = welcome / attract (idle state), "#/catalog" = catalog, "#/fitting" = fitting
-// selection (minimal). Visitor state (catalog search / filters / sort, fitting selection) lives in memory only and is
-// cleared when the idle timer returns the kiosk to the welcome screen.
-import { createButton } from "./design-system/components/button/button.js?v=e0e8b6842915";
-import { idleTimeoutMs } from "./config.js?v=e0e8b6842915";
-import { createIdleTimer } from "./idle.js?v=e0e8b6842915";
-import { mountShowcase } from "./showcase.js?v=e0e8b6842915";
-import { SHOWCASE_COLUMNS } from "./products.js?v=e0e8b6842915";
-import { CATALOG_PRODUCTS } from "./catalog/products.js?v=e0e8b6842915";
-import { createSelection } from "./catalog/selection.js?v=e0e8b6842915";
-import { mountCatalog } from "./catalog/catalog-screen.js?v=e0e8b6842915";
-import { mountFitting } from "./catalog/fitting-screen.js?v=e0e8b6842915";
+// Screens by hash: "#/" (or empty) = welcome / attract (idle state), "#/catalog" = catalog (the fitting selection is a
+// bottom sheet over it), "#/fitting-request" = placeholder for the step after «Заказать на примерку».
+// Visitor state (catalog search / filters / sort, fitting selection) lives in memory only and is cleared when the idle timer returns the kiosk to the welcome screen.
+import { createButton } from "./design-system/components/button/button.js?v=25bff0f871c8";
+import { idleTimeoutMs } from "./config.js?v=25bff0f871c8";
+import { createIdleTimer } from "./idle.js?v=25bff0f871c8";
+import { mountShowcase } from "./showcase.js?v=25bff0f871c8";
+import { SHOWCASE_COLUMNS } from "./products.js?v=25bff0f871c8";
+import { CATALOG_PRODUCTS } from "./catalog/products.js?v=25bff0f871c8";
+import { createSelection } from "./catalog/selection.js?v=25bff0f871c8";
+import { mountCatalog } from "./catalog/catalog-screen.js?v=25bff0f871c8";
+import { mountFitting } from "./catalog/fitting-screen.js?v=25bff0f871c8";
 
-const ROUTES = { welcome: "#/", catalog: "#/catalog", fitting: "#/fitting" };
+const ROUTES = { welcome: "#/", catalog: "#/catalog", fitting: "#/fitting-request" };
 const $ = (sel) => document.querySelector(sel);
 const byId = new Map(CATALOG_PRODUCTS.map((p) => [p.id, p]));
 
@@ -20,7 +20,7 @@ let startedAt = null;
 const showcase = mountShowcase($("#showcase"), SHOWCASE_COLUMNS);
 
 const selection = createSelection({ onChange: (change) => catalog.onSelectionChange(change) });
-const catalog = mountCatalog($("#catalogScreen"), { products: CATALOG_PRODUCTS, selection, onOpenFitting: () => go("fitting") });
+const catalog = mountCatalog($("#catalogScreen"), { products: CATALOG_PRODUCTS, selection, onSubmitFitting: () => go("fitting") });
 const fitting = mountFitting($("#fittingScreen"), { byId, selection, onBack: () => go("catalog") });
 
 $("#welcomeCta").append(createButton({

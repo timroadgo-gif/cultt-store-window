@@ -1,14 +1,15 @@
 // Каталог витрины (iPad, landscape): шапка (логотип, поиск, фильтры), категории + сортировка, активные фильтры и
 // число лотов, сетка карточек с выбором на примерку, панель примерки. Состояние каталога — в памяти, сбрасывается
 // reset() (по бездействию). Выбор на примерку живёт в selection и не сбрасывается при поиске / фильтрах / сортировке.
-import { createButton } from "../design-system/components/button/button.js?v=e0e8b6842915";
-import { createTextAction } from "../design-system/components/text-action/text-action.js?v=e0e8b6842915";
-import { createIcon } from "../design-system/icons/icon.js?v=e0e8b6842915";
+import { createButton } from "../design-system/components/button/button.js?v=25bff0f871c8";
+import { createTextAction } from "../design-system/components/text-action/text-action.js?v=25bff0f871c8";
+import { createIcon } from "../design-system/icons/icon.js?v=25bff0f871c8";
 import {
   CATEGORIES, SORT_OPTIONS, applyCatalog, activeFilterChips, clearFilters, createCatalogState, lotsWord, money,
-} from "./filters.js?v=e0e8b6842915";
-import { openFilterSheet } from "./filter-sheet.js?v=e0e8b6842915";
-import { createFittingPanel } from "./fitting-panel.js?v=e0e8b6842915";
+} from "./filters.js?v=25bff0f871c8";
+import { openFilterSheet } from "./filter-sheet.js?v=25bff0f871c8";
+import { createFittingPanel } from "./fitting-panel.js?v=25bff0f871c8";
+import { createFittingSheet } from "./fitting-sheet.js?v=25bff0f871c8";
 
 const h = (tag, className, ...children) => {
   const n = document.createElement(tag);
@@ -21,7 +22,7 @@ const FILTERS_ICON_URL = "assets/filters.svg";
 let filtersIconMarkup = null;
 const loadFiltersIcon = () => (filtersIconMarkup ??= fetch(FILTERS_ICON_URL).then((r) => r.text()).catch(() => ""));
 
-export function mountCatalog(root, { products, selection, onOpenFitting }) {
+export function mountCatalog(root, { products, selection, onSubmitFitting }) {
   const state = createCatalogState();
   const byId = new Map(products.map((p) => [p.id, p]));
 
@@ -95,7 +96,9 @@ export function mountCatalog(root, { products, selection, onOpenFitting }) {
   toast.setAttribute("role", "status");
   toast.hidden = true;
 
-  const panel = createFittingPanel({ byId, limit: selection.limit, onOpen: onOpenFitting });
+  // «Открыть примерку» → bottom sheet over the catalog; it reads and edits the same selection.
+  const fittingSheet = createFittingSheet({ byId, selection, onSubmit: () => onSubmitFitting?.() });
+  const panel = createFittingPanel({ byId, limit: selection.limit, onOpen: () => { closeMenu(); hideToast(); fittingSheet.open(); } });
   root.append(top, nav, scroller, toast, panel.el);
 
   // Cards are created once and re-ordered on every update, so selection state and loaded photos survive.
@@ -152,6 +155,7 @@ export function mountCatalog(root, { products, selection, onOpenFitting }) {
     root.toggleAttribute("data-selection-full", selection.full);
     if (change.type !== "add" || !selection.full) hideToast();
     panel.update(selection.ids, change);
+    fittingSheet.update(change);
     root.toggleAttribute("data-panel", selection.size > 0);
   }
 
@@ -276,6 +280,7 @@ export function mountCatalog(root, { products, selection, onOpenFitting }) {
   // Next visitor: everything back to the initial state (selection is cleared by app.js).
   function reset() {
     closeMenu();
+    fittingSheet.close({ immediate: true });
     sheet?.close({ immediate: true });
     sheet = null;
     hideToast();
@@ -287,5 +292,5 @@ export function mountCatalog(root, { products, selection, onOpenFitting }) {
   }
 
   update();
-  return { reset, onSelectionChange, get state() { return state; }, scroller, closeOverlays: () => { closeMenu(); sheet?.close({ immediate: true }); } };
+  return { reset, onSelectionChange, get state() { return state; }, scroller, closeOverlays: () => { closeMenu(); sheet?.close({ immediate: true }); fittingSheet.close({ immediate: true }); }, fittingSheet };
 }

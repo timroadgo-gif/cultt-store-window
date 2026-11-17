@@ -1,8 +1,7 @@
-// Минимальный экран «Примерка»: выбранные лоты и возврат в каталог. Оформление заявки на примерку (номер,
-// консультант) — следующий шаг, здесь не реализовано.
-import { createButton } from "../design-system/components/button/button.js?v=e0e8b6842915";
-import { createTextAction } from "../design-system/components/text-action/text-action.js?v=e0e8b6842915";
-import { money, lotsWord } from "./filters.js?v=e0e8b6842915";
+// Заглушка следующего шага после «Заказать на примерку»: выбранные лоты (тот же selection, без изменений) и
+// возврат в каталог. Подтверждение заявки, номер и передача консультанту здесь не реализованы.
+import { createButton } from "../design-system/components/button/button.js?v=25bff0f871c8";
+import { money, lotsWord } from "./filters.js?v=25bff0f871c8";
 
 const h = (tag, className, ...children) => {
   const n = document.createElement(tag);
@@ -18,11 +17,11 @@ export function mountFitting(root, { byId, selection, onBack }) {
   const back = createButton({ label: "К каталогу", variant: "secondary", iconPosition: "leading", icon: "arrow-left", onClick: onBack });
   const bar = h("header", "kf-bar", logo, back);
 
-  const title = h("h1", "kf-title", "Примерка");
+  const title = h("h1", "kf-title", "Заявка на примерку");
   title.id = "fittingTitle";
   const sub = h("p", "kf-sub ds-text-body");
   const list = h("ul", "kf-list");
-  const note = h("p", "kf-note ds-text-body", "Оформление заявки на примерку появится на следующем шаге прототипа");
+  const note = h("p", "kf-note ds-text-body", "Подтверждение заявки и передача консультанту — следующий шаг прототипа");
   const body = h("div", "kf-body", h("div", "kf-head", title, sub), list, note);
   body.dataset.scrollReset = "";
   root.append(bar, body);
@@ -34,16 +33,13 @@ export function mountFitting(root, { byId, selection, onBack }) {
       const p = byId.get(id);
       const img = h("img", "kf-item__image");
       Object.assign(img, { src: p.image, alt: "", draggable: false });
-      const remove = createTextAction({ label: "Убрать", onClick: () => { selection.toggle(id); if (!selection.size) onBack(); else render(); } });
-      remove.setAttribute("aria-label", `Убрать из примерки: ${p.brand} ${p.name}`);
       return h("li", "kf-item",
         h("div", "kf-item__media ds-corner", img),
         h("div", "kf-item__info",
           h("p", "ds-text-body kf-item__brand", p.brand),
           h("p", "ds-text-body kf-item__model", p.name),
           h("p", "ds-text-body-s kf-item__meta", `${p.condition} · ${money(p.price)}`),
-          h("p", "ds-text-body-s kf-item__meta", `Артикул ${p.article}`)),
-        remove);
+          h("p", "ds-text-body-s kf-item__meta", `Артикул ${p.article}`)));
     }));
   }
   return { render };

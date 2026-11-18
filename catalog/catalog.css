@@ -285,13 +285,14 @@
    Centred in the area between the meta row and the fitting tray (the scroller already reserves the tray's height). */
 .kc-scroll[data-empty] { display: flex; flex-direction: column; }
 .kc-scroll[data-empty] .kc-grid { display: none; }
-.kc-empty { flex: 1 0 auto; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: var(--spacing-spacious-group) 0 var(--space-96); text-align: center; }
+/* Empty result: outline icon → heading → one quiet line → compact CTA, centred in a narrow column with generous air. */
+.kc-empty { flex: 1 0 auto; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: var(--spacing-spacious-group) var(--spacing-standard-block) var(--space-48); text-align: center; } /* a touch above the true centre (optical centre) */
 .kc-empty p { margin: 0; }
-.kc-empty__icon { display: grid; color: var(--color-grey-7); margin-bottom: var(--spacing-standard-control); }
-.kc-empty__title { max-width: 30ch; font: var(--font-weight-medium) 22px / 28px var(--font-family-sans); letter-spacing: var(--font-tracking-snug, 0); color: var(--color-ink); text-wrap: balance; }
-.kc-empty__text { max-width: 44ch; margin-top: var(--spacing-compact-inline) !important; font: var(--font-weight-regular) 15px / 22px var(--font-family-sans); color: var(--color-grey-7); text-wrap: balance; }
+.kc-empty__icon { display: grid; color: var(--color-grey-6); margin-bottom: var(--space-24); }
+.kc-empty__title { max-width: 28ch; font: var(--font-weight-regular) 20px / 28px var(--font-family-sans); letter-spacing: var(--font-tracking-snug, 0); color: var(--color-ink); text-wrap: balance; }
+.kc-empty__text { max-width: 40ch; margin-top: var(--spacing-compact-inline) !important; font: var(--font-weight-regular) 15px / 22px var(--font-family-sans); color: var(--color-grey-7); text-wrap: balance; }
 .kc-empty__actions { display: flex; flex-wrap: wrap; justify-content: center; gap: var(--spacing-standard-text-group); margin-top: var(--spacing-spacious-group); }
-.ds-button.kc-empty__action { min-width: 220px; }
+.ds-button.kc-empty__action { flex: none; } /* width from the label + the kit padding, no stretched buttons */
 
 /* ---------- Toast (limit) ---------- */
 .kc-toast {

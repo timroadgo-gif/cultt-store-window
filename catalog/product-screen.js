@@ -6,12 +6,12 @@
 //   • Справа колонка: «Бренд Модель», тип, цена → «Добавить в примерку» / «Убрать из примерки» → характеристики.
 //   • Без статуса «В примерке · N из 5»: выбор виден по кнопке и в панели примерки.
 // Выбор на примерку — общий selection (тот же, что у каталога, панели и шторки).
-import { createButton } from "../design-system/components/button/button.js?v=a55d3567b850";
-import { createTextAction } from "../design-system/components/text-action/text-action.js?v=a55d3567b850";
-import { createIcon } from "../design-system/icons/icon.js?v=a55d3567b850";
-import { openFullscreen } from "./fullscreen.js?v=a55d3567b850";
-import { money } from "./filters.js?v=a55d3567b850";
-import { pill } from "./ui.js?v=a55d3567b850";
+import { createButton } from "../design-system/components/button/button.js?v=824c37b7dc74";
+import { createTextAction } from "../design-system/components/text-action/text-action.js?v=824c37b7dc74";
+import { createIcon } from "../design-system/icons/icon.js?v=824c37b7dc74";
+import { openFullscreen } from "./fullscreen.js?v=824c37b7dc74";
+import { money } from "./filters.js?v=824c37b7dc74";
+import { pill } from "./ui.js?v=824c37b7dc74";
 
 const h = (tag, className, ...children) => {
   const n = document.createElement(tag);

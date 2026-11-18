@@ -1,16 +1,16 @@
 // Каталог витрины (iPad, landscape): шапка (логотип, поиск, фильтры), категории + сортировка, активные фильтры и
 // число лотов, сетка карточек с выбором на примерку, панель примерки. Состояние каталога — в памяти, сбрасывается
 // reset() (по бездействию). Выбор на примерку живёт в selection и не сбрасывается при поиске / фильтрах / сортировке.
-import { createButton } from "../design-system/components/button/button.js?v=a55d3567b850";
-import { createTextAction } from "../design-system/components/text-action/text-action.js?v=a55d3567b850";
-import { createIcon } from "../design-system/icons/icon.js?v=a55d3567b850";
+import { createButton } from "../design-system/components/button/button.js?v=824c37b7dc74";
+import { createTextAction } from "../design-system/components/text-action/text-action.js?v=824c37b7dc74";
+import { createIcon } from "../design-system/icons/icon.js?v=824c37b7dc74";
 import {
   CATEGORIES, FILTER_SETS, SORT_OPTIONS, applyCatalog, activeFilterChips, assignFilters, clearFilters, createCatalogState, createFilters, lotsWord, money,
-} from "./filters.js?v=a55d3567b850";
-import { openFilterSheet } from "./filter-sheet.js?v=a55d3567b850";
-import { pill } from "./ui.js?v=a55d3567b850";
-import { createFittingPanel } from "./fitting-panel.js?v=a55d3567b850";
-import { createFittingSheet } from "./fitting-sheet.js?v=a55d3567b850";
+} from "./filters.js?v=824c37b7dc74";
+import { openFilterSheet } from "./filter-sheet.js?v=824c37b7dc74";
+import { pill } from "./ui.js?v=824c37b7dc74";
+import { createFittingPanel } from "./fitting-panel.js?v=824c37b7dc74";
+import { createFittingSheet } from "./fitting-sheet.js?v=824c37b7dc74";
 
 const h = (tag, className, ...children) => {
   const n = document.createElement(tag);
@@ -105,7 +105,7 @@ export function mountCatalog(root, { products, selection, network, availability,
   const empty = h("div", "kc-empty");
   empty.hidden = true;
   empty.setAttribute("role", "status");
-  const emptyIcon = h("span", "kc-empty__icon", createIcon("search", { size: 24 }));
+  const emptyIcon = h("span", "kc-empty__icon");
   emptyIcon.setAttribute("aria-hidden", "true");
   const emptyTitle = h("p", "kc-empty__title");
   const emptyText = h("p", "kc-empty__text");
@@ -336,7 +336,10 @@ export function mountCatalog(root, { products, selection, network, availability,
       primary: { label: "Показать все лоты", run: () => { state.category = "all"; } }, secondary: null,
     };
   }
+  // Outline icon per state (kit icons at 36 px → the same ~1.5 px line for every icon): a search came back empty / the filter list / an empty rail.
+  const EMPTY_ICON = { "search-filters": "search", search: "search", filters: "search-list", category: "hanger" };
   function paintEmpty(c) {
+    if (empty.dataset.kind !== c.kind) emptyIcon.replaceChildren(createIcon(EMPTY_ICON[c.kind], { size: 36 }));
     empty.dataset.kind = c.kind;
     emptyTitle.textContent = c.title;
     emptyText.textContent = c.text;

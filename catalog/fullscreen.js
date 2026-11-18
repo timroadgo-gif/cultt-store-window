@@ -1,8 +1,8 @@
 // Shared fullscreen photo viewer for both product pages (standard and experimental gallery): PhotoSwipe 5 (vendored,
 // MIT) — swipe between photos, pinch / double-tap zoom, pan, counter, UI Kit icons, ink background.
 // The host keeps its gallery in sync through onChange(index) and gets the photo element for the open/close «zoom».
-import PhotoSwipe from "../vendor/photoswipe/photoswipe.esm.min.js?v=a55d3567b850";
-import { iconMarkup } from "../design-system/icons/icon.js?v=a55d3567b850";
+import PhotoSwipe from "../vendor/photoswipe/photoswipe.esm.min.js?v=824c37b7dc74";
+import { iconMarkup } from "../design-system/icons/icon.js?v=824c37b7dc74";
 
 const PHOTO = { w: 960, h: 1280 };
 const reducedMotion = () => matchMedia("(prefers-reduced-motion: reduce)").matches;

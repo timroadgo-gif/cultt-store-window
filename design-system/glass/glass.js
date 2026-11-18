@@ -4,7 +4,7 @@
 // browser with a GPU context, iOS Safari included). The CSS material always stays: it is the look before the first
 // snapshot and the whole look where the engine is off (no WebGL, Reduce Transparency, ?glass=flat).
 
-import { attachLens, engineAvailable } from "./engine.js?v=a55d3567b850";
+import { attachLens, engineAvailable } from "./engine.js?v=824c37b7dc74";
 
 export const SHAPES = ["circle", "pill", "rounded"];
 export const MATERIALS = ["light"]; // native light appearance; other materials need user approval

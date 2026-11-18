@@ -9,16 +9,16 @@
 //     в состоянии disabled UI Kit, под ней — причина. Связь вернулась → кнопка снова активна, короткое подтверждение.
 //     Ошибка отправки (сервис не ответил, таймаут, ошибка сервиса) — пояснение под кнопкой, выбор сохраняется.
 // Проданные лоты (сценарий прототипа, catalog/availability.js): остаются на своих местах, фото приглушено, метка
-// «Продан», «×» работает как обычно. Под заголовком — «2 лота уже проданы», над кнопкой — что сделать; пока
+// «Продан», «×» работает как обычно. Под заголовком — «2 товара больше недоступны», слева от кнопки — что сделать; пока
 // проданный лот в примерке, «Заказать на примерку» в состоянии disabled UI Kit и ничего не отправляет.
 // Подложка — ModalBackdrop UI Kit (легкое затемнение + небольшой размытие, слой целиком плавно появляется).
-import { createModalBackdrop, openBackdrop, closeBackdrop } from "../design-system/backdrop/backdrop.js?v=44bbd0c399aa";
-import { createButton, setButtonState } from "../design-system/components/button/button.js?v=44bbd0c399aa";
-import { createIcon } from "../design-system/icons/icon.js?v=44bbd0c399aa";
-import { lotsWord, money } from "./filters.js?v=44bbd0c399aa";
-import { soldPhrase } from "./availability.js?v=44bbd0c399aa";
-import { pill } from "./ui.js?v=44bbd0c399aa";
-import { offlineIcon } from "./offline.js?v=44bbd0c399aa";
+import { createModalBackdrop, openBackdrop, closeBackdrop } from "../design-system/backdrop/backdrop.js?v=db2d8224091c";
+import { createButton, setButtonState } from "../design-system/components/button/button.js?v=db2d8224091c";
+import { createIcon } from "../design-system/icons/icon.js?v=db2d8224091c";
+import { money } from "./filters.js?v=db2d8224091c";
+import { unavailablePhrase } from "./availability.js?v=db2d8224091c";
+import { pill } from "./ui.js?v=db2d8224091c";
+import { offlineIcon } from "./offline.js?v=db2d8224091c";
 
 const h = (tag, className, ...children) => {
   const n = document.createElement(tag);
@@ -56,7 +56,7 @@ export function createFittingSheet({ byId, selection, network, availability, onA
   function build() {
     const title = h("h2", "kfs__title");
     title.id = "kfsTitle";
-    const status = h("p", "kfs__status", h("span", "kfs__status-icon", createIcon("info", { size: 16 })), h("span", "kfs__status-text"));
+    const status = h("p", "kfs__status", h("span", "kfs__status-text"));
     status.setAttribute("role", "status");
     status.hidden = true;
     const closeBtn = createButton({ variant: "secondary", iconPosition: "only", icon: "close", ariaLabel: "Закрыть примерку", onClick: () => close() });
@@ -76,8 +76,8 @@ export function createFittingSheet({ byId, selection, network, availability, onA
     note.setAttribute("role", "status");
     const block = h("p", "kfs__block");
     block.hidden = true;
-    const primary = h("div", "kfs__primary", block, submit, note);
-    const actions = h("div", "kfs__actions", addMore, primary);
+    const primary = h("div", "kfs__primary", submit, note);
+    const actions = h("div", "kfs__actions", block, addMore, primary);
 
     const sheet = h("section", "kfs ds-corner", h("header", "kfs__head", h("div", "kfs__heading", title, status), closeBtn), slots, actions);
     sheet.dataset.cornerEdges = "top";
@@ -155,11 +155,9 @@ export function createFittingSheet({ byId, selection, network, availability, onA
     refs.block.hidden = !sold.length;
     el.toggleAttribute("data-sold", sold.length > 0);
     if (sold.length) {
-      const text = soldPhrase(sold.length, lotsWord);
+      const text = unavailablePhrase(sold.length);
       if (refs.statusText.textContent !== text) refs.statusText.textContent = text;
-      const left = ids.length - sold.length;
-      const hint = !left ? "Уберите проданные лоты и выберите другие в каталоге"
-        : `Уберите ${sold.length === 1 ? "недоступный лот" : "недоступные лоты"}, чтобы заказать ${left === 1 ? "оставшийся" : "остальные"}`;
+      const hint = sold.length === 1 ? "Удалите недоступный товар, чтобы продолжить" : "Удалите недоступные товары, чтобы продолжить";
       if (refs.block.textContent !== hint) refs.block.textContent = hint;
     }
     paintNet();

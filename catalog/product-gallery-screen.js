@@ -1,6 +1,5 @@
 // Карточка товара (основная с 2026-11-17) — «галерея» по образцу страницы товара Hermès, айдентика THE CULTT.
-// Маршрут #/product-x/<id>; открывается из каталога для всех лотов. Прежняя карточка (product-screen.js, #/product/<id>)
-// сохранена и включается в симуляторе («Прежняя»).
+// Маршрут #/product-x/<id>; открывается из каталога для всех лотов — единственная карточка товара.
 //   • Фото во всю высоту экрана, 3:4 (ширина = высота × 3/4), идут лентой вправо с зазором 4 px и уходят за край.
 //     Прокрутка свободная: нативная инерция, без scroll-snap и без доводки — где палец отпустил, там лента и стоит.
 //   • Внизу слева — лента миниатюр (как у Hermès): полупрозрачные, активная — непрозрачная с тонкой чертой снизу;
@@ -14,14 +13,14 @@
 //     галерея заканчивается у верхнего края панели (перекрытие 8 px), фото уменьшаются с сохранением 3:4. Переход
 //     анимирован (360 мс, как выезд панели; без анимации при reduced motion), позиция прокрутки сохраняется.
 // Выбор на примерку — общий selection (каталог, панель примерки, шторка).
-import { createButton } from "../design-system/components/button/button.js?v=7a26db7e6a78";
-import { createTextAction } from "../design-system/components/text-action/text-action.js?v=7a26db7e6a78";
-import { createIconButton } from "../design-system/components/icon-button/icon-button.js?v=7a26db7e6a78";
-import { createIcon } from "../design-system/icons/icon.js?v=7a26db7e6a78";
-import { money } from "./filters.js?v=7a26db7e6a78";
-import { pill } from "./ui.js?v=7a26db7e6a78";
-import { openFullscreen } from "./fullscreen.js?v=7a26db7e6a78";
-import { lotDetails } from "./lot-details.js?v=7a26db7e6a78";
+import { createButton } from "../design-system/components/button/button.js?v=44bbd0c399aa";
+import { createTextAction } from "../design-system/components/text-action/text-action.js?v=44bbd0c399aa";
+import { createIconButton } from "../design-system/components/icon-button/icon-button.js?v=44bbd0c399aa";
+import { createIcon } from "../design-system/icons/icon.js?v=44bbd0c399aa";
+import { money } from "./filters.js?v=44bbd0c399aa";
+import { pill } from "./ui.js?v=44bbd0c399aa";
+import { openFullscreen } from "./fullscreen.js?v=44bbd0c399aa";
+import { lotDetails } from "./lot-details.js?v=44bbd0c399aa";
 
 const h = (tag, className, ...children) => {
   const n = document.createElement(tag);

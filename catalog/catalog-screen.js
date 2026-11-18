@@ -1,16 +1,16 @@
 // Каталог витрины (iPad, landscape): шапка (логотип, поиск, фильтры), категории + сортировка, активные фильтры и
 // число лотов, сетка карточек с выбором на примерку, панель примерки. Состояние каталога — в памяти, сбрасывается
 // reset() (по бездействию). Выбор на примерку живёт в selection и не сбрасывается при поиске / фильтрах / сортировке.
-import { createButton } from "../design-system/components/button/button.js?v=7a26db7e6a78";
-import { createTextAction } from "../design-system/components/text-action/text-action.js?v=7a26db7e6a78";
-import { createIcon } from "../design-system/icons/icon.js?v=7a26db7e6a78";
+import { createButton } from "../design-system/components/button/button.js?v=44bbd0c399aa";
+import { createTextAction } from "../design-system/components/text-action/text-action.js?v=44bbd0c399aa";
+import { createIcon } from "../design-system/icons/icon.js?v=44bbd0c399aa";
 import {
   CATEGORIES, FILTER_SETS, SORT_OPTIONS, applyCatalog, activeFilterChips, assignFilters, clearFilters, createCatalogState, createFilters, lotsWord, money,
-} from "./filters.js?v=7a26db7e6a78";
-import { openFilterSheet } from "./filter-sheet.js?v=7a26db7e6a78";
-import { pill } from "./ui.js?v=7a26db7e6a78";
-import { createFittingPanel } from "./fitting-panel.js?v=7a26db7e6a78";
-import { createFittingSheet } from "./fitting-sheet.js?v=7a26db7e6a78";
+} from "./filters.js?v=44bbd0c399aa";
+import { openFilterSheet } from "./filter-sheet.js?v=44bbd0c399aa";
+import { pill } from "./ui.js?v=44bbd0c399aa";
+import { createFittingPanel } from "./fitting-panel.js?v=44bbd0c399aa";
+import { createFittingSheet } from "./fitting-sheet.js?v=44bbd0c399aa";
 
 const h = (tag, className, ...children) => {
   const n = document.createElement(tag);
@@ -25,7 +25,7 @@ const iconCache = new Map();
 const loadIcon = (url) => { if (!iconCache.has(url)) iconCache.set(url, fetch(url).then((r) => r.text()).catch(() => "")); return iconCache.get(url); };
 const loadFiltersIcon = () => loadIcon(FILTERS_ICON_URL);
 
-export function mountCatalog(root, { products, selection, network, onSubmitFitting, onOpenProduct, onAddMore }) {
+export function mountCatalog(root, { products, selection, network, availability, onSubmitFitting, onOpenProduct, onAddMore }) {
   const state = createCatalogState();
   const byId = new Map(products.map((p) => [p.id, p]));
 
@@ -119,7 +119,7 @@ export function mountCatalog(root, { products, selection, network, onSubmitFitti
   toast.hidden = true;
 
   // «Открыть примерку» → bottom sheet over the catalog; it reads and edits the same selection.
-  const fittingSheet = createFittingSheet({ byId, selection, network, onSubmit: (ids) => onSubmitFitting?.(ids), onAddMore: () => onAddMore?.() });
+  const fittingSheet = createFittingSheet({ byId, selection, network, availability, onSubmit: (ids) => onSubmitFitting?.(ids), onAddMore: () => onAddMore?.() });
   const panel = createFittingPanel({ byId, limit: selection.limit, onOpen: () => { closeMenu(); hideToast(); fittingSheet.open(); } });
   root.append(top, nav, scroller, toast, panel.el);
 
@@ -290,7 +290,7 @@ export function mountCatalog(root, { products, selection, network, onSubmitFitti
 
     const chips = activeFilterChips(state);
     chipsBox.replaceChildren(...chips.map((c) => {
-      const chip = h("button", "kc-chip ds-corner ds-text-body-s", h("span", null, c.label), h("span", "kc-chip__x", createIcon("close", { size: 16 })));
+      const chip = h("button", "kc-chip ds-corner ds-text-body-s", h("span", "kc-chip__label", c.label), h("span", "kc-chip__x", createIcon("close", { size: 16 })));
       chip.type = "button";
       chip.dataset.corner = "circular";
       chip.setAttribute("aria-label", `Убрать фильтр: ${c.label}`);

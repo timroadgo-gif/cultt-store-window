@@ -5,7 +5,7 @@
 // The app (app.html) runs in an iframe of exactly the device's landscape CSS viewport; only a CSS transform on the
 // whole device scales it visually, so the app's innerWidth / innerHeight and media queries never see the window size.
 // One iframe for the whole session: switching devices resizes it and keeps the app state.
-import { DEVICES, deviceById } from "./devices.js?v=7a26db7e6a78";
+import { DEVICES, deviceById } from "./devices.js?v=44bbd0c399aa";
 
 const $ = (id) => document.getElementById(id);
 const els = {
@@ -106,21 +106,6 @@ function route() {
   else layout();
 }
 
-// Product page variant: the gallery page is the main one; «Прежняя» shows the previous page (?pdp=classic in the
-// shell URL, passed to the app on load and switched live through the app's simulator hook).
-const pdpButtons = [...document.querySelectorAll("[data-pdp]")];
-let pdp = new URLSearchParams(location.search).get("pdp") === "classic" ? "standard" : "gallery";
-function paintPdp() { for (const b of pdpButtons) b.setAttribute("aria-pressed", String(b.dataset.pdp === pdp)); document.body.dataset.pdpVariant = pdp; }
-for (const b of pdpButtons) b.addEventListener("click", () => {
-  pdp = b.dataset.pdp;
-  const url = new URL(location.href);
-  if (pdp === "standard") url.searchParams.set("pdp", "classic"); else url.searchParams.delete("pdp");
-  history.replaceState(null, "", url);
-  els.app.contentWindow?.__kiosk?.setPdpVariant(pdp);
-  paintPdp();
-});
-paintPdp();
-
 // Connection test states (prototype only; the app never shows these controls): «Онлайн» = the real connection,
 // «Офлайн» / «Переподключение» are simulated inside the app (no real request is made while simulated).
 // ?net=offline|reconnecting in the shell URL is passed to the app on load and switched live through its hook.
@@ -140,6 +125,40 @@ paintNet();
 const orderFailure = document.getElementById("orderFailure");
 orderFailure.addEventListener("change", () => { els.app.contentWindow?.__kiosk?.setNextOrderFailure(orderFailure.value || null); });
 setInterval(() => { const k = els.app.contentWindow?.__kiosk; if (k && !k.network.nextOrderFailure && orderFailure.value) orderFailure.value = ""; }, 500);
+
+// Prototype scenarios: «Часть лотов продана» fills the fitting selection with 5 fixed lots (2 sold) and opens the
+// fitting sheet; «Обычный режим» removes the sold marks. ?scenario=sold in the shell URL runs it when the app loads.
+const scenarioBtn = document.getElementById("scenarioBtn");
+const scenarioMenu = document.getElementById("scenarioMenu");
+const scenarioItems = [...scenarioMenu.querySelectorAll("[data-scenario]")];
+let scenario = new URLSearchParams(location.search).get("scenario") === "sold" ? "sold" : "";
+function paintScenario() {
+  for (const b of scenarioItems) b.setAttribute("aria-checked", String(b.dataset.scenario === scenario));
+  scenarioBtn.toggleAttribute("data-active", !!scenario);
+  scenarioBtn.title = scenario ? "Активен сценарий «Часть лотов продана»" : "";
+  scenarioBtn.setAttribute("aria-label", scenario ? "Сценарии — активен «Часть лотов продана»" : "Сценарии");
+  const url = new URL(location.href);
+  if (scenario) url.searchParams.set("scenario", scenario); else url.searchParams.delete("scenario");
+  if (url.href !== location.href) history.replaceState(null, "", url);
+}
+function toggleScenarioMenu(open = scenarioMenu.hidden) {
+  scenarioMenu.hidden = !open;
+  scenarioBtn.setAttribute("aria-expanded", String(open));
+  if (open) scenarioItems.find((b) => b.getAttribute("aria-checked") === "true")?.focus();
+}
+scenarioBtn.addEventListener("click", () => toggleScenarioMenu());
+for (const b of scenarioItems) b.addEventListener("click", () => {
+  scenario = b.dataset.scenario;
+  els.app.contentWindow?.__kiosk?.runScenario(scenario || null);
+  toggleScenarioMenu(false);
+  scenarioBtn.focus();
+  paintScenario();
+});
+document.addEventListener("click", (e) => { if (!scenarioMenu.hidden && !e.target.closest("#scenarios")) toggleScenarioMenu(false); });
+document.addEventListener("keydown", (e) => { if (e.key === "Escape" && !scenarioMenu.hidden) { toggleScenarioMenu(false); scenarioBtn.focus(); } });
+// The app ends the scenario itself when the next visitor starts (selection cleared): keep the toolbar in sync.
+setInterval(() => { const k = els.app.contentWindow?.__kiosk; if (k && scenario && !k.scenario.name) { scenario = ""; paintScenario(); } }, 500);
+paintScenario();
 
 els.back.addEventListener("click", () => { location.hash = ""; });
 els.select.addEventListener("change", () => { location.hash = els.select.value + (zoom === "100" ? "/100" : ""); });

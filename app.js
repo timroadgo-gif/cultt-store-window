@@ -1,28 +1,28 @@
 // THE CULTT store-window kiosk (iPad, landscape).
-// Screens by hash: "#/" (or empty) = welcome / attract (idle state), "#/catalog" = catalog, "#/product/<id>" = product
-// page; the fitting tray and the fitting sheet are shared by both. After «Заказать на примерку» succeeds, the
+// Screens by hash: "#/" (or empty) = welcome / attract (idle state), "#/catalog" = catalog, "#/product-x/<id>" = product
+// page (old "#/product/<id>" links redirect there); the fitting tray and the fitting sheet are shared by both. After «Заказать на примерку» succeeds, the
 // confirmation screen (request number, 10 s) covers everything and then returns to the welcome screen.
 // Visitor state (catalog search / filters / sort, fitting selection) lives in memory only; it is cleared by the
 // inactivity warning (restart / timeout) and after a confirmed fitting request.
 // Connectivity (catalog/network.js): one monitor for all screens. Without a connection everything local keeps working
 // (catalog, filters, sort, product pages, the fitting selection and its sheet); only sending the fitting request is
 // blocked. A compact notice (catalog/offline.js) is placed per screen; recovery is automatic and keeps all state.
-import { createButton } from "./design-system/components/button/button.js?v=7a26db7e6a78";
-import { pill } from "./catalog/ui.js?v=7a26db7e6a78";
-import { idleTimeoutMs, warningSeconds } from "./config.js?v=7a26db7e6a78";
-import { createIdleTimer } from "./idle.js?v=7a26db7e6a78";
-import { mountShowcase } from "./showcase.js?v=7a26db7e6a78";
-import { SHOWCASE_COLUMNS } from "./products.js?v=7a26db7e6a78";
-import { CATALOG_PRODUCTS } from "./catalog/products.js?v=7a26db7e6a78";
-import { createSelection } from "./catalog/selection.js?v=7a26db7e6a78";
-import { mountCatalog } from "./catalog/catalog-screen.js?v=7a26db7e6a78";
-import { OrderError, nextOrderFailure, setNextOrderFailure, submitFittingRequest } from "./catalog/request.js?v=7a26db7e6a78";
-import { createNetwork } from "./catalog/network.js?v=7a26db7e6a78";
-import { createOfflineBanner, watchImages } from "./catalog/offline.js?v=7a26db7e6a78";
-import { createConfirmScreen } from "./catalog/confirm-screen.js?v=7a26db7e6a78";
-import { createIdleWarning } from "./catalog/idle-warning.js?v=7a26db7e6a78";
-import { mountProduct } from "./catalog/product-screen.js?v=7a26db7e6a78";
-import { mountProductGallery } from "./catalog/product-gallery-screen.js?v=7a26db7e6a78";
+import { createButton } from "./design-system/components/button/button.js?v=44bbd0c399aa";
+import { pill } from "./catalog/ui.js?v=44bbd0c399aa";
+import { idleTimeoutMs, warningSeconds } from "./config.js?v=44bbd0c399aa";
+import { createIdleTimer } from "./idle.js?v=44bbd0c399aa";
+import { mountShowcase } from "./showcase.js?v=44bbd0c399aa";
+import { SHOWCASE_COLUMNS } from "./products.js?v=44bbd0c399aa";
+import { CATALOG_PRODUCTS } from "./catalog/products.js?v=44bbd0c399aa";
+import { createSelection } from "./catalog/selection.js?v=44bbd0c399aa";
+import { mountCatalog } from "./catalog/catalog-screen.js?v=44bbd0c399aa";
+import { OrderError, nextOrderFailure, setNextOrderFailure, submitFittingRequest } from "./catalog/request.js?v=44bbd0c399aa";
+import { createNetwork } from "./catalog/network.js?v=44bbd0c399aa";
+import { createOfflineBanner, watchImages } from "./catalog/offline.js?v=44bbd0c399aa";
+import { SOLD_SCENARIO, createAvailability } from "./catalog/availability.js?v=44bbd0c399aa";
+import { createConfirmScreen } from "./catalog/confirm-screen.js?v=44bbd0c399aa";
+import { createIdleWarning } from "./catalog/idle-warning.js?v=44bbd0c399aa";
+import { mountProductGallery } from "./catalog/product-gallery-screen.js?v=44bbd0c399aa";
 
 const ROUTES = { welcome: "#/", catalog: "#/catalog", product: "#/product/", productX: "#/product-x/" };
 const $ = (sel) => document.querySelector(sel);
@@ -38,24 +38,29 @@ const images = watchImages(network);
 }
 const showcase = mountShowcase($("#showcase"), SHOWCASE_COLUMNS);
 
-const selection = createSelection({ onChange: (change) => { catalog.onSelectionChange(change); product.onSelectionChange(change); productX.onSelectionChange(change); } });
+// Prototype scenarios (simulator → «Сценарии»): sold marks live apart from the product data; a lot leaving the selection
+// drops its mark, a cleared selection (next visitor) drops them all.
+const availability = createAvailability();
+const selection = createSelection({ onChange: (change) => {
+  if (change.type === "remove") availability.release(change.id);
+  if (change.type === "clear") availability.reset();
+  catalog.onSelectionChange(change);
+  productX.onSelectionChange(change);
+} });
 const catalog = mountCatalog($("#catalogScreen"), {
-  products: CATALOG_PRODUCTS, selection, network,
+  products: CATALOG_PRODUCTS, selection, network, availability,
   onSubmitFitting: (ids) => submitAndConfirm(ids),
   onOpenProduct: (id) => openProduct(id),
-  onAddMore: () => { if (currentRoute() === "product") go("catalog"); },
+  onAddMore: () => { if (currentRoute() === "productx") go("catalog"); },
 });
-const product = mountProduct($("#productScreen"), { byId, selection, onBack: () => go("catalog"), onOpenFitting: () => catalog.fittingSheet.open() });
-// Product page: the gallery page (product-gallery-screen.js) is the main one since 2026-11-17; the previous page
-// (product-screen.js) stays available through the simulator switch «Прежняя» (or ?pdp=classic). Same data, same selection.
+// Product page: the gallery page (product-gallery-screen.js) — the only product page.
 const productX = mountProductGallery($("#productXScreen"), { byId, selection, onBack: () => go("catalog"), onOpenFitting: () => catalog.fittingSheet.open() });
-let pdpVariant = new URLSearchParams(location.search).get("pdp") === "classic" ? "standard" : "gallery";
 
 // Catalog scroll position survives a visit to a product page (the catalog is hidden, not rebuilt).
 let catalogScroll = 0;
 function openProduct(id) {
   catalogScroll = catalog.scroller.scrollTop;
-  location.hash = (pdpVariant === "gallery" ? ROUTES.productX : ROUTES.product) + encodeURIComponent(id);
+  location.hash = ROUTES.productX + encodeURIComponent(id);
 }
 // Confirmation: shown only after the (mock) submission resolved. Once its entrance is done, the session is reset under
 // the opaque layer (selection, catalog, overlays) and the welcome screen is set behind it; leaving just fades it out.
@@ -106,7 +111,6 @@ function resetSession() {
   startedAt = null;
   if (warning.state.open) warning.dispose();
   selection.clear();
-  product.reset();
   productX.reset();
   catalog.reset();
   catalogScroll = 0;
@@ -133,14 +137,15 @@ const productXIdFromHash = () => (location.hash.startsWith(ROUTES.productX) ? de
 function currentRoute() {
   if (location.hash === ROUTES.catalog) return "catalog";
   if (productXIdFromHash()) return byId.has(productXIdFromHash()) ? "productx" : "catalog";
-  if (productIdFromHash()) return byId.has(productIdFromHash()) ? "product" : "catalog";
   return "welcome";
 }
 
 let lastRoute = null;
 function render() {
+  // Old links to the previous product page (#/product/<id>) open the same lot on the product page.
+  if (productIdFromHash()) history.replaceState(null, "", ROUTES.productX + encodeURIComponent(productIdFromHash()));
   const route = currentRoute();
-  if ((productIdFromHash() || productXIdFromHash()) && route === "catalog") history.replaceState(null, "", ROUTES.catalog);
+  if (productXIdFromHash() && route === "catalog") history.replaceState(null, "", ROUTES.catalog);
   document.documentElement.dataset.screen = route;
   for (const s of document.querySelectorAll("[data-screen-id]")) {
     const on = s.dataset.screenId === route;
@@ -148,18 +153,16 @@ function render() {
     s.inert = !on;
   }
   if (route !== "catalog") catalog.closeOverlays();
-  if (route !== "product") product.close({ immediate: true });
   if (route !== "productx") productX.close({ immediate: true });
-  if (route !== "catalog" && route !== "product" && route !== "productx") catalog.closeFittingSheet();
-  if (route === "product") product.show(productIdFromHash());
+  if (route !== "catalog" && route !== "productx") catalog.closeFittingSheet();
   if (route === "productx") productX.show(productXIdFromHash());
   // One fitting tray, shown on the catalog and on the product page.
-  const trayHost = { catalog: "#catalogScreen", product: "#productScreen", productx: "#productXScreen" }[route];
+  const trayHost = { catalog: "#catalogScreen", productx: "#productXScreen" }[route];
   if (trayHost) $(trayHost).append(catalog.panel.el);
   // Offline notice: in the catalog flow under the header; floating top-right elsewhere (not on the confirmation).
   if (route === "catalog") offlineBanner.place(null, { placement: "inline", after: catalog.header });
-  else offlineBanner.place($({ welcome: "#welcomeScreen", product: "#productScreen", productx: "#productXScreen" }[route] ?? "#welcomeScreen"));
-  if (route === "catalog" && (lastRoute === "product" || lastRoute === "productx")) catalog.scroller.scrollTop = catalogScroll;
+  else offlineBanner.place($({ welcome: "#welcomeScreen", productx: "#productXScreen" }[route] ?? "#welcomeScreen"));
+  if (route === "catalog" && lastRoute === "productx") catalog.scroller.scrollTop = catalogScroll;
   lastRoute = route;
   // The welcome screen is the idle state: the showcase runs there, the idle timer runs everywhere else.
   showcase.setRunning(route === "welcome");
@@ -170,9 +173,24 @@ function render() {
   }
 }
 
+// «Часть лотов продана»: 5 fixed lots in the fitting selection, the 2nd and the 4th sold, the fitting sheet open.
+// "sold" | null (back to normal: the marks are removed, the selection stays).
+function runScenario(name) {
+  if (name !== "sold") { availability.reset(); return availability.scenario; }
+  if (warning.state.open) warning.dispose();
+  catalog.closeFittingSheet();
+  selection.clear();
+  for (const id of SOLD_SCENARIO.ids) selection.toggle(id);
+  availability.start("sold", SOLD_SCENARIO.sold);
+  if (currentRoute() !== "catalog" && currentRoute() !== "productx") go("catalog");
+  catalog.fittingSheet.open();
+  return availability.scenario;
+}
+
 addEventListener("hashchange", render);
 addEventListener("pagehide", () => idle.stop());
 render();
+if (new URLSearchParams(location.search).get("scenario") === "sold") runScenario("sold"); // simulator: ?scenario=sold
 
 // Read-only hooks for automated checks (Playwright); no behaviour depends on them.
 window.__kiosk = {
@@ -181,16 +199,7 @@ window.__kiosk = {
   get idleTimeoutMs() { return idle.timeoutMs; },
   get warning() { return warning.state; },
   get session() { return { startedAt, selectedLots: selection.size, selection: selection.ids }; },
-  get product() { return product.state; },
   get productX() { return productX.state; },
-  get pdpVariant() { return pdpVariant; },
-  // Simulator control: switch the product page variant; an open product page switches in place.
-  setPdpVariant(v) {
-    pdpVariant = v === "gallery" ? "gallery" : "standard";
-    const id = productIdFromHash() || productXIdFromHash();
-    if (id && byId.has(id)) history.replaceState(null, "", (pdpVariant === "gallery" ? ROUTES.productX : ROUTES.product) + encodeURIComponent(id)), render();
-    return pdpVariant;
-  },
   get confirm() { return confirm.state; },
   get network() { return { ...network.state, canOrder: network.canOrder, failedImages: images.failed, nextOrderFailure: nextOrderFailure() }; },
   get fitting() { return catalog.fittingSheet.state; },
@@ -201,5 +210,8 @@ window.__kiosk = {
   setNetwork(mode) { return network.simulate(mode === "online" ? null : mode); },
   // Simulator control: make the next fitting request fail although the connection is fine ("server" | "timeout").
   setNextOrderFailure(kind) { return setNextOrderFailure(kind); },
+  // Simulator control: prototype scenario "sold" | null.
+  runScenario(name) { return runScenario(name); },
+  get scenario() { return { name: availability.scenario, sold: availability.sold }; },
   get catalog() { const s = catalog.state; return { query: s.query, category: s.category, sort: s.sort, types: [...s.types], brands: [...s.brands], models: [...s.models], colors: [...s.colors], conditions: [...s.conditions], priceMin: s.priceMin, priceMax: s.priceMax, scrollTop: catalog.scroller.scrollTop }; },
 };

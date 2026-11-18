@@ -8,13 +8,17 @@
 //   • Без связи шторка работает как обычно (убрать, «Добавить еще», закрыть); заблокирована только отправка: кнопка
 //     в состоянии disabled UI Kit, под ней — причина. Связь вернулась → кнопка снова активна, короткое подтверждение.
 //     Ошибка отправки (сервис не ответил, таймаут, ошибка сервиса) — пояснение под кнопкой, выбор сохраняется.
+// Проданные лоты (сценарий прототипа, catalog/availability.js): остаются на своих местах, фото приглушено, метка
+// «Продан», «×» работает как обычно. Под заголовком — «2 лота уже проданы», над кнопкой — что сделать; пока
+// проданный лот в примерке, «Заказать на примерку» в состоянии disabled UI Kit и ничего не отправляет.
 // Подложка — ModalBackdrop UI Kit (легкое затемнение + небольшой размытие, слой целиком плавно появляется).
-import { createModalBackdrop, openBackdrop, closeBackdrop } from "../design-system/backdrop/backdrop.js?v=7a26db7e6a78";
-import { createButton, setButtonState } from "../design-system/components/button/button.js?v=7a26db7e6a78";
-import { createIcon } from "../design-system/icons/icon.js?v=7a26db7e6a78";
-import { money } from "./filters.js?v=7a26db7e6a78";
-import { pill } from "./ui.js?v=7a26db7e6a78";
-import { offlineIcon } from "./offline.js?v=7a26db7e6a78";
+import { createModalBackdrop, openBackdrop, closeBackdrop } from "../design-system/backdrop/backdrop.js?v=44bbd0c399aa";
+import { createButton, setButtonState } from "../design-system/components/button/button.js?v=44bbd0c399aa";
+import { createIcon } from "../design-system/icons/icon.js?v=44bbd0c399aa";
+import { lotsWord, money } from "./filters.js?v=44bbd0c399aa";
+import { soldPhrase } from "./availability.js?v=44bbd0c399aa";
+import { pill } from "./ui.js?v=44bbd0c399aa";
+import { offlineIcon } from "./offline.js?v=44bbd0c399aa";
 
 const h = (tag, className, ...children) => {
   const n = document.createElement(tag);
@@ -39,7 +43,9 @@ const NOTES = {
 };
 const RESTORED_MS = 4000;
 
-export function createFittingSheet({ byId, selection, network, onAddMore, onSubmit }) {
+export function createFittingSheet({ byId, selection, network, availability, onAddMore, onSubmit }) {
+  const isSold = (id) => !!availability?.isSold(id);
+  const soldIds = () => selection.ids.filter(isSold);
   let backdrop = null;
   let el = null;
   let refs = null;
@@ -50,6 +56,9 @@ export function createFittingSheet({ byId, selection, network, onAddMore, onSubm
   function build() {
     const title = h("h2", "kfs__title");
     title.id = "kfsTitle";
+    const status = h("p", "kfs__status", h("span", "kfs__status-icon", createIcon("info", { size: 16 })), h("span", "kfs__status-text"));
+    status.setAttribute("role", "status");
+    status.hidden = true;
     const closeBtn = createButton({ variant: "secondary", iconPosition: "only", icon: "close", ariaLabel: "Закрыть примерку", onClick: () => close() });
     closeBtn.classList.add("kfs__close", "kc-tool");
     closeBtn.dataset.corner = "circular";
@@ -65,15 +74,17 @@ export function createFittingSheet({ byId, selection, network, onAddMore, onSubm
     const noteText = h("span", "kfs__note-text", NOTE_DEFAULT);
     const note = h("p", "kfs__note", noteIcon, noteText);
     note.setAttribute("role", "status");
-    const primary = h("div", "kfs__primary", submit, note);
+    const block = h("p", "kfs__block");
+    block.hidden = true;
+    const primary = h("div", "kfs__primary", block, submit, note);
     const actions = h("div", "kfs__actions", addMore, primary);
 
-    const sheet = h("section", "kfs ds-corner", h("header", "kfs__head", title, closeBtn), slots, actions);
+    const sheet = h("section", "kfs ds-corner", h("header", "kfs__head", h("div", "kfs__heading", title, status), closeBtn), slots, actions);
     sheet.dataset.cornerEdges = "top";
     sheet.setAttribute("role", "dialog");
     sheet.setAttribute("aria-modal", "true");
     sheet.setAttribute("aria-labelledby", "kfsTitle");
-    refs = { title, slots, addMore, closeBtn, submit, note, noteText };
+    refs = { title, status, statusText: status.lastChild, block, slots, addMore, closeBtn, submit, note, noteText };
     return sheet;
   }
 
@@ -86,8 +97,9 @@ export function createFittingSheet({ byId, selection, network, onAddMore, onSubm
     remove.setAttribute("aria-label", `Убрать из примерки: ${p.brand} ${p.name}`);
     remove.append(h("span", "kfs-item__remove-visual ds-corner", createIcon("close", { size: 16 })));
     remove.addEventListener("click", () => removeItem(id));
+    const badge = h("span", "kfs-item__badge", "Продан");
     const node = h("li", "kfs-item",
-      h("div", "kfs-item__media ds-corner", img, remove),
+      h("div", "kfs-item__media ds-corner", img, badge, remove),
       // Same text block as the catalog card (kc-card__*): condition → «Brand Model» on one line → price.
       h("div", "kc-card__info kfs-item__info",
         h("p", "kc-card__condition ds-text-body-s", p.condition),
@@ -125,6 +137,32 @@ export function createFittingSheet({ byId, selection, network, onAddMore, onSubm
     [...wanted, ...empties].forEach((node, i) => {
       if (refs.slots.children[i] !== node) refs.slots.insertBefore(node, refs.slots.children[i] ?? null);
     });
+    paintSold();
+  }
+
+  // Sold lots: mark the cards, the line under the title and the hint above the button (counts are always live).
+  function paintSold() {
+    if (!refs) return;
+    const ids = selection.ids;
+    const sold = ids.filter(isSold);
+    for (const [id, node] of itemNodes) {
+      const on = isSold(id);
+      node.toggleAttribute("data-sold", on);
+      const p = byId.get(id);
+      node.querySelector(".kfs-item__remove").setAttribute("aria-label", `Убрать из примерки: ${p.brand} ${p.name}${on ? " (продан)" : ""}`);
+    }
+    refs.status.hidden = !sold.length;
+    refs.block.hidden = !sold.length;
+    el.toggleAttribute("data-sold", sold.length > 0);
+    if (sold.length) {
+      const text = soldPhrase(sold.length, lotsWord);
+      if (refs.statusText.textContent !== text) refs.statusText.textContent = text;
+      const left = ids.length - sold.length;
+      const hint = !left ? "Уберите проданные лоты и выберите другие в каталоге"
+        : `Уберите ${sold.length === 1 ? "недоступный лот" : "недоступные лоты"}, чтобы заказать ${left === 1 ? "оставшийся" : "остальные"}`;
+      if (refs.block.textContent !== hint) refs.block.textContent = hint;
+    }
+    paintNet();
   }
 
   // FLIP: remember positions, apply the new layout, animate every moved node from its old place.
@@ -162,7 +200,7 @@ export function createFittingSheet({ byId, selection, network, onAddMore, onSubm
   let restoredTimer = null;
   let wasShown = network?.state.shown ?? false;
   async function submitRequest() {
-    if (submitting || !selection.size) return;
+    if (submitting || !selection.size || soldIds().length) return; // sold lots in the selection: nothing is sent
     if (network && !network.canOrder) { error = network.state.reason === "service" ? "unreachable" : "offline"; paintNet(); return; } // no request at all
     submitting = true;
     error = null;
@@ -185,12 +223,14 @@ export function createFittingSheet({ byId, selection, network, onAddMore, onSubm
     if (!refs) return;
     const s = network?.state ?? { shown: false, online: true, reason: null };
     const blocked = s.shown || (!s.online && (error === "offline" || error === "unreachable"));
-    if (!submitting) setButtonState(refs.submit, blocked ? "disabled" : "default");
+    const soldBlocked = soldIds().length > 0;
+    if (!submitting) setButtonState(refs.submit, blocked || soldBlocked ? "disabled" : "default");
     let kind = "default";
     if (blocked) kind = s.reason === "service" ? "service" : "offline";
     else if (error === "timeout" || error === "server" || error === "unreachable") kind = error === "unreachable" ? "timeout" : error;
     else if (Date.now() < restoredUntil) kind = "restored";
     refs.note.dataset.kind = kind;
+    refs.note.hidden = soldBlocked && kind === "default"; // the hint above the button is the one message then
     const text = kind === "default" ? NOTE_DEFAULT : NOTES[kind];
     if (refs.noteText.textContent !== text) refs.noteText.textContent = text;
   }
@@ -205,6 +245,8 @@ export function createFittingSheet({ byId, selection, network, onAddMore, onSubm
     wasShown = s.shown;
     paintNet();
   });
+
+  availability?.subscribe(() => { if (el) paintSold(); });
 
   // Called by the catalog on every selection change while the sheet exists.
   function update() {
@@ -245,6 +287,7 @@ export function createFittingSheet({ byId, selection, network, onAddMore, onSubm
   return {
     open, close, update,
     get isOpen() { return !!el && el.dataset.state === "open"; },
-    get state() { return { open: !!el && el.dataset.state === "open", submit: refs?.submit.dataset.state ?? null, note: refs?.note.dataset.kind ?? null, noteText: refs?.noteText.textContent ?? null, error }; },
+    get state() { return { open: !!el && el.dataset.state === "open", submit: refs?.submit.dataset.state ?? null, note: refs?.note.dataset.kind ?? null, noteText: refs?.noteText.textContent ?? null, error,
+      sold: soldIds(), status: refs && !refs.status.hidden ? refs.statusText.textContent : null, block: refs && !refs.block.hidden ? refs.block.textContent : null }; },
   };
 }

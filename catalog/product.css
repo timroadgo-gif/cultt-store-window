@@ -71,10 +71,8 @@
   overflow-y: hidden;
   scroll-snap-type: x mandatory;
   overscroll-behavior-x: contain;
-  scrollbar-width: none;
   touch-action: pan-x;
 }
-.kp-track::-webkit-scrollbar { display: none; }
 .kp-slide {
   --corner-radius: var(--kc-product-radius);
   flex: 0 0 calc((100% - var(--kp-photo-gap)) / 2);

@@ -13,14 +13,14 @@
 //     галерея заканчивается у верхнего края панели (перекрытие 8 px), фото уменьшаются с сохранением 3:4. Переход
 //     анимирован (360 мс, как выезд панели; без анимации при reduced motion), позиция прокрутки сохраняется.
 // Выбор на примерку — общий selection (каталог, панель примерки, шторка).
-import { createButton } from "../design-system/components/button/button.js?v=431dfa42b9fe";
-import { createTextAction } from "../design-system/components/text-action/text-action.js?v=431dfa42b9fe";
-import { createIconButton } from "../design-system/components/icon-button/icon-button.js?v=431dfa42b9fe";
-import { createIcon } from "../design-system/icons/icon.js?v=431dfa42b9fe";
-import { money } from "./filters.js?v=431dfa42b9fe";
-import { pill } from "./ui.js?v=431dfa42b9fe";
-import { openFullscreen } from "./fullscreen.js?v=431dfa42b9fe";
-import { lotDetails } from "./lot-details.js?v=431dfa42b9fe";
+import { createButton } from "../design-system/components/button/button.js?v=384110737152";
+import { createTextAction } from "../design-system/components/text-action/text-action.js?v=384110737152";
+import { createIconButton } from "../design-system/components/icon-button/icon-button.js?v=384110737152";
+import { createIcon } from "../design-system/icons/icon.js?v=384110737152";
+import { money } from "./filters.js?v=384110737152";
+import { pill } from "./ui.js?v=384110737152";
+import { openFullscreen } from "./fullscreen.js?v=384110737152";
+import { lotDetails } from "./lot-details.js?v=384110737152";
 
 const h = (tag, className, ...children) => {
   const n = document.createElement(tag);
@@ -65,7 +65,16 @@ export function mountProductGallery(root, { byId, selection, onBack, onOpenFitti
   const fixed = h("div", "kpx-panel__fixed", h("div", "kpx-head", condition, name, price), h("div", "kpx-actions", cta, limit));
   const scroll = h("div", "kpx-panel__scroll", sections);
   const panel = h("section", "kpx-panel ds-corner", fixed, scroll);
-  scroll.addEventListener("scroll", () => scroll.toggleAttribute("data-scrolled", scroll.scrollTop > 2), { passive: true });
+  // Edge state of the accordion list: scrolled away from the top (boundary line + top fade), more below (bottom fade).
+  // Re-checked on scroll and whenever the list or the panel changes size (accordions opening, another lot, resize).
+  function paintEdges() {
+    const max = scroll.scrollHeight - scroll.clientHeight;
+    panel.toggleAttribute("data-scrolled", scroll.scrollTop > 2);
+    panel.toggleAttribute("data-more", max > 2 && scroll.scrollTop < max - 2);
+  }
+  scroll.addEventListener("scroll", paintEdges, { passive: true });
+  new ResizeObserver(paintEdges).observe(sections);
+  new ResizeObserver(paintEdges).observe(scroll);
   panel.setAttribute("aria-labelledby", "productXTitle");
 
   root.append(gallery, top, panel);
@@ -88,7 +97,8 @@ export function mountProductGallery(root, { byId, selection, onBack, onOpenFitti
       btn.setAttribute("aria-expanded", String(open));
       sec.toggleAttribute("data-open", open);
       // keep the opened section in view inside the panel's own scroll area (small iPads)
-      if (open) setTimeout(() => scroll.scrollTo({ top: Math.min(sec.offsetTop, scroll.scrollHeight), behavior: "smooth" }), 280);
+      // (position measured inside the list itself — offsetTop would count from the panel and overshoot by the summary)
+      if (open) setTimeout(() => scroll.scrollTo({ top: sec.getBoundingClientRect().top - scroll.getBoundingClientRect().top + scroll.scrollTop, behavior: "smooth" }), 280);
     });
     return sec;
   }

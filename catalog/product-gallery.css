@@ -36,11 +36,9 @@
   overflow-x: auto;
   overflow-y: hidden;
   overscroll-behavior-x: contain; /* free scrolling: no scroll-snap, native momentum, no correction afterwards */
-  scrollbar-width: none;
   touch-action: pan-x;
   padding-inline-end: calc(var(--kpx-panel-w) + var(--kpx-edge) * 2); /* the last photo can be seen fully left of the panel */
 }
-.kpx-track::-webkit-scrollbar { display: none; }
 .kpx-photo { flex: none; height: 100%; aspect-ratio: 3 / 4; padding: 0; border: 0; background: var(--color-grey-1); cursor: zoom-in; -webkit-tap-highlight-color: transparent; }
 .kpx-photo__image { display: block; width: 100%; height: 100%; object-fit: cover; pointer-events: none; -webkit-user-drag: none; }
 /* Thumbnails (Hermès treatment): bottom-left, small 3:4, no container; inactive almost transparent, the active one opaque
@@ -56,10 +54,8 @@
   max-width: calc(var(--kpx-thumb-w) * 7 + var(--kpx-thumb-gap) * 6);
   padding: 2px 0 8px; /* room for the active line */
   overflow-x: auto;
-  scrollbar-width: none;
   touch-action: pan-x;
 }
-.kpx-thumbs::-webkit-scrollbar { display: none; }
 .kpx-thumb {
   position: relative;
   flex: none;
@@ -104,9 +100,44 @@
   box-shadow: 0 0 0 1px color-mix(in srgb, var(--color-ink) 6%, transparent);
   font-family: var(--font-family-sans);
 }
-.kpx-panel__fixed { flex: none; padding: var(--kpx-panel-pad) var(--kpx-panel-pad) 0; }
-.kpx-panel__scroll[data-scrolled] { box-shadow: inset 0 1px 0 var(--kiosk-hairline); }
-.kpx-panel__scroll { flex: 0 1 auto; min-height: 0; overflow-y: auto; overscroll-behavior: contain; padding: var(--spacing-standard-control) var(--kpx-panel-pad) var(--spacing-compact-inline); scrollbar-width: thin; }
+/* Fixed summary + scrolling accordions read as one panel: at rest the first accordion's top hairline sits exactly on the
+   boundary; once the list scrolls, that same line stays on the fixed part (hairline, no shadow) and the content fades out
+   over a short distance just beneath it instead of being cut. A matching fade at the bottom edge while more content
+   follows below. */
+.kpx-panel {
+  --kpx-fade: var(--spacing-standard-control);
+}
+.kpx-panel__fixed {
+  position: relative;
+  z-index: 1;
+  flex: none;
+  padding: var(--kpx-panel-pad) var(--kpx-panel-pad) var(--spacing-standard-control);
+}
+.kpx-panel__fixed::after { /* the boundary hairline, inset like the accordion lines */
+  content: "";
+  position: absolute;
+  left: var(--kpx-panel-pad);
+  right: var(--kpx-panel-pad);
+  bottom: 0;
+  height: 1px;
+  background: var(--kiosk-hairline);
+  opacity: 0;
+  transition: opacity 160ms var(--kc-ease);
+}
+.kpx-panel[data-scrolled] .kpx-panel__fixed::after { opacity: 1; }
+.kpx-panel__scroll {
+  --_top: 0px;
+  --_bottom: 0px;
+  flex: 0 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding: 0 var(--kpx-panel-pad) var(--spacing-compact-inline);
+  -webkit-mask-image: linear-gradient(to bottom, transparent 0, #000 var(--_top), #000 calc(100% - var(--_bottom)), transparent 100%);
+  mask-image: linear-gradient(to bottom, transparent 0, #000 var(--_top), #000 calc(100% - var(--_bottom)), transparent 100%);
+}
+.kpx-panel[data-scrolled] .kpx-panel__scroll { --_top: var(--kpx-fade); }
+.kpx-panel[data-more] .kpx-panel__scroll { --_bottom: var(--kpx-fade); }
 .kpx-head { display: flex; flex-direction: column; }
 .kpx-condition { margin: 0; color: var(--color-grey-7); }
 .kpx-name {
@@ -155,5 +186,5 @@
 
 @media (prefers-reduced-motion: reduce) {
   .kpx.is-entering .kpx-gallery, .ds-button.kpx-cta.is-changed { animation: none; }
-  .kpx-acc__body, .kpx-acc__plus, .kpx-acc__minus, .kpx-gallery, .kpx-thumbs { transition: none; }
+  .kpx-acc__body, .kpx-acc__plus, .kpx-acc__minus, .kpx-gallery, .kpx-thumbs, .kpx-panel__fixed::after { transition: none; }
 }

@@ -210,9 +210,13 @@
 .kc-reset { min-height: var(--kc-chip-height); }
 
 /* ---------- Grid + card ---------- */
+/* Columns come from the real content width: as many as fit at ≥ 196 px, but never more than 5 — a column is at least a
+   fifth of the row (minus gaps). Landscape mini / 11″ / 13″ → 5, portrait 13″ → 4, portrait mini → 3. Without the
+   cap a 13″ screen fit 6 narrower cards, so the photos got smaller on the bigger iPad. */
 .kc-grid {
+  --kc-cols-max: 5;
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(var(--kc-card-min), 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(max(var(--kc-card-min), calc((100% - (var(--kc-cols-max) - 1) * var(--kc-grid-gap-col)) / var(--kc-cols-max))), 1fr));
   gap: var(--kc-grid-gap-row) var(--kc-grid-gap-col);
   align-items: start;
 }

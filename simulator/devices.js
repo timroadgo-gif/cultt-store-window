@@ -12,10 +12,10 @@ export const DEVICES = [
   },
   {
     id: "air",
-    name: "iPad Air",
-    model: "iPad Air 11″ (M2, 2024; у M3, 2025 — тот же экран)",
-    chip: "M2 / M3 · 11″",
-    width: 1180, height: 820, // 820 × 1180 pt portrait
+    name: "iPad Air 13″",
+    model: "iPad Air 13″ (M2, 2024; у M3, 2025 — тот же экран)",
+    chip: "M2 / M3 · 13″",
+    width: 1366, height: 1024, // 1024 × 1366 pt portrait
     bezel: 20, screenRadius: 18, camera: "top", // landscape front camera on the long edge
   },
   {

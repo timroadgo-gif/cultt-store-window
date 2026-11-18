@@ -84,8 +84,8 @@
 
 .kpx-top { position: absolute; z-index: 5; top: calc(var(--spacing-standard-control) + var(--safe-top)); left: calc(var(--spacing-standard-control) + var(--safe-left)); }
 
-/* Floating panel: bottom edge anchored above the fitting tray; grows upward. The identity + primary action part is fixed,
-   the accordions scroll inside when the panel reaches its maximum height, so the button never leaves the screen. */
+/* Floating panel: bottom edge anchored above the fitting tray; grows upward. Summary + accordions scroll inside when the
+   panel reaches its maximum height; the action bar stays at the bottom, so the button never leaves the screen. */
 .kpx-panel {
   --corner-radius: 16px;
   position: absolute;
@@ -100,31 +100,13 @@
   box-shadow: 0 0 0 1px color-mix(in srgb, var(--color-ink) 6%, transparent);
   font-family: var(--font-family-sans);
 }
-/* Fixed summary + scrolling accordions read as one panel: at rest the first accordion's top hairline sits exactly on the
-   boundary; once the list scrolls, that same line stays on the fixed part (hairline, no shadow) and the content fades out
-   over a short distance just beneath it instead of being cut. A matching fade at the bottom edge while more content
-   follows below. */
+/* One card: a scrolling column (summary + accordions) and a persistent action bar at the bottom. The column fades out
+   over a short distance at an edge only while there is more content past it; while content continues under the bar a
+   hairline (inset like the accordion lines) separates them. No shadows. When everything fits, the card is just as tall
+   as its content. */
 .kpx-panel {
   --kpx-fade: var(--spacing-standard-control);
 }
-.kpx-panel__fixed {
-  position: relative;
-  z-index: 1;
-  flex: none;
-  padding: var(--kpx-panel-pad) var(--kpx-panel-pad) var(--spacing-standard-control);
-}
-.kpx-panel__fixed::after { /* the boundary hairline, inset like the accordion lines */
-  content: "";
-  position: absolute;
-  left: var(--kpx-panel-pad);
-  right: var(--kpx-panel-pad);
-  bottom: 0;
-  height: 1px;
-  background: var(--kiosk-hairline);
-  opacity: 0;
-  transition: opacity 160ms var(--kc-ease);
-}
-.kpx-panel[data-scrolled] .kpx-panel__fixed::after { opacity: 1; }
 .kpx-panel__scroll {
   --_top: 0px;
   --_bottom: 0px;
@@ -132,12 +114,26 @@
   min-height: 0;
   overflow-y: auto;
   overscroll-behavior: contain;
-  padding: 0 var(--kpx-panel-pad) var(--spacing-compact-inline);
+  padding: var(--kpx-panel-pad) var(--kpx-panel-pad) 0;
   -webkit-mask-image: linear-gradient(to bottom, transparent 0, #000 var(--_top), #000 calc(100% - var(--_bottom)), transparent 100%);
   mask-image: linear-gradient(to bottom, transparent 0, #000 var(--_top), #000 calc(100% - var(--_bottom)), transparent 100%);
 }
 .kpx-panel[data-scrolled] .kpx-panel__scroll { --_top: var(--kpx-fade); }
 .kpx-panel[data-more] .kpx-panel__scroll { --_bottom: var(--kpx-fade); }
+.kpx-panel__bar { position: relative; flex: none; padding: var(--spacing-standard-control) var(--kpx-panel-pad) var(--kpx-panel-pad); }
+.kpx-panel__bar::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: var(--kpx-panel-pad);
+  right: var(--kpx-panel-pad);
+  height: 1px;
+  background: var(--kiosk-hairline);
+  opacity: 0;
+  transition: opacity 160ms var(--kc-ease);
+}
+.kpx-panel[data-more] .kpx-panel__bar::before { opacity: 1; }
+.kpx-sections { margin-top: var(--spacing-standard-block); }
 .kpx-head { display: flex; flex-direction: column; }
 .kpx-condition { margin: 0; color: var(--color-grey-7); }
 .kpx-name {
@@ -153,7 +149,7 @@
   color: var(--color-ink);
   font-variant-numeric: tabular-nums;
 }
-.kpx-actions { display: flex; flex-direction: column; gap: var(--spacing-standard-text-group); margin-top: var(--spacing-standard-block); }
+.kpx-actions { display: flex; flex-direction: column; gap: var(--spacing-standard-text-group); }
 .ds-button.kpx-cta { --_height: var(--kiosk-action-height); --_fs: var(--kiosk-btn-fs); --_lh: var(--kiosk-btn-lh); transition: background-color 180ms var(--kc-ease), color 180ms var(--kc-ease); }
 .ds-button.kpx-cta.is-changed { animation: kp-cta 220ms var(--kc-ease); }
 .kpx-limit { display: flex; flex-direction: column; align-items: flex-start; gap: var(--spacing-compact-stack); color: var(--color-grey-7); }
@@ -178,13 +174,12 @@
 .kpx-acc[data-open] .kpx-acc__body { grid-template-rows: 1fr; }
 .kpx-acc__inner { min-height: 0; overflow: hidden; }
 /* Rows like the website: «Год выпуска: 2019» — grey label, ink value, one line each. */
-.kpx-attrs { display: flex; flex-direction: column; gap: var(--spacing-compact-inline); padding: 0 0 var(--spacing-standard-control); }
-.kpx-attr { margin: 0; font: var(--font-weight-regular) var(--text-body-size) / var(--text-body-line-height) var(--font-family-sans); color: var(--color-ink); }
-.kpx-attr__label { color: var(--color-grey-7); }
+/* Specification list: label and value in one tone and weight (Manrope 400, 13/20, grey-7), compact even rhythm. */
+.kpx-attrs { display: flex; flex-direction: column; gap: var(--spacing-compact-stack); padding: 0 0 var(--spacing-standard-control); }
+.kpx-attr { margin: 0; font: var(--font-weight-regular) 13px / 20px var(--font-family-sans); color: var(--color-grey-7); }
 .kpx-attr__value { font-variant-numeric: tabular-nums; }
-.kpx-demo { margin: var(--spacing-compact-stack) 0 0; font: var(--font-weight-regular) var(--text-caption-size) / var(--text-caption-line-height) var(--font-family-sans); color: var(--color-grey-6); }
 
 @media (prefers-reduced-motion: reduce) {
   .kpx.is-entering .kpx-gallery, .ds-button.kpx-cta.is-changed { animation: none; }
-  .kpx-acc__body, .kpx-acc__plus, .kpx-acc__minus, .kpx-gallery, .kpx-thumbs, .kpx-panel__fixed::after { transition: none; }
+  .kpx-acc__body, .kpx-acc__plus, .kpx-acc__minus, .kpx-gallery, .kpx-thumbs, .kpx-panel__bar::before { transition: none; }
 }

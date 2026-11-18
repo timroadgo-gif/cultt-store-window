@@ -13,14 +13,14 @@
 //     галерея заканчивается у верхнего края панели (перекрытие 8 px), фото уменьшаются с сохранением 3:4. Переход
 //     анимирован (360 мс, как выезд панели; без анимации при reduced motion), позиция прокрутки сохраняется.
 // Выбор на примерку — общий selection (каталог, панель примерки, шторка).
-import { createButton } from "../design-system/components/button/button.js?v=c4dc60a7b65c";
-import { createTextAction } from "../design-system/components/text-action/text-action.js?v=c4dc60a7b65c";
-import { createIconButton } from "../design-system/components/icon-button/icon-button.js?v=c4dc60a7b65c";
-import { createIcon } from "../design-system/icons/icon.js?v=c4dc60a7b65c";
-import { money } from "./filters.js?v=c4dc60a7b65c";
-import { pill } from "./ui.js?v=c4dc60a7b65c";
-import { openFullscreen } from "./fullscreen.js?v=c4dc60a7b65c";
-import { lotDetails } from "./lot-details.js?v=c4dc60a7b65c";
+import { createButton } from "../design-system/components/button/button.js?v=1a397976f53a";
+import { createTextAction } from "../design-system/components/text-action/text-action.js?v=1a397976f53a";
+import { createIconButton } from "../design-system/components/icon-button/icon-button.js?v=1a397976f53a";
+import { createIcon } from "../design-system/icons/icon.js?v=1a397976f53a";
+import { money } from "./filters.js?v=1a397976f53a";
+import { pill } from "./ui.js?v=1a397976f53a";
+import { openFullscreen } from "./fullscreen.js?v=1a397976f53a";
+import { lotDetails } from "./lot-details.js?v=1a397976f53a";
 
 const h = (tag, className, ...children) => {
   const n = document.createElement(tag);
@@ -61,11 +61,12 @@ export function mountProductGallery(root, { byId, selection, onBack, onOpenFitti
   const infoBody = h("div", "kpx-attrs");
   const sizeBody = h("div", "kpx-attrs");
   const sections = h("div", "kpx-sections", accordion("info", "Информация о лоте", infoBody), accordion("sizes", "Размеры", sizeBody));
-  // Fixed part (identity + primary action) and a scrollable part (accordions): expanding never pushes the button away.
-  const fixed = h("div", "kpx-panel__fixed", h("div", "kpx-head", condition, name, price), h("div", "kpx-actions", cta, limit));
-  const scroll = h("div", "kpx-panel__scroll", sections);
-  const panel = h("section", "kpx-panel ds-corner", fixed, scroll);
-  // Edge state of the accordion list: scrolled away from the top (boundary line + top fade), more below (bottom fade).
+  // One scrolling column (condition, name, price, accordions) above a persistent action bar at the bottom of the card:
+  // the CTA is always reachable, however much of the information is open.
+  const scroll = h("div", "kpx-panel__scroll", h("div", "kpx-head", condition, name, price), sections);
+  const bar = h("div", "kpx-panel__bar", h("div", "kpx-actions", cta, limit));
+  const panel = h("section", "kpx-panel ds-corner", scroll, bar);
+  // Edge state of the column: scrolled away from the top (top fade), more below (bottom fade + hairline over the bar).
   // Re-checked on scroll and whenever the list or the panel changes size (accordions opening, another lot, resize).
   function paintEdges() {
     const max = scroll.scrollHeight - scroll.clientHeight;
@@ -197,7 +198,7 @@ export function mountProductGallery(root, { byId, selection, onBack, onOpenFitti
     });
   }
 
-  // ---------- Information (catalog/lot-details.js: real attributes first, marked demo defaults for the rest) ----------
+  // ---------- Information (catalog/lot-details.js: real attributes first, demo defaults for the rest — data-demo) ----------
   function buildInfo() {
     const d = lotDetails(product);
     const rows = (list) => list.map((r) => {
@@ -205,9 +206,8 @@ export function mountProductGallery(root, { byId, selection, onBack, onOpenFitti
       if (r.demo) row.dataset.demo = "";
       return row;
     });
-    const note = (list) => (list.some((r) => r.demo) ? h("p", "kpx-demo", "Часть значений — демонстрационные, для макета") : null);
-    infoBody.replaceChildren(...rows(d.info), note(d.info) ?? "");
-    sizeBody.replaceChildren(...rows(d.sizes), note(d.sizes) ?? "");
+    infoBody.replaceChildren(...rows(d.info));
+    sizeBody.replaceChildren(...rows(d.sizes));
     for (const sec of sections.children) { sec.removeAttribute("data-open"); sec.querySelector(".kpx-acc__head").setAttribute("aria-expanded", "false"); }
   }
 

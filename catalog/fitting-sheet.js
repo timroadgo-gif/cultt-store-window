@@ -9,16 +9,16 @@
 //     в состоянии disabled UI Kit, под ней — причина. Связь вернулась → кнопка снова активна, короткое подтверждение.
 //     Ошибка отправки (сервис не ответил, таймаут, ошибка сервиса) — пояснение под кнопкой, выбор сохраняется.
 // Проданные лоты (сценарий прототипа, catalog/availability.js): остаются на своих местах, фото приглушено, метка
-// «Продан», «×» работает как обычно. Под заголовком — «2 товара больше недоступны», слева от кнопки — что сделать; пока
+// «Продан», «×» работает как обычно. Под заголовком — «2 товара больше недоступны», под кнопкой — что сделать; пока
 // проданный лот в примерке, «Заказать на примерку» в состоянии disabled UI Kit и ничего не отправляет.
 // Подложка — ModalBackdrop UI Kit (легкое затемнение + небольшой размытие, слой целиком плавно появляется).
-import { createModalBackdrop, openBackdrop, closeBackdrop } from "../design-system/backdrop/backdrop.js?v=1a397976f53a";
-import { createButton, setButtonState } from "../design-system/components/button/button.js?v=1a397976f53a";
-import { createIcon } from "../design-system/icons/icon.js?v=1a397976f53a";
-import { money } from "./filters.js?v=1a397976f53a";
-import { unavailablePhrase } from "./availability.js?v=1a397976f53a";
-import { pill } from "./ui.js?v=1a397976f53a";
-import { offlineIcon } from "./offline.js?v=1a397976f53a";
+import { createModalBackdrop, openBackdrop, closeBackdrop } from "../design-system/backdrop/backdrop.js?v=579219c791c2";
+import { createButton, setButtonState } from "../design-system/components/button/button.js?v=579219c791c2";
+import { createIcon } from "../design-system/icons/icon.js?v=579219c791c2";
+import { money } from "./filters.js?v=579219c791c2";
+import { unavailablePhrase } from "./availability.js?v=579219c791c2";
+import { pill } from "./ui.js?v=579219c791c2";
+import { offlineIcon } from "./offline.js?v=579219c791c2";
 
 const h = (tag, className, ...children) => {
   const n = document.createElement(tag);
@@ -76,8 +76,8 @@ export function createFittingSheet({ byId, selection, network, availability, onA
     note.setAttribute("role", "status");
     const block = h("p", "kfs__block");
     block.hidden = true;
-    const primary = h("div", "kfs__primary", submit, note);
-    const actions = h("div", "kfs__actions", block, addMore, primary);
+    const primary = h("div", "kfs__primary", submit, block, note); // sold-lot warning sits right under the CTA it explains
+    const actions = h("div", "kfs__actions", addMore, primary);
 
     const sheet = h("section", "kfs ds-corner", h("header", "kfs__head", h("div", "kfs__heading", title, status), closeBtn), slots, actions);
     sheet.dataset.cornerEdges = "top";
@@ -157,7 +157,7 @@ export function createFittingSheet({ byId, selection, network, availability, onA
     if (sold.length) {
       const text = unavailablePhrase(sold.length);
       if (refs.statusText.textContent !== text) refs.statusText.textContent = text;
-      const hint = sold.length === 1 ? "Удалите недоступный товар, чтобы продолжить" : "Удалите недоступные товары, чтобы продолжить";
+      const hint = sold.length === 1 ? "Уберите проданный товар, чтобы продолжить" : "Уберите проданные товары, чтобы продолжить";
       if (refs.block.textContent !== hint) refs.block.textContent = hint;
     }
     paintNet();

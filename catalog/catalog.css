@@ -651,18 +651,15 @@
   box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--color-ink) 22%, transparent);
 }
 
-/* One action row while sold lots remain: the hint on the left, «Добавить еще» (if shown) and the CTA on the right. */
+/* Sold lots in the selection: a short warning directly under the disabled CTA (the note's place), restrained red,
+   small Manrope Regular, centred on the button like the usual note. */
 .kfs__block {
-  flex: 0 1 48ch;
-  min-width: 0;
-  margin: 0 auto 0 0;
-  font: var(--font-weight-regular) 14px / 20px var(--font-family-sans);
-  color: var(--color-grey-7);
-  text-align: left;
-  text-wrap: pretty;
+  margin: 0;
+  font: var(--font-weight-regular) var(--text-caption-size) / var(--text-caption-line-height) var(--font-family-sans);
+  letter-spacing: var(--text-caption-letter-spacing);
+  color: var(--color-red-7);
+  text-align: center;
+  text-wrap: balance;
 }
-.kfs[data-sold] .kfs__actions { align-items: center; justify-content: space-between; gap: var(--spacing-standard-block); }
-.kfs[data-sold] .kfs__add-more { margin-left: auto; }
-.kfs[data-sold] .kfs__add-more + .kfs__primary { margin-left: calc(var(--spacing-standard-text-group) - var(--spacing-standard-block)); }
 
 @media (prefers-reduced-motion: reduce) { .kfs, .kfs-item__image, .kfs-item__info { transition: none; } }

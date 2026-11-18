@@ -8,10 +8,10 @@
 // the ring smoothly. It starts when the entrance (≈ 260 ms) has finished.
 // While open: the app underneath is inert, Escape and other keys are swallowed, background scroll is blocked; the
 // countdown's own updates are not user activity (the idle timer is stopped while the warning is open).
-import { createModalBackdrop, openBackdrop, closeBackdrop } from "../design-system/backdrop/backdrop.js?v=1a397976f53a";
-import { createButton } from "../design-system/components/button/button.js?v=1a397976f53a";
-import { createTextAction } from "../design-system/components/text-action/text-action.js?v=1a397976f53a";
-import { pill } from "./ui.js?v=1a397976f53a";
+import { createModalBackdrop, openBackdrop, closeBackdrop } from "../design-system/backdrop/backdrop.js?v=579219c791c2";
+import { createButton } from "../design-system/components/button/button.js?v=579219c791c2";
+import { createTextAction } from "../design-system/components/text-action/text-action.js?v=579219c791c2";
+import { pill } from "./ui.js?v=579219c791c2";
 
 const h = (tag, className, ...children) => {
   const n = document.createElement(tag);
@@ -36,6 +36,7 @@ export function createIdleWarning({ seconds, onContinue, onRestart, onTimeout, i
   let startTimer = null;
   let resolved = false;
   let inerted = [];
+  let covered = []; // backdrops of modals already open underneath (fitting sheet, filters…)
 
   const swallowKeys = (e) => { // no Escape / keyboard shortcuts reach the page while the decision is pending
     if (!card) return;
@@ -96,7 +97,13 @@ export function createIdleWarning({ seconds, onContinue, onRestart, onTimeout, i
     inerted = inertTargets().filter((n) => n && !n.inert);
     inerted.forEach((n) => { n.inert = true; });
     document.body.append(backdrop, card);
+    // Top-most layer of the whole app: its backdrop always renders the material (dim + blur) over everything below —
+    // screen, open sheets, their own backdrops — instead of being a transparent "nested" backdrop that would leave an
+    // open sheet sharp. The backdrops underneath fade out meanwhile, so dimming and blur are applied exactly once.
+    covered = [...document.querySelectorAll('.ds-backdrop[data-state="open"]')];
+    covered.forEach((b) => b.classList.add("kidle-covered"));
     openBackdrop(backdrop);
+    delete backdrop.dataset.nested;
     void card.offsetWidth;
     card.dataset.state = "open";
     window.addEventListener("keydown", swallowKeys, true);
@@ -150,6 +157,8 @@ export function createIdleWarning({ seconds, onContinue, onRestart, onTimeout, i
     window.removeEventListener("touchmove", blockScroll, true);
     inerted.forEach((n) => { n.inert = false; });
     inerted = [];
+    covered.forEach((b) => b.classList.remove("kidle-covered")); // «Да, продолжить»: the sheet's own backdrop is back
+    covered = [];
     const c = card, b = backdrop;
     card = null; backdrop = null; refs = null;
     if (!c) return;

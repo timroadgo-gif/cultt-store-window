@@ -6,6 +6,8 @@
   --kidle-z: 200000;
 }
 .ds-backdrop.kidle-backdrop { z-index: var(--kidle-z); }
+/* Lower backdrops while the warning is open: hidden (cross-fade with the warning's own backdrop), never doubled. */
+.ds-backdrop.kidle-covered { opacity: 0; transition: opacity 260ms var(--motion-easing-standard); }
 .kidle {
   --corner-radius: var(--alert-radius);
   position: fixed;

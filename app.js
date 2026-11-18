@@ -7,22 +7,22 @@
 // Connectivity (catalog/network.js): one monitor for all screens. Without a connection everything local keeps working
 // (catalog, filters, sort, product pages, the fitting selection and its sheet); only sending the fitting request is
 // blocked. A compact notice (catalog/offline.js) is placed per screen; recovery is automatic and keeps all state.
-import { createButton } from "./design-system/components/button/button.js?v=384110737152";
-import { pill } from "./catalog/ui.js?v=384110737152";
-import { idleTimeoutMs, warningSeconds } from "./config.js?v=384110737152";
-import { createIdleTimer } from "./idle.js?v=384110737152";
-import { mountShowcase } from "./showcase.js?v=384110737152";
-import { SHOWCASE_COLUMNS } from "./products.js?v=384110737152";
-import { CATALOG_PRODUCTS } from "./catalog/products.js?v=384110737152";
-import { createSelection } from "./catalog/selection.js?v=384110737152";
-import { mountCatalog } from "./catalog/catalog-screen.js?v=384110737152";
-import { OrderError, nextOrderFailure, setNextOrderFailure, submitFittingRequest } from "./catalog/request.js?v=384110737152";
-import { createNetwork } from "./catalog/network.js?v=384110737152";
-import { createOfflineBanner, watchImages } from "./catalog/offline.js?v=384110737152";
-import { SOLD_SCENARIO, createAvailability } from "./catalog/availability.js?v=384110737152";
-import { createConfirmScreen } from "./catalog/confirm-screen.js?v=384110737152";
-import { createIdleWarning } from "./catalog/idle-warning.js?v=384110737152";
-import { mountProductGallery } from "./catalog/product-gallery-screen.js?v=384110737152";
+import { createButton } from "./design-system/components/button/button.js?v=a55d3567b850";
+import { pill } from "./catalog/ui.js?v=a55d3567b850";
+import { idleTimeoutMs, warningSeconds } from "./config.js?v=a55d3567b850";
+import { createIdleTimer } from "./idle.js?v=a55d3567b850";
+import { mountShowcase } from "./showcase.js?v=a55d3567b850";
+import { SHOWCASE_COLUMNS } from "./products.js?v=a55d3567b850";
+import { CATALOG_PRODUCTS } from "./catalog/products.js?v=a55d3567b850";
+import { createSelection } from "./catalog/selection.js?v=a55d3567b850";
+import { mountCatalog } from "./catalog/catalog-screen.js?v=a55d3567b850";
+import { OrderError, nextOrderFailure, setNextOrderFailure, submitFittingRequest } from "./catalog/request.js?v=a55d3567b850";
+import { createNetwork } from "./catalog/network.js?v=a55d3567b850";
+import { createOfflineBanner, watchImages } from "./catalog/offline.js?v=a55d3567b850";
+import { SOLD_SCENARIO, createAvailability } from "./catalog/availability.js?v=a55d3567b850";
+import { createConfirmScreen } from "./catalog/confirm-screen.js?v=a55d3567b850";
+import { createIdleWarning } from "./catalog/idle-warning.js?v=a55d3567b850";
+import { mountProductGallery } from "./catalog/product-gallery-screen.js?v=a55d3567b850";
 
 const ROUTES = { welcome: "#/", catalog: "#/catalog", product: "#/product/", productX: "#/product-x/" };
 const $ = (sel) => document.querySelector(sel);

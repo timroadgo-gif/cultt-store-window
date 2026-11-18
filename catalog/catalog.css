@@ -635,6 +635,11 @@
   pointer-events: none;
 }
 .kfs-item[data-sold] .kfs-item__badge { display: inline-flex; }
+/* On a sold card «×» is the action that matters: solid white with a light hairline, so it reads over the faded photo. */
+.kfs-item[data-sold] .kfs-item__remove-visual {
+  background: var(--color-white);
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--color-ink) 22%, transparent);
+}
 
 /* One action row while sold lots remain: the hint on the left, «Добавить еще» (if shown) and the CTA on the right. */
 .kfs__block {

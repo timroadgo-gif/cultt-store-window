@@ -12,13 +12,13 @@
 // «Продан», «×» работает как обычно. Под заголовком — «2 товара больше недоступны», слева от кнопки — что сделать; пока
 // проданный лот в примерке, «Заказать на примерку» в состоянии disabled UI Kit и ничего не отправляет.
 // Подложка — ModalBackdrop UI Kit (легкое затемнение + небольшой размытие, слой целиком плавно появляется).
-import { createModalBackdrop, openBackdrop, closeBackdrop } from "../design-system/backdrop/backdrop.js?v=db2d8224091c";
-import { createButton, setButtonState } from "../design-system/components/button/button.js?v=db2d8224091c";
-import { createIcon } from "../design-system/icons/icon.js?v=db2d8224091c";
-import { money } from "./filters.js?v=db2d8224091c";
-import { unavailablePhrase } from "./availability.js?v=db2d8224091c";
-import { pill } from "./ui.js?v=db2d8224091c";
-import { offlineIcon } from "./offline.js?v=db2d8224091c";
+import { createModalBackdrop, openBackdrop, closeBackdrop } from "../design-system/backdrop/backdrop.js?v=431dfa42b9fe";
+import { createButton, setButtonState } from "../design-system/components/button/button.js?v=431dfa42b9fe";
+import { createIcon } from "../design-system/icons/icon.js?v=431dfa42b9fe";
+import { money } from "./filters.js?v=431dfa42b9fe";
+import { unavailablePhrase } from "./availability.js?v=431dfa42b9fe";
+import { pill } from "./ui.js?v=431dfa42b9fe";
+import { offlineIcon } from "./offline.js?v=431dfa42b9fe";
 
 const h = (tag, className, ...children) => {
   const n = document.createElement(tag);

@@ -288,7 +288,12 @@
 /* Empty result: outline icon → heading → one quiet line → compact CTA, centred in a narrow column with generous air. */
 .kc-empty { flex: 1 0 auto; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: var(--spacing-spacious-group) var(--spacing-standard-block) var(--space-48); text-align: center; } /* a touch above the true centre (optical centre) */
 .kc-empty p { margin: 0; }
-.kc-empty__icon { display: grid; color: var(--color-grey-6); margin-bottom: var(--space-24); }
+.kc-empty__icon { display: grid; color: var(--color-grey-6); margin-bottom: var(--spacing-spacious-group); }
+/* 56 px box (≈ 2× the heading size, like the reference) with a ~1.3 px line instead of the 2.3 px the 24-unit grid
+   would give: stroke icons get a thinner stroke (0.56 unit); outline-fill icons (search) are eroded by a stroke in
+   the surface colour drawn over their 1-unit outline (1 − 0.44 = 0.56 unit). Geometry is not edited. */
+.kc-empty__icon svg[stroke], .kc-empty__icon path[stroke="currentColor"] { stroke-width: .56; }
+.kc-empty__icon svg[fill="currentColor"] path, .kc-empty__icon path[fill="currentColor"] { stroke: var(--kiosk-surface); stroke-width: .44; stroke-linejoin: round; }
 .kc-empty__title { max-width: 28ch; font: var(--font-weight-regular) 20px / 28px var(--font-family-sans); letter-spacing: var(--font-tracking-snug, 0); color: var(--color-ink); text-wrap: balance; }
 .kc-empty__text { max-width: 40ch; margin-top: var(--spacing-compact-inline) !important; font: var(--font-weight-regular) 15px / 22px var(--font-family-sans); color: var(--color-grey-7); text-wrap: balance; }
 .kc-empty__actions { display: flex; flex-wrap: wrap; justify-content: center; gap: var(--spacing-standard-text-group); margin-top: var(--spacing-spacious-group); }

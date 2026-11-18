@@ -1,16 +1,16 @@
 // Каталог витрины (iPad, landscape): шапка (логотип, поиск, фильтры), категории + сортировка, активные фильтры и
 // число лотов, сетка карточек с выбором на примерку, панель примерки. Состояние каталога — в памяти, сбрасывается
 // reset() (по бездействию). Выбор на примерку живёт в selection и не сбрасывается при поиске / фильтрах / сортировке.
-import { createButton } from "../design-system/components/button/button.js?v=f47ea6fdf577";
-import { createTextAction } from "../design-system/components/text-action/text-action.js?v=f47ea6fdf577";
-import { createIcon } from "../design-system/icons/icon.js?v=f47ea6fdf577";
+import { createButton } from "../design-system/components/button/button.js?v=c4dc60a7b65c";
+import { createTextAction } from "../design-system/components/text-action/text-action.js?v=c4dc60a7b65c";
+import { createIcon } from "../design-system/icons/icon.js?v=c4dc60a7b65c";
 import {
   CATEGORIES, FILTER_SETS, SORT_OPTIONS, applyCatalog, activeFilterChips, assignFilters, clearFilters, createCatalogState, createFilters, lotsWord, money,
-} from "./filters.js?v=f47ea6fdf577";
-import { openFilterSheet } from "./filter-sheet.js?v=f47ea6fdf577";
-import { pill } from "./ui.js?v=f47ea6fdf577";
-import { createFittingPanel } from "./fitting-panel.js?v=f47ea6fdf577";
-import { createFittingSheet } from "./fitting-sheet.js?v=f47ea6fdf577";
+} from "./filters.js?v=c4dc60a7b65c";
+import { openFilterSheet } from "./filter-sheet.js?v=c4dc60a7b65c";
+import { pill } from "./ui.js?v=c4dc60a7b65c";
+import { createFittingPanel } from "./fitting-panel.js?v=c4dc60a7b65c";
+import { createFittingSheet } from "./fitting-sheet.js?v=c4dc60a7b65c";
 
 const h = (tag, className, ...children) => {
   const n = document.createElement(tag);
@@ -336,10 +336,10 @@ export function mountCatalog(root, { products, selection, network, availability,
       primary: { label: "Показать все лоты", run: () => { state.category = "all"; } }, secondary: null,
     };
   }
-  // Outline icon per state (kit icons at 36 px → the same ~1.5 px line for every icon): a search came back empty / the filter list / an empty rail.
+  // Outline icon per state (kit icons at 56 px, line thinned to ~1.3 px in catalog.css): a search came back empty / the filter list / an empty rail.
   const EMPTY_ICON = { "search-filters": "search", search: "search", filters: "search-list", category: "hanger" };
   function paintEmpty(c) {
-    if (empty.dataset.kind !== c.kind) emptyIcon.replaceChildren(createIcon(EMPTY_ICON[c.kind], { size: 36 }));
+    if (empty.dataset.kind !== c.kind) emptyIcon.replaceChildren(createIcon(EMPTY_ICON[c.kind], { size: 56 }));
     empty.dataset.kind = c.kind;
     emptyTitle.textContent = c.title;
     emptyText.textContent = c.text;
